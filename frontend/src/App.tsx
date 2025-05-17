@@ -4,8 +4,8 @@ import './App.css';
 
 import { Routes,Route,BrowserRouter } from 'react-router-dom';
 
-import DashboardLayout from "./pages/dashboardLayout/DashboardLayout";
-import DashboardPage from "./pages/dashboardLayout/DashboardPage";
+import DashboardLayout from "./layouts/DashboardLayout";
+import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";
 
 
