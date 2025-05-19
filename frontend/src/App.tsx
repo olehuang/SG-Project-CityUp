@@ -2,23 +2,34 @@ import React from 'react';
 import logo from './logo.svg';
 import './App.css';
 
-import { Routes,Route,BrowserRouter } from 'react-router-dom';
+import { Routes,Route,BrowserRouter,createBrowserRouter,createRoutesFromElements } from 'react-router-dom';
 
 import DashboardLayout from "./layouts/DashboardLayout";
 import DashboardPage from "./pages/DashboardPage";
 import HomePage from "./pages/HomePage";
+import {AuthProvider} from "./components/AuthProvider";
+import KeycloakClient from "./components/keycloak";
+import Keycloakinit from "./components/Keycloakinit";
+import ProtectedRouter from "./components/ProtectedRouter";
+
 
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route element={<HomePage />}  path="/" />{/*HomePage*/}
-          <Route element={<DashboardLayout/> }  >{/*DashboardLayout*/}
-             <Route element={<DashboardPage/>} path="/dashboard" />{/*DashboardPage*/}
-          </Route>{/*DashboardLayout*/}
-      </Routes>
-    </BrowserRouter>
+    <AuthProvider>
+        <BrowserRouter>
+            <Routes>
+                <Route element={<Keycloakinit />}>{/*KeycloakInit*/}
+                    <Route element={<HomePage />}  path="/" />{/*HomePage*/}
+                    <Route element={<ProtectedRouter />}>{/*ProtectedRouter*/}
+                        <Route element={<DashboardLayout/> }  >{/*DashboardLayout*/}
+                            <Route element={<DashboardPage/>} path="/dashboard" />{/*DashboardPage*/}
+                        </Route>{/*DashboardLayout*/}
+                    </Route>{/*ProtectedRouter*/}
+                </Route>{/*KeycloakInit*/}
+            </Routes>
+        </BrowserRouter>
+    </AuthProvider>
   );
 }
 
