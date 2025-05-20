@@ -9,7 +9,6 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-
 import UploadIcon from '@mui/icons-material/Upload';      // ← 新增图标
 import { Link } from 'react-router-dom';                 // ← 引入 Link
 
@@ -20,6 +19,7 @@ import AuthProvider, {useAuthHook} from "./AuthProvider";
 import LogOut from "./LogOut";
 import Profile from "./Profile";
 import UploadHistory from "./UploadHistory";
+import Upload from "./Upload";
 
 interface SidebarProps {
     open: boolean;
@@ -41,6 +41,13 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 <ListItemIcon>
                                 </ListItemIcon>
                                 <ListItemText primary={'dashboard'} />
+                            </ListItemButton>
+                        </ListItem>
+                        {/* Upload 页面入口 */}
+                        <ListItem disablePadding>
+                            <ListItemButton component={Link} to="/dashboard/upload">
+                                <ListItemIcon><UploadIcon/></ListItemIcon>
+                                <ListItemText primary="Upload" />
                             </ListItemButton>
                         </ListItem>
                     </List>
