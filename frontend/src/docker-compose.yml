@@ -1,11 +1,11 @@
 services:
 
   keycloak:
-    image: quay.io/keycloak/keycloak:26.0.7
+    image: quay.io/keycloak/keycloak:latest
     container_name: keycloak
     environment:
       # path where import Order
-      # absolut Order path like:D:\sherad\7semester\BP\
+      # absolut Order path like:
       # or under same order :./import
       - KEYCLOAK_IMPORT=./import
     ports:
