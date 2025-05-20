@@ -10,6 +10,10 @@ import ListItemText from '@mui/material/ListItemText';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 
+import UploadIcon from '@mui/icons-material/Upload';      // ← 新增图标
+import { Link } from 'react-router-dom';                 // ← 引入 Link
+
+
 interface SidebarProps {
     open: boolean;
     onClose: () => void;
@@ -32,6 +36,35 @@ const DrawerList = (
         </List>
     </Box>
 );
+
+// const DrawerList = (
+//       <Box>
+//             <List>
+//               {/* 仪表盘入口 */}
+//               <ListItem disablePadding>
+//                 <ListItemButton component={Link} to="/dashboard">
+//                   <ListItemIcon>
+//                     <InboxIcon />
+//                   </ListItemIcon>
+//                   <ListItemText primary="Dashboard" />
+//                 </ListItemButton>
+//               </ListItem>
+//               {/* Upload 入口 */}
+//               <ListItem disablePadding>
+//                 <ListItemButton component={Link} to="/dashboard/upload">
+//                   <ListItemIcon>
+//                     <UploadIcon />
+//                   </ListItemIcon>
+//                   <ListItemText primary="Upload" />
+//                 </ListItemButton>
+//               </ListItem>
+//             </List>
+//             <Divider />
+//             <List>
+//               {/* 这里可以继续添加其他分组或菜单项 */}
+//             </List>
+//           </Box>
+//     );
 
 const Sidebar = ({ open, onClose }: SidebarProps) => {
     return (
