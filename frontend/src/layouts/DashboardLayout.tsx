@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Sidebar from '../Components/Sidebar';
-import TopBar from '../Components/TopBar';
+import Sidebar from "../components/Sidebar";
+import TopBar from '../components/TopBar';
 import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
 
