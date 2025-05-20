@@ -30,7 +30,9 @@ const decodeAndVerifyToken = async (token: string) => {
 const extractUserInfo = async (token: string) => {
     const payload = await decodeAndVerifyToken(token);
     const getUserRoles =  (): string[] => {
-        const roles = creatKeycloak.tokenParsed.resource_access?.['cityup']?.roles || [];
+        const roles = payload.resource_access?.['cityup']?.roles ||
+            payload.realm_access?.roles ||
+            [];
         return roles;
     };
 

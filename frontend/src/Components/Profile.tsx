@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import Collapse from '@mui/material/Collapse';
 import List from '@mui/material/List';
 import ListItemButton from '@mui/material/ListItemButton';
@@ -8,18 +8,28 @@ import ListSubheader from '@mui/material/ListSubheader';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeycloakClient from "./keycloak";
-import {AuthProvider,useAuthHook} from "../components/AuthProvider";
 
 
-const Profile = ()=>{
+
+const Profile = ({ token }: { token: string })=>{
     const [openProfile, setOpenProfile] = useState(false);
-    const {user_id,userInfo}=useAuthHook();
-    const [admin,setAdmin]=useState(false);
+    const [roles, setRoles] = useState<string[]>([]);
+
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();//
         setOpenProfile(!openProfile);
     };
 
+    useEffect(() => {
+        const fetchRoles = async () => {
+        const userInfo= await KeycloakClient.extractUserInfo(token);
+        setRoles(userInfo?.roles||[]);
+        console.log(userInfo?.roles);
+        }
+        if (token!==null && token!==undefined) {
+            fetchRoles();
+        }
+    },[token]);
 
     const keycloakBaseUrl = "http://localhost:8080";
 
@@ -51,18 +61,12 @@ const Profile = ()=>{
                         </ListItemIcon>
                         <ListItemText primary="User Information" />
                     </ListItemButton>
-                    {
+                    {roles.includes('admin') &&
                         <ListItemButton sx={{ pl: 4 }} onClick={hanldAdminPanel}>
                         <ListItemIcon>
                         </ListItemIcon>
                         <ListItemText primary="Admin Panel" />
                     </ListItemButton>}
-                    <ListItemButton sx={{ pl: 4 }}>
-                        <ListItemIcon>
-                        </ListItemIcon>
-                        <ListItemText primary="History" />
-                    </ListItemButton>
-
                 </List>
             </Collapse>
         </List>

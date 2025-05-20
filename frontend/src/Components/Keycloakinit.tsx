@@ -7,8 +7,8 @@ import {useEffect, useState} from "react";
 
 const KeycloakInit = () => {
 
-    const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading,setUserInfo}=useAuthHook();
-    const  [token, setToken] = useState(null);
+    const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading,setToken}=useAuthHook();
+
 
     //listen Keycloak Certification status changes
     useEffect(() => {
@@ -27,12 +27,13 @@ const KeycloakInit = () => {
         const {token} = tokens || {};
         try{
             setToken(token); //  token to storge
+
             KeycloakClient.extractUserInfo(token)
                 .then(userInfo => {
                     if (userInfo) {
                         setUserID(userInfo.userId)//global
                         setAuthLoading(false);
-                        setUserInfo(userInfo);
+                        setToken(token);
                         console.log(userInfo);
                     }
                 });
