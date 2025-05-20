@@ -5,12 +5,18 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
+import {useNavigate} from "react-router-dom";
 
 interface TopBarProps {
     onMenuClick: () => void;
 }
 
 const TopBar = ({ onMenuClick }: TopBarProps) => {
+
+    const navigate=useNavigate();
+    const handleClickToHome=()=>{//temp to homepage
+        navigate("/");
+    }
     return (
         <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
             <Toolbar>
@@ -22,7 +28,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 >
                     <MenuIcon />
                 </IconButton>
-                <Typography variant="h6" component="div" sx={{ ml: 2 }}>
+                <Typography variant="h6" component="div" sx={{ ml: 2 }} onClick={handleClickToHome}>
                     CityUp
                 </Typography>
             </Toolbar>
