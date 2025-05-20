@@ -6,7 +6,7 @@ from main import app
 client = TestClient(app)
 
 def test_upload_photo():
-    # test_image_content = b"fake image data"  # 用一个假的图像数据模拟
+    # test_image_content = b"fake image data"
     # test_file = io.BytesIO(test_image_content)
     # test_file.name = "test.jpg"
     with open("F:\Bild\Weixin Image_20250520074752.png", "rb") as f:
