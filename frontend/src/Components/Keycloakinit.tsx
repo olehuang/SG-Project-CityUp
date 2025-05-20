@@ -7,7 +7,7 @@ import {useEffect, useState} from "react";
 
 const KeycloakInit = () => {
 
-    const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading}=useAuthHook();
+    const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading,setUserInfo}=useAuthHook();
     const  [token, setToken] = useState(null);
 
     //listen Keycloak Certification status changes
@@ -32,6 +32,7 @@ const KeycloakInit = () => {
                     if (userInfo) {
                         setUserID(userInfo.userId)//global
                         setAuthLoading(false);
+                        setUserInfo(userInfo);
                         console.log(userInfo);
                     }
                 });

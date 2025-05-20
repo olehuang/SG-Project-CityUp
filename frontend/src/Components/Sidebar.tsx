@@ -14,12 +14,12 @@ import  {useNavigate} from 'react-router-dom';
 import Keycloak from "./keycloak";
 import AuthProvider from "./AuthProvider";
 import LogOut from "./LogOut";
+import Profile from "./Profile";
 
 interface SidebarProps {
     open: boolean;
     onClose: () => void;
 }
-
 
 
 
@@ -36,22 +36,16 @@ const DrawerList = (
         </List>
         <Divider />
         <List>
-            <ListItem key={'Profile'} disablePadding>
-                <ListItemButton>
-                    <ListItemIcon>
-                        Profile
-                    </ListItemIcon>
-                    <ListItemText  />
-                </ListItemButton>
-            </ListItem>
-            <ListItem key={'LogOut'}>
-                <ListItemButton >
-                    <ListItemIcon>
-                        <LogOut/>
-                    </ListItemIcon>
-                    <ListItemText  />
-                </ListItemButton>
-            </ListItem>
+            {/*<ListItem key={'Profile'} disablePadding>*/}
+            {/*    <ListItemButton>*/}
+            {/*        <ListItemIcon>*/}
+            {/*        </ListItemIcon>*/}
+
+            {/*        <ListItemText  />*/}
+            {/*    </ListItemButton>*/}
+            {/*</ListItem>*/}
+            <Profile />
+            <LogOut/>
         </List>
     </Box>
 );
@@ -59,8 +53,8 @@ const DrawerList = (
 const Sidebar = ({ open, onClose }: SidebarProps) => {
 
     return (
-        <Drawer open={open} onClose={onClose}>
-            <Box sx={{ width: 250 }} role="presentation" onClick={onClose}>
+        <Drawer open={open} onClick={onClose}>
+            <Box sx={{ width: 250 }} role="presentation" >{/*onClose={onClose}*/}
                 {DrawerList}
             </Box>
         </Drawer>

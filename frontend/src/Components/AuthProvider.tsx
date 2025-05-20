@@ -10,6 +10,8 @@ interface AuthContextProps {
     setUserID: (value: string) => void; // setting keycloak user id to user_id
     authLoading: boolean;
     setAuthLoading: (value: boolean) => void;
+    userInfo:any;               //user Info
+    setUserInfo:(value:any) => void;
 }
 
 // setting default value
@@ -19,7 +21,9 @@ const defaultAuthContext: AuthContextProps = {
     user_id:"",              //default is empty
     setUserID:()=>{},  // default is empty
     authLoading: true,
-    setAuthLoading: (value: boolean) => {}
+    setAuthLoading: (value: boolean) => {},
+    setUserInfo:()=>{},
+    userInfo:""
 };
 // AuthContext erstellt mit default value
 const AuthContext = createContext<AuthContextProps>(defaultAuthContext);
@@ -29,9 +33,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     const [auth, setAuth] = useState(false); // manager global login status
     const [user_id,setUserID] = useState<string>("");//manage global user_id
     const [authLoading, setAuthLoading] = useState(true);
+    const [userInfo, setUserInfo] = useState<string|null>(null);
 
     return (
-        <AuthContext.Provider value={{ auth, setAuth,user_id,setUserID,authLoading, setAuthLoading}}>
+        <AuthContext.Provider value={{ auth, setAuth,
+            user_id,setUserID,authLoading,setAuthLoading,userInfo,setUserInfo}}>
             {children}
         </AuthContext.Provider>
     )

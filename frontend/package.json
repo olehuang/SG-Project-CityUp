@@ -5,6 +5,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@keycloak/keycloak-account-ui": "^26.2.4",
     "@mui/material": "^7.1.0",
     "@react-keycloak/web": "^3.4.0",
     "@testing-library/dom": "^10.4.0",
