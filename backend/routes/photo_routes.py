@@ -8,6 +8,7 @@ import os
 import shutil
 import uuid
 import time
+from pymongo import ReturnDocument
 
 from db_entities import MongoDB, Photo, ReviewStatus
 # from utils.logger import log_error
@@ -15,11 +16,11 @@ from db_entities import MongoDB, Photo, ReviewStatus
 router = APIRouter()
 photo_collection = MongoDB.get_instance().get_collection("photos")
 
-# 配置上传目录
+# 上传目录
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads/photos")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# 配置访问URL的基础路径
+# 访问URL的基础路径
 UPLOAD_URL_PATH = os.getenv("UPLOAD_URL_PATH", "static/photos")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 #
@@ -54,7 +55,7 @@ async def upload_photo(
     try:
         # 验证文件类型
         if not photo.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="上传的文件必须是图片格式")
+            raise HTTPException(status_code=400, detail="The uploaded file must be in image format")
 
         # 生成唯一文件名
         timestamp = int(time.time())
@@ -83,7 +84,7 @@ async def upload_photo(
         if not result.inserted_id:
             # 如果数据库插入失败，删除已上传的文件
             os.remove(file_path)
-            raise HTTPException(status_code=500, detail="照片上传失败")
+            raise HTTPException(status_code=500, detail="Photo upload failed")
 
         return {"message": "The photo was uploaded successfully and is awaiting review.",
                 "photo_id": str(result.inserted_id)}
@@ -92,8 +93,37 @@ async def upload_photo(
         raise
     except Exception as e:
         print("upload_photo error:", traceback.format_exc())
-        # log_error("照片上传过程中发生异常\n" + traceback.format_exc(), e, user_id=user_id)
+        # log_error("An exception occurred during the photo upload process\n" + traceback.format_exc(), e, user_id=user_id)
         raise HTTPException(status_code=500, detail="Server error, upload failed")
+
+
+
+@router.get("/review/next", response_model=PhotoResponse)
+async def get_next_pending_photo():
+    try:
+        doc = photo_collection.find_one_and_update(
+            {"status": ReviewStatus.Pending.value},
+            {"$set": {"status": ReviewStatus.Reviewing.value}},
+            sort=[("upload_time", 1)],
+            return_document=ReturnDocument.AFTER
+        )
+
+        if not doc:
+            raise HTTPException(status_code=404, detail="There are no photos to review")
+
+        return PhotoResponse(
+            photo_id=str(doc["_id"]),
+            user_id=doc["user_id"],
+            building_id=doc["building_id"],
+            upload_time=doc["upload_time"].isoformat(),
+            image_url=doc.get("image_url"),
+            status=doc["status"],
+            feedback=doc.get("feedback")
+        )
+    except Exception as e:
+        print("get_next_pending_photo error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error, failed to retrieve photos to be reviewed")
+
 
 
 @router.post("/review")
@@ -110,7 +140,8 @@ async def review_photo(data: PhotoReviewRequest):
         if result.matched_count == 0:
             raise HTTPException(status_code=404, detail="No photos found")
 
-        return {"message":f"Photo reviewed successfully. Status updated to: {data.status.value}"}
+        return {"message":f"Photo reviewed successfully. Status updated to: {data.status.value}",
+                "photo_id": data.photo_id}
 
     except Exception as e:
         print("review_photo error:", traceback.format_exc())

@@ -81,6 +81,7 @@ class Building:
 # 审核状态
 class ReviewStatus(Enum):
     Pending = "pending"  #待审核
+    Reviewing = "reviewing"  # 审核中
     Approved = "approved" #成功
     Rejected = "rejected"  #失败
 

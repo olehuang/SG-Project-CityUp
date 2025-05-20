@@ -22,12 +22,12 @@ def test_upload_photo():
         files={"photo": ("test.jpg", test_file, "image/jpeg")}
     )
 
-    assert response.status_code == 201, f"上传失败，响应内容: {response.text}"
+    assert response.status_code == 201, f"Upload failed, response content: {response.text}"
     data = response.json()
     assert "photo_id" in data
     assert "message" in data
-    print("上传返回：", data)
-    # assert upload_response.status_code == 201, f"上传失败，响应内容: {upload_response.text}"
+    print("Upload Return：", data)
+    # assert upload_response.status_code == 201, f"Upload failed, response content: {upload_response.text}"
     #
     # # 上传成功后，再去请求获取照片列表
     # response = client.get("/photos/user/test_user")
@@ -42,16 +42,16 @@ def test_get_user_photos():
     response = client.get("/photos/user/test_user")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
-    print("获取照片列表：", response.json())
+    print("Get a list of photos：", response.json())
 
 
 def test_review_photo():
-    # 获取已有照片 ID（实际测试应替换为上传得到的 ID）
+    # Get the ID of an existing photo
     response = client.get("/photos/user/test_user")
     assert response.status_code == 200
     photo_list = response.json()
     if not photo_list:
-        print("没有照片可审核")
+        print("No photos to review")
         return
 
     photo_id = photo_list[0]["photo_id"]
@@ -59,8 +59,8 @@ def test_review_photo():
     response = client.post("/photos/review", json={
         "photo_id": photo_id,
         "status": "approved",
-        "feedback": "测试审核通过"
+        "feedback": "Test review passed"
     })
 
     assert response.status_code == 200
-    print("审核结果：", response.json())
+    print("Audit Results：", response.json())
