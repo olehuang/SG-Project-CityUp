@@ -7,3 +7,4 @@ requirements.txt
 /test.py
 app.log
 .venv
+uploads/

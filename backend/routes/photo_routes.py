@@ -46,48 +46,61 @@ class PhotoResponse(BaseModel):
     feedback: Optional[str]
 
 
+
+
 @router.post("/", status_code=201)
 async def upload_photo(
         user_id: str = Form(...),
         building_id: str = Form(...),
-        photo: UploadFile = File(...)
+        photos: List[UploadFile] = File(...)
 ):
     try:
-        # 验证文件类型
-        if not photo.content_type.startswith("image/"):
-            raise HTTPException(status_code=400, detail="The uploaded file must be in image format")
+        if not photos:
+            raise HTTPException(status_code=400, detail="No photos were provided")
 
-        # 生成唯一文件名
-        timestamp = int(time.time())
-        file_extension = os.path.splitext(photo.filename)[1]
-        # unique_filename = f"{user_id}_{timestamp}{file_extension}"
-        unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
-        file_path = os.path.join(UPLOAD_DIR, unique_filename)
+        uploaded_photos = []
 
-        # 保存文件
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(photo.file, buffer)
+        for photo in photos:
+            # 验证文件类型
+            if not photo.content_type.startswith("image/"):
+                raise HTTPException(status_code=400,
+                                    detail=f"The uploaded file '{photo.filename}' must be in image format")
 
-        # 生成访问URL
-        # image_url = f"{BASE_URL}/{UPLOAD_DIR}/{unique_filename}"
-        image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
+            # 生成唯一文件名
+            timestamp = int(time.time())
+            file_extension = os.path.splitext(photo.filename)[1]
+            unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
+            file_path = os.path.join(UPLOAD_DIR, unique_filename)
 
+            # 保存文件
+            with open(file_path, "wb") as buffer:
+                shutil.copyfileobj(photo.file, buffer)
 
-        photo_obj = Photo(
-            user_id=user_id,
-            building_id=building_id,
-            image_url=image_url,
-            upload_time=datetime.now(timezone.utc),
-            status = ReviewStatus.Pending
-        )
-        result = photo_collection.insert_one(photo_obj.to_dict())
-        if not result.inserted_id:
-            # 如果数据库插入失败，删除已上传的文件
-            os.remove(file_path)
-            raise HTTPException(status_code=500, detail="Photo upload failed")
+            # 生成访问URL
+            image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
 
-        return {"message": "The photo was uploaded successfully and is awaiting review.",
-                "photo_id": str(result.inserted_id)}
+            photo_obj = Photo(
+                user_id=user_id,
+                building_id=building_id,
+                image_url=image_url,
+                upload_time=datetime.now(timezone.utc),
+                status=ReviewStatus.Pending
+            )
+            result = photo_collection.insert_one(photo_obj.to_dict())
+            if not result.inserted_id:
+                # 如果数据库插入失败，删除已上传的文件
+                os.remove(file_path)
+                raise HTTPException(status_code=500, detail=f"Upload failed for photo '{photo.filename}'")
+
+            uploaded_photos.append({
+                "photo_id": str(result.inserted_id),
+                "filename": photo.filename
+            })
+
+        return {
+            "message": f"Successfully uploaded {len(uploaded_photos)} photos. All photos are awaiting review.",
+            "uploaded_photos": uploaded_photos
+        }
 
     except HTTPException:
         raise
@@ -95,7 +108,6 @@ async def upload_photo(
         print("upload_photo error:", traceback.format_exc())
         # log_error("An exception occurred during the photo upload process\n" + traceback.format_exc(), e, user_id=user_id)
         raise HTTPException(status_code=500, detail="Server error, upload failed")
-
 
 
 @router.get("/review/next", response_model=PhotoResponse)
