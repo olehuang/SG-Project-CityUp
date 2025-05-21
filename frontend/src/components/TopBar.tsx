@@ -18,7 +18,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         navigate("/");
     }
     return (
-        <AppBar position="static" sx={{ backgroundColor: '#1976d2' }}>
+        <AppBar position="static" sx={{
+            // backgroundColor: '#1976d2',
+            backgroundColor: '#5D4037'
+        }}>
             <Toolbar>
                 <IconButton
                     edge="start"
