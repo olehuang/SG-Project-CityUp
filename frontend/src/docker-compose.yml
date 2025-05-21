@@ -1,0 +1,26 @@
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      # path where import Order
+      # absolut Order path like:
+      # or under same order :./import
+      - KEYCLOAK_IMPORT=./import
+    ports:
+      - "8080:8080"
+    command: -v start-dev --import-realm
+    volumes:
+      # local path hangt in container
+      # Order Path: z.B: /host_mnt/d/sherad/7semester/BP/import/
+      # or under same Order: ./import
+      - ./import/:/opt/keycloak/data/import
+    networks:
+      - keycloak-network
+    restart: unless-stopped
+
+
+networks:
+  keycloak-network:
+    driver: bridge
