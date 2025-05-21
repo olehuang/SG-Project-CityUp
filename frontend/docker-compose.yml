@@ -16,6 +16,7 @@ services:
       # Order Path: z.B: /host_mnt/d/sherad/7semester/BP/import/
       # or under same Order: ./import
       - ./import/:/opt/keycloak/data/import
+
     networks:
       - keycloak-network
     restart: unless-stopped

@@ -20,6 +20,9 @@ import LogOut from "./LogOut";
 import Profile from "./Profile";
 import UploadHistory from "./UploadHistory";
 import Upload from "./Upload";
+import Tutorial from  "./Tutorial";
+import ProductIntroduction from "./ProductIntroduction";
+import BuildingInfo from "./BuildingInfo";
 
 interface SidebarProps {
     open: boolean;
@@ -54,8 +57,17 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                     <Divider />
                     <List>
                         <Profile token={token}/>
+                        <Tutorial/>
+                        <BuildingInfo/>
                         <UploadHistory/>
-                        <LogOut/>
+                        <ProductIntroduction/>
+                    </List>
+                </Box>
+                <Divider />
+                <Box>
+                    <Divider />
+                    <List>
+                        <LogOut />
                     </List>
                 </Box>
             </Box>
