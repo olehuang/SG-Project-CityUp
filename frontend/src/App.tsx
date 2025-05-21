@@ -11,6 +11,7 @@ import {AuthProvider} from "./components/AuthProvider";
 import KeycloakClient from "./components/keycloak";
 import Keycloakinit from "./components/Keycloakinit";
 import ProtectedRouter from "./components/ProtectedRouter";
+import Upload from "./components/Upload";
 
 
 
@@ -24,6 +25,7 @@ function App() {
                     <Route element={<ProtectedRouter />}>{/*ProtectedRouter*/}
                         <Route element={<DashboardLayout/> }  >{/*DashboardLayout*/}
                             <Route element={<DashboardPage/>} path="/dashboard" />{/*DashboardPage*/}
+                            <Route element={<Upload/>} path="/dashboard/upload" />{/*UploadPage*/}
                         </Route>{/*DashboardLayout*/}
                     </Route>{/*ProtectedRouter*/}
                 </Route>{/*KeycloakInit*/}

@@ -15,12 +15,12 @@ interface FileWithCoords {
 }
 
 // 把最新的文件列表（含坐标与 URL）回传给父组件。
-interface UploadProps {
-    onUpload: (files: FileWithCoords[]) => void;
-}
+//interface UploadProps {
+//    onUpload: (files: FileWithCoords[]) => void;
+//}
 
-//
-const Upload: React.FC<UploadProps> = ({ onUpload }) => {
+//{ onUpload }UploadProps
+const Upload: React.FC = () => {
     const [address, setAddress] = useState<string>(''); // Optional building door number
     const [selectedFiles, setSelectedFiles] = useState<FileWithCoords[]>([]); // recorded files
     const [uploading, setUploading] = useState<boolean>(false); // Uploading logo in progress
@@ -94,7 +94,7 @@ const Upload: React.FC<UploadProps> = ({ onUpload }) => {
         const next = [...selectedFiles, ...processed];
 
         setSelectedFiles(next);
-        onUpload(next);
+       // onUpload(next);
     };
 
     /** 触发拍照选择 for shooting photo */
@@ -114,7 +114,7 @@ const Upload: React.FC<UploadProps> = ({ onUpload }) => {
     const handleRemove = (idx: number) => {
         const next = selectedFiles.filter((_, i) => i !== idx);
         setSelectedFiles(next);
-        onUpload(next);
+        //onUpload(next);
     };
 
     /** 将所选文件提交到后端 Submitting to the backend */
@@ -219,7 +219,7 @@ const Upload: React.FC<UploadProps> = ({ onUpload }) => {
                                 onClick={() => {
                                     const next = selectedFiles.filter((_, i) => i !== idx);
                                     setSelectedFiles(next);
-                                    onUpload(next);
+                                    //onUpload(next);
                                 }}
                             >
                                 <DeleteIcon fontSize="small" />

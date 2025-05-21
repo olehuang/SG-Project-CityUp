@@ -50,12 +50,14 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
                                 <ListItemIcon><UploadIcon/></ListItemIcon>
+                                {/*<Upload/>*/}
                                 <ListItemText primary="Upload" />
                             </ListItemButton>
                         </ListItem>
                     </List>
                     <Divider />
                     <List>
+
                         <Profile token={token}/>
                         <Tutorial/>
                         <BuildingInfo/>
