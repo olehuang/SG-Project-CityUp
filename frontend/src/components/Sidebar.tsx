@@ -39,11 +39,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
             <Box sx={{ width: 250 }} role="presentation" >{/*onClose={onClose}*/}
                 <Box>
                     <List>
-                        <ListItem key={'dashboard'} disablePadding>
-                            <ListItemButton>
+                        <ListItem key={'dashboard'} disablePadding >
+                            <ListItemButton component={Link} to={"/dashboard"}>
                                 <ListItemIcon>
                                 </ListItemIcon>
-                                <ListItemText primary={'dashboard'} />
+                                <ListItemText primary='dashboard' />
                             </ListItemButton>
                         </ListItem>
                         {/* Upload 页面入口 */}

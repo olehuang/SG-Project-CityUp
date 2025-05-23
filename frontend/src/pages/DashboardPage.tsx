@@ -85,6 +85,7 @@ const DashboardPage: React.FC = () => {
     const handleClick = (label: string) => {
         if (selected === label) {
             setSelected(null);  // 如果已经选中了，再点一次取消选中
+
         } else {
             setSelected(label);
         }
