@@ -12,7 +12,10 @@ import KeycloakClient from "./components/keycloak";
 import Keycloakinit from "./components/Keycloakinit";
 import ProtectedRouter from "./components/ProtectedRouter";
 import Upload from "./components/Upload";
-
+import Tutorial from "./components/Tutorial";
+import BuildingInfo from "./components/BuildingInfo";
+import UploadHistory from "./components/UploadHistory";
+import ProductIntroduction from "./components/ProductIntroduction";
 
 
 function App() {
@@ -26,6 +29,10 @@ function App() {
                         <Route element={<DashboardLayout/> }  >{/*DashboardLayout*/}
                             <Route element={<DashboardPage/>} path="/dashboard" />{/*DashboardPage*/}
                             <Route element={<Upload/>} path="/dashboard/upload" />{/*UploadPage*/}
+                            <Route element={<Tutorial/>} path="/dashboard/tutorial" />{/*Tutorial*/}
+                            <Route element={<BuildingInfo/>} path="/dashboard/buildingInformation" />{/*Building Infomation*/}
+                            <Route element={<UploadHistory/>} path="/dashboard/uploadHistory" />{/*Upload History*/}
+                            <Route element={<ProductIntroduction/>} path="/dashboard/productIntroduction" />{/*Product Introduction*/}
                         </Route>{/*DashboardLayout*/}
                     </Route>{/*ProtectedRouter*/}
                 </Route>{/*KeycloakInit*/}

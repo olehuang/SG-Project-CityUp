@@ -1,24 +1,26 @@
 import React, { useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
+import {useNavigate} from "react-router-dom";
+import pageBackgroundStyles from "./pageBackgroundStyles";
 
 const styles = {
-    container: {
-        height: "100vh",
-        margin: 0,
-        padding: 0,
-        boxSizing: "border-box",
-        // backgroundColor: "#f5f9fc",
-        backgroundColor: "#FFF8E1",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        overflowY: "hidden",
-    },
-    wrapper: {
-        width: 1000,
-        maxWidth: "100%",
-        marginTop: "-60px",
-    },
+    // container: {
+    //     height: "100vh",
+    //     margin: 0,
+    //     padding: 0,
+    //     boxSizing: "border-box",
+    //     // backgroundColor: "#f5f9fc",
+    //     backgroundColor: "#FFF8E1",
+    //     display: "flex",
+    //     justifyContent: "center",
+    //     alignItems: "center",
+    //     overflowY: "hidden",
+    // },
+    // wrapper: {
+    //     width: 1000,
+    //     maxWidth: "100%",
+    //     marginTop: "-60px",
+    // },
     topRow: {
         display: "flex",
         justifyContent:  "center",
@@ -71,10 +73,11 @@ const styles = {
 
 const DashboardPage: React.FC = () => {
     const [selected, setSelected] = useState<string | null>(null);
+    const navigate = useNavigate();
 
     const topItems = [
         { label: "Tutorial", desc: "Step-by-step guide" },
-        { label: "Upload", desc: "Add your files here" },
+        { label: "Upload", desc: "Add your files here"  },
         { label: "Building Information", desc: "Browse building details" },
     ];
     const bottomItems = [
@@ -82,7 +85,19 @@ const DashboardPage: React.FC = () => {
         { label: "Upload History", desc: "See your past uploads" },
     ];
 
+    const labelMap=(label:string)=>{
+        switch (label) {
+            case "Tutorial":return "tutorial";
+            case "Upload":return "upload";
+            case "Building Information":return "buildingInformation";
+            case "Product Introduction": return "productIntroduction";
+            case "Upload History":return "uploadHistory";
+            default:return "";
+        }
+    }
+
     const handleClick = (label: string) => {
+        navigate("/dashboard/"+labelMap(label));// transfor to label page
         if (selected === label) {
             setSelected(null);  // 如果已经选中了，再点一次取消选中
 
@@ -92,8 +107,8 @@ const DashboardPage: React.FC = () => {
     };
 
     return (
-        <Box sx={styles.container}>
-            <Box sx={styles.wrapper}>
+        <Box sx={pageBackgroundStyles.container}>
+            <Box sx={pageBackgroundStyles.wrapper}>
                 <Box sx={styles.topRow}>
                     {topItems.map(({ label, desc }) => (
                         <Button

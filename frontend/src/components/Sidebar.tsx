@@ -50,19 +50,35 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
                                 <ListItemIcon><UploadIcon/></ListItemIcon>
-                                {/*<Upload/>*/}
                                 <ListItemText primary="Upload" />
                             </ListItemButton>
                         </ListItem>
                     </List>
                     <Divider />
                     <List>
-
                         <Profile token={token}/>
-                        <Tutorial/>
-                        <BuildingInfo/>
-                        <UploadHistory/>
-                        <ProductIntroduction/>
+                        <ListItem disablePadding>
+                            <ListItemButton component={Link} to="/dashboard/tutorial">
+                                <ListItemIcon></ListItemIcon>
+                                <ListItemText primary="Tutorial" />
+                            </ListItemButton>
+                        </ListItem>
+                        <ListItemButton  component={Link} to="/dashboard/buildingInfomation">
+                            <ListItemIcon>
+                            </ListItemIcon>
+                            <ListItemText primary="BuildingInformation" />
+                        </ListItemButton>
+                        <ListItemButton component={Link} to="/dashboard/uploadHistory" >
+                            <ListItemIcon>
+                            </ListItemIcon>
+                            <ListItemText primary="History" />
+                        </ListItemButton>
+                        <ListItemButton  component={Link} to="/dashboard/productIntroduction">
+                            <ListItemIcon>
+                            </ListItemIcon>
+                            <ListItemText primary="Product Introduction" />
+                        </ListItemButton>
+
                     </List>
                 </Box>
                 <Divider />
