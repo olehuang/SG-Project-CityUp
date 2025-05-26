@@ -30,18 +30,20 @@ class MongoDB:
         return self.db[collection_name]
 
 
-# 用户信息
+# User information table
 class User:
-    def __init__(self, user_id: str, username: str, email: str):
+    def __init__(self, user_id: str, username: str, email: str, role: str):
         self.user_id = user_id
         self.username = username
         self.email = email
+        self.role = "user"
 
     def to_dict(self):
         return {
             "user_id": self.user_id,
             "username": self.username,
             "email": self.email,
+            "role": self.role,
         }
 
     @classmethod
@@ -49,7 +51,8 @@ class User:
         return cls(
             user_id=data["user_id"],
             username=data["username"],
-            email=data["email"]
+            email=data["email"],
+            role=data["role"],
         )
 
 
