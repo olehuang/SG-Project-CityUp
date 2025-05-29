@@ -5,7 +5,7 @@ from typing import Optional
 
 from bson import ObjectId
 from pymongo import MongoClient
-
+from pymongo import AsyncMongoClient
 # MongoDB初始化
 
 class MongoDB:
@@ -24,7 +24,7 @@ class MongoDB:
             MongoDB._instance = self
             uri = os.getenv("MONGO_DB_URL")
 
-            self.client = MongoClient(uri)
+            self.client = AsyncMongoClient(uri)
             self.db = self.client["city_photo_app"]
 
 

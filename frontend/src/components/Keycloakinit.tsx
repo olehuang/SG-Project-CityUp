@@ -38,9 +38,9 @@ const KeycloakInit = () => {
                         setAuthLoading(false);
                         setToken(token);
                         if (userInfo.roles.includes("admin")) {
-                            uploadRole(user_id,"admin");
+                            uploadRole(userInfo.userId,"admin");
                         }else{
-                            uploadRole(user_id);
+                            uploadRole(userInfo.userId);
                         }
                         console.log(userInfo);
                     }
@@ -54,6 +54,7 @@ const KeycloakInit = () => {
     const uploadRole =async (user_id:any,role="user")=>{
          const url=`http://127.0.0.1:8000/users/update_user`;
          const payload={user_id, role}
+        console.log("payload",payload);
          try{
              const response = await fetch(url, {
                  method: "POST",

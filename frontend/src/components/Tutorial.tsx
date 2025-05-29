@@ -24,8 +24,8 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 
 const Tutorial=()=>{
     return(
-        <Box sx={pageBackgroundStyles.container}>
-            <Box sx={{ display: "flex", height: "100vh",justifyContent: "left !important"}}>
+        <Box sx={pageBackgroundStyles.container} style={{justifyContent: "left !important"}}>
+            <Box sx={{ display: "flex", height: "100vh",}}>
                 {/* left seid */}
                 <Box sx={{
                     width: 280,

@@ -9,7 +9,7 @@ import traceback
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 
-app = FastAPI()
+
 router = APIRouter()
 
 class User(BaseModel):
@@ -24,11 +24,12 @@ class RoleUpdate(BaseModel):
 @router.post("/save_user")
 async def save_user(user: User):
     try:
-        response= await db_userEntities.save_user(user)
+        response= await db_userEntities.save_user_or_create(user)
+        print(response)
         return jsonable_encoder(response)
     except Exception as e:
         print("Exception while saving user",traceback.format_exc())
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 @router.post("/update_user")
 async def update_user(data:RoleUpdate):
@@ -37,7 +38,7 @@ async def update_user(data:RoleUpdate):
         return jsonable_encoder(response)
     except Exception as e:
         print("Exception while updating user role",traceback.format_exc())
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @router.post("/delete_user")
@@ -47,5 +48,6 @@ async def delete_user(user_id:str):
         return jsonable_encoder(response)
     except Exception as e:
         print("Exception while deleting user",traceback.format_exc())
-        return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 
