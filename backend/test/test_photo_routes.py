@@ -97,3 +97,8 @@ def test_review_photo():
 
     assert response.status_code == 200
     print("Audit Results：", response.json())
+
+
+"""
+python -m pytest test/test_photo_routes.py -s -v
+"""

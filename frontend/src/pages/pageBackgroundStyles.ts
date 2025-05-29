@@ -8,7 +8,7 @@ const pageBackgroundStyles = {
             // backgroundColor: "#f5f9fc",
             backgroundColor: "#FFF8E1",
             display: "flex",
-            justifyContent: "center",
+            //justifyContent: "center",
             alignItems: "center",
             overflowY: "hidden",
         },

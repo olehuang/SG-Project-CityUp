@@ -38,9 +38,9 @@ const KeycloakInit = () => {
                         setAuthLoading(false);
                         setToken(token);
                         if (userInfo.roles.includes("admin")) {
-                            uploadRole("admin");
+                            uploadRole(user_id,"admin");
                         }else{
-                            uploadRole();
+                            uploadRole(user_id);
                         }
                         console.log(userInfo);
                     }
@@ -51,15 +51,16 @@ const KeycloakInit = () => {
         }
     };
 
-    const uploadRole =async (role="user")=>{
-         const url=`http://127.0.0.1:8000/user/update_user`;
+    const uploadRole =async (user_id:any,role="user")=>{
+         const url=`http://127.0.0.1:8000/users/update_user`;
+         const payload={user_id, role}
          try{
              const response = await fetch(url, {
                  method: "POST",
                  headers: {
                      "Content-Type": "application/json"
                  },
-                 body: JSON.stringify(role)
+                 body: JSON.stringify(payload)
              });
              if (!response.ok) {
                  const errorData = await response.json();
@@ -73,13 +74,14 @@ const KeycloakInit = () => {
     }
 
     const saveUser=async (userInfo:any)=>{
-        const url=`http://127.0.0.1:8000/user/save_user`;
+        const url=`http://127.0.0.1:8000/users/save_user`;
         const payload={
             user_id:userInfo.userId,
-            username:userInfo.username,
+            username:userInfo.userName,
             email:userInfo.email,
-            roles:userInfo?.roles[0],
+            role: userInfo.roles && userInfo.roles.length > 0 ? userInfo.roles[0] : "user"
         }
+        console.log("payload to save user:",payload);
         try {
         const response = await fetch(url, {
             method: "POST",

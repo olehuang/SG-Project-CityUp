@@ -16,6 +16,7 @@ import Tutorial from "./components/Tutorial";
 import BuildingInfo from "./components/BuildingInfo";
 import UploadHistory from "./components/UploadHistory";
 import ProductIntroduction from "./components/ProductIntroduction";
+import PhotoReview from "./components/PhotoReview";
 
 
 function App() {
@@ -33,6 +34,7 @@ function App() {
                             <Route element={<BuildingInfo/>} path="/dashboard/buildingInformation" />{/*Building Infomation*/}
                             <Route element={<UploadHistory/>} path="/dashboard/uploadHistory" />{/*Upload History*/}
                             <Route element={<ProductIntroduction/>} path="/dashboard/productIntroduction" />{/*Product Introduction*/}
+                            <Route element={<PhotoReview/>} path="/dashboard/photoReview" />{/*Product Introduction*/}
                         </Route>{/*DashboardLayout*/}
                     </Route>{/*ProtectedRouter*/}
                 </Route>{/*KeycloakInit*/}

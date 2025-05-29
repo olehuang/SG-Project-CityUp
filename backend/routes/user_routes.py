@@ -6,40 +6,45 @@ from datetime import datetime
 from db_entities import User
 import db_userEntities
 import traceback
+from fastapi import FastAPI
+from fastapi.encoders import jsonable_encoder
 
-
+app = FastAPI()
 router = APIRouter()
 
 class User(BaseModel):
     user_id: str
     username: str
     email: str
-    role="user"
+    role:str ="user"
 
-@router.post("/user/save_user")
+class RoleUpdate(BaseModel):
+    user_id: str
+    role: str = "user"
+@router.post("/save_user")
 async def save_user(user: User):
     try:
         response= await db_userEntities.save_user(user)
-        return response
+        return jsonable_encoder(response)
     except Exception as e:
         print("Exception while saving user",traceback.format_exc())
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-@router.post("/user/update_user")
-async def update_user(user_id:str,role="user"):
+@router.post("/update_user")
+async def update_user(data:RoleUpdate):
     try:
-        response= await db_userEntities.update_user_role(user_id,role)
-        return response
+        response= await db_userEntities.update_user_role(data.user_id,data.role)
+        return jsonable_encoder(response)
     except Exception as e:
         print("Exception while updating user role",traceback.format_exc())
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
-@router.post("/user/delete_user")
+@router.post("/delete_user")
 async def delete_user(user_id:str):
     try:
         response= await db_userEntities.delete_user(user_id)
-        return response
+        return jsonable_encoder(response)
     except Exception as e:
         print("Exception while deleting user",traceback.format_exc())
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

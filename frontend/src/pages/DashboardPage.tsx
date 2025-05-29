@@ -1,7 +1,9 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import { Box, Button, Typography } from "@mui/material";
 import {useNavigate} from "react-router-dom";
 import pageBackgroundStyles from "./pageBackgroundStyles";
+import {useAuthHook} from "../components/AuthProvider";
+import KeycloakClient from "../components/keycloak";
 
 const styles = {
     // container: {
@@ -74,16 +76,36 @@ const styles = {
 const DashboardPage: React.FC = () => {
     const [selected, setSelected] = useState<string | null>(null);
     const navigate = useNavigate();
+    const {token}=useAuthHook();
 
+    const [roles, setRoles] = useState<string[]>([]);
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const userInfo= await KeycloakClient.extractUserInfo(token);
+            setRoles(userInfo?.roles||[]);
+            console.log(userInfo?.roles);
+        }
+        if (token!==null && token!==undefined) {
+            fetchRoles();
+        }
+    },[token]);
+
+    //bottom Button in Daschboard page
     const topItems = [
         { label: "Tutorial", desc: "Step-by-step guide" },
         { label: "Upload", desc: "Add your files here"  },
         { label: "Building Information", desc: "Browse building details" },
     ];
-    const bottomItems = [
-        { label: "Product Introduction", desc: "Overview of the project" },
-        { label: "Upload History", desc: "See your past uploads" },
-    ];
+
+    //bottom Button in Daschboard page
+    const bottomItems =(
+        [
+            { label: "Product Introduction", desc: "Overview of the project" },
+            { label: "Upload History", desc: "See your past uploads" },
+            { label: "Photo Review", desc: "Review uploaded Photos" }
+        ]
+            .filter( item => item.label !== "Photo Review" || roles.includes("admin"))
+    );
 
     const labelMap=(label:string)=>{
         switch (label) {
@@ -92,6 +114,7 @@ const DashboardPage: React.FC = () => {
             case "Building Information":return "buildingInformation";
             case "Product Introduction": return "productIntroduction";
             case "Upload History":return "uploadHistory";
+            case "Photo Review": return "photoReview";
             default:return "";
         }
     }

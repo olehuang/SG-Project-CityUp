@@ -23,6 +23,8 @@ import Upload from "./Upload";
 import Tutorial from  "./Tutorial";
 import ProductIntroduction from "./ProductIntroduction";
 import BuildingInfo from "./BuildingInfo";
+import {useEffect, useState} from "react";
+import KeycloakClient from "./keycloak";
 
 interface SidebarProps {
     open: boolean;
@@ -33,6 +35,17 @@ interface SidebarProps {
 
 const Sidebar = ({ open, onClose }: SidebarProps) => {
     const {token}=useAuthHook();
+    const [roles, setRoles] = useState<string[]>([]);
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const userInfo= await KeycloakClient.extractUserInfo(token);
+            setRoles(userInfo?.roles||[]);
+            console.log(userInfo?.roles);
+        }
+        if (token!==null && token!==undefined) {
+            fetchRoles();
+        }
+    },[token]);
 
     return (
         <Drawer open={open} onClick={onClose}>
@@ -78,6 +91,12 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                             </ListItemIcon>
                             <ListItemText primary="Product Introduction" />
                         </ListItemButton>
+                        {roles.includes('admin') &&
+                            <ListItemButton component={Link} to="/dashboard/photoReview">
+                                <ListItemIcon>
+                                </ListItemIcon>
+                                <ListItemText primary="Photo Review " />
+                            </ListItemButton>}
 
                     </List>
                 </Box>
