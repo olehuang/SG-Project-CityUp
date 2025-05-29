@@ -76,10 +76,10 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 <ListItemText primary="Tutorial" />
                             </ListItemButton>
                         </ListItem>
-                        <ListItemButton  component={Link} to="/dashboard/buildingInfomation">
+                        <ListItemButton  component={Link} to="/dashboard/buildingInformation">
                             <ListItemIcon>
                             </ListItemIcon>
-                            <ListItemText primary="BuildingInformation" />
+                            <ListItemText primary="Building Information" />
                         </ListItemButton>
                         <ListItemButton component={Link} to="/dashboard/uploadHistory" >
                             <ListItemIcon>
