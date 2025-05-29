@@ -2,31 +2,11 @@ import os
 import io
 from fastapi.testclient import TestClient
 from main import app
+from pymongo import MongoClient
+import traceback
 
 client = TestClient(app)
-#
-# def test_upload_single_photo():
-#     # test_image_content = b"fake image data"
-#     # test_file = io.BytesIO(test_image_content)
-#     # test_file.name = "test.jpg"
-#     with open("F:\Bild\Weixin Image_20250520074752.png", "rb") as f:
-#         test_file = io.BytesIO(f.read())
-#     test_file.name = "Weixin Image_20250520074752.png"
-#
-#     response = client.post(
-#         "/photos/",
-#         data={
-#             "user_id": "test_user",
-#             "building_id": "test_building"
-#         },
-#         files={"photo": ("test.jpg", test_file, "image/jpeg")}
-#     )
-#
-#     assert response.status_code == 201, f"Upload failed, response content: {response.text}"
-#     data = response.json()
-#     assert "photo_id" in data
-#     assert "message" in data
-#     print("Upload Return：", data)
+
 def test_upload_multiple_photos():
     test_files = []
     image_paths = [
@@ -77,6 +57,22 @@ def test_get_user_photos():
     assert isinstance(response.json(), list)
     print("Get a list of photos：", response.json())
 
+
+
+
+def test_get_batch_pending_photos_and_mark_reviewing():
+    response = client.post("/photos/review/batch", params={"batch_size": 5})
+    if response.status_code == 404:
+        print("ℹ️ No pending photos to review")
+        return []
+
+    assert response.status_code == 200
+    batch = response.json()
+    assert len(batch) > 0
+    for photo in batch:
+        assert photo["status"] == "reviewing"
+    print(f"✅ Retrieved and marked {len(batch)} photos as 'reviewing'")
+    return batch
 
 def test_review_photo():
     # Get the ID of an existing photo

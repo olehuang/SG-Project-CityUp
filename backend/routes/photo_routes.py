@@ -23,12 +23,6 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 # 访问URL的基础路径
 UPLOAD_URL_PATH = os.getenv("UPLOAD_URL_PATH", "static/photos")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
-#
-# class PhotoUploadRequest(BaseModel):
-#     user_id: str
-#     building_id: str
-#     image_url: Optional[str] = None
-
 
 class PhotoReviewRequest(BaseModel):
     photo_id: str
@@ -87,6 +81,7 @@ async def upload_photo(
                 status=ReviewStatus.Pending
             )
             result = photo_collection.insert_one(photo_obj.to_dict())
+            print(f"Document inserted with ID: {result.inserted_id}")
             if not result.inserted_id:
                 # 如果数据库插入失败，删除已上传的文件
                 os.remove(file_path)
@@ -110,33 +105,70 @@ async def upload_photo(
         raise HTTPException(status_code=500, detail="Server error, upload failed")
 
 
-@router.get("/review/next", response_model=PhotoResponse)
-async def get_next_pending_photo():
+# @router.get("/review/next", response_model=PhotoResponse)
+# async def get_next_pending_photo():
+#     try:
+#         doc = photo_collection.find_one_and_update(
+#             {"status": ReviewStatus.Pending.value},
+#             {"$set": {"status": ReviewStatus.Reviewing.value}},
+#             sort=[("upload_time", 1)],
+#             return_document=ReturnDocument.AFTER
+#         )
+#
+#         if not doc:
+#             raise HTTPException(status_code=404, detail="There are no photos to review")
+#
+#         return PhotoResponse(
+#             photo_id=str(doc["_id"]),
+#             user_id=doc["user_id"],
+#             building_id=doc["building_id"],
+#             upload_time=doc["upload_time"].isoformat(),
+#             image_url=doc.get("image_url"),
+#             status=doc["status"],
+#             feedback=doc.get("feedback")
+#         )
+#     except Exception as e:
+#         print("get_next_pending_photo error:", traceback.format_exc())
+#         raise HTTPException(status_code=500, detail="Server error, failed to retrieve photos to be reviewed")
+#
+#
+@router.post("/review/batch", response_model=List[PhotoResponse])
+async def get_batch_pending_photos(batch_size: int = 30):
     try:
-        doc = photo_collection.find_one_and_update(
-            {"status": ReviewStatus.Pending.value},
-            {"$set": {"status": ReviewStatus.Reviewing.value}},
-            sort=[("upload_time", 1)],
-            return_document=ReturnDocument.AFTER
+        # 获取前 batch_size 条待审核照片
+        pending_photos = list(photo_collection.find(
+            {"status": ReviewStatus.Pending.value}
+        ).sort("upload_time", 1).limit(batch_size))
+
+        if not pending_photos:
+            raise HTTPException(status_code=404, detail="No pending photos to review.")
+
+        # 拿到这些照片的 ID
+        photo_ids = [doc["_id"] for doc in pending_photos]
+
+        # 批量更新它们的状态为 reviewing
+        result = photo_collection.update_many(
+            {"_id": {"$in": photo_ids}},
+            {"$set": {"status": ReviewStatus.Reviewing.value}}
         )
 
-        if not doc:
-            raise HTTPException(status_code=404, detail="There are no photos to review")
+        print(f"Marked {result.modified_count} photos as reviewing.")
 
-        return PhotoResponse(
-            photo_id=str(doc["_id"]),
-            user_id=doc["user_id"],
-            building_id=doc["building_id"],
-            upload_time=doc["upload_time"].isoformat(),
-            image_url=doc.get("image_url"),
-            status=doc["status"],
-            feedback=doc.get("feedback")
-        )
+        return [
+            PhotoResponse(
+                photo_id=str(doc["_id"]),
+                user_id=doc["user_id"],
+                building_id=doc["building_id"],
+                upload_time=doc["upload_time"].isoformat(),
+                image_url=doc.get("image_url"),
+                status=ReviewStatus.Reviewing.value,
+                feedback=doc.get("feedback")
+            )
+            for doc in pending_photos
+        ]
     except Exception as e:
-        print("get_next_pending_photo error:", traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Server error, failed to retrieve photos to be reviewed")
-
-
+        print("get_batch_pending_photos error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while retrieving photo batch.")
 
 @router.post("/review")
 async def review_photo(data: PhotoReviewRequest):
