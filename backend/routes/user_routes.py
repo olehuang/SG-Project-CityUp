@@ -68,10 +68,11 @@ async def check_user(user_id:str):
 async def check_role(user_id:str):
     try:
         response= await db_userEntities.get_user(user_id)
+        print("response：",response)
         if response is None:
             return False
         else:
-            return response.role
+            return response
     except Exception as e:
         print("Exception while getting user",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

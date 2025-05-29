@@ -22,9 +22,9 @@ const KeycloakInit = () => {
 
         };
        //if use no in DB storaged, save in DB
-        if (user_id){
+        if (user_id) {
             checkUser(user_id);
-            checkRole(user_id);
+            checkRole(user_id)
         }
     }, [user_id,auth]);
 
@@ -54,7 +54,7 @@ const KeycloakInit = () => {
     const uploadRole =async (user_id:any,role="user")=>{
          const url=`http://127.0.0.1:8000/users/update_user`;
          const payload={user_id, role}
-        console.log("payload",payload);
+        console.log("payload in upload role",payload);
          try{
              const response = await fetch(url, {
                  method: "POST",
@@ -79,7 +79,7 @@ const KeycloakInit = () => {
         try{
             const response = await axios.get(url,{ params: { user_id } });
             const data = response.data;
-            console.log("response checkUser:",data);
+
             if (data===false){
                 saveUser(userInfo)
             }
@@ -91,28 +91,16 @@ const KeycloakInit = () => {
     const checkRole=async (user_id:any)=>{
         const url=`http://127.0.0.1:8000/users/check_role`;
         try{
-            const response = await fetch(url,
-                {
-                method: "GET",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(user_id)
-                }
-            );
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || "Error");
-            }
-            const data = await response.json();
-            console.log("response check role:",data);
+            const response = await axios.get(url,{ params: { user_id } });
+            const data =  response.data.role;
+
             if (data!==userInfo.roles[0]){
                 if (userInfo.roles[0]==="admin") {
                     uploadRole(userInfo.userId,"admin");
                 }else{
                     uploadRole(userInfo.userId);
                 };
-            }
+            }else if(!data){return}
         }catch (error:any){
             console.error("Something wrong with checking role ：", error);
         }
