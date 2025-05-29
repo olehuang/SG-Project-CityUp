@@ -2,7 +2,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton  from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import React,{useState}from "react";
+import React, {useEffect, useState} from "react";
 import Button from "@mui/material/Button";
 import {useNavigate} from "react-router-dom";
 
@@ -25,10 +25,24 @@ import {
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import AppBar from "@mui/material/AppBar";
 import Divider from "@mui/material/Divider";
+import {useAuthHook} from "../components/AuthProvider";
+import KeycloakClient from "../components/keycloak";
 
 
 const Tutorial=()=>{
     const drawerWidth = 240;
+    const {token}=useAuthHook();
+    const [roles, setRoles] = useState<string[]>([]);
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const userInfo= await KeycloakClient.extractUserInfo(token);
+            setRoles(userInfo?.roles||[]);
+            console.log(userInfo?.roles);
+        }
+        if (token!==null && token!==undefined) {
+            fetchRoles();
+        }
+    },[token]);
 
     const sections = [
         "Tutorial",
@@ -36,9 +50,9 @@ const Tutorial=()=>{
         "Photo Upload",
         "Upload Histoty",
         "Building Information",
-        "Photo Review",
-        "User Management"
+        ...(roles.includes("admin") ? ["Photo Review", "User Management"] : [])
     ];
+
 
     return(
         <Box sx={pageBackgroundStyles.container}
@@ -64,17 +78,19 @@ const Tutorial=()=>{
                 <Box sx={{overflow: "auto", p: 2}}>
                     <List>
                         {sections.map((text, index) => (
-                            <ListItem key={index} disablePadding onClick={() => {
-                                const element = document.getElementById(text);
-                                if (element) {
-                                    element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }
-                            }}>
-                                <ListItemButton>
-                                    <ListItemText primary={text}/>
-                                </ListItemButton>
-                            </ListItem>
-                        ))}
+                                <ListItem key={index} disablePadding onClick={() => {
+                                    const element = document.getElementById(text);
+                                    if (element) {
+                                        element.scrollIntoView({behavior: 'smooth', block: 'start'});
+                                    }
+                                }}>
+                                    <ListItemButton>
+                                        <ListItemText primary={text}/>
+                                    </ListItemButton>
+                                </ListItem>
+                            )
+                        )
+                        }
                     </List>
                 </Box>
             </Box>
@@ -115,16 +131,24 @@ const Tutorial=()=>{
                         <Typography variant="h4" sx={styles.title}>Building Information</Typography>
                     </Box>
                     <Divider sx={styles.divider}/>
-                    <Box id={"Photo Review"} sx={styles.tutorialModelBox}>
 
-                        <Typography variant="h4" sx={styles.title}>Photo Review</Typography>
-                    </Box>
-                    <Divider sx={styles.divider}/>
+                    {roles.includes('admin') &&
+                        <>
+                            <Box id={"Photo Review"} sx={styles.tutorialModelBox}>
+                                <Typography variant="h4" sx={styles.title}>Photo Review</Typography>
+                            </Box>
+                            <Divider sx={styles.divider}/>
+                        </>
+                    }
 
-                    <Box id={"User Management"} sx={styles.tutorialModelBox}>
-                        <Typography variant="h4" sx={styles.title}>User Management</Typography>
-                    </Box>
-                    <Divider sx={styles.divider}/>
+                    {roles.includes('admin') &&
+                        <>
+                            <Box id={"User Management"} sx={styles.tutorialModelBox}>
+                                <Typography variant="h4" sx={styles.title}>User Management</Typography>
+                            </Box>
+                            <Divider sx={styles.divider}/>
+                        </>
+                    }
 
 
                     {/* 这里可以继续添加内容 */}
