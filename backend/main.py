@@ -1,13 +1,16 @@
 import asyncio
 
+
+import os
+from dotenv import load_dotenv
+load_dotenv()
+#if want to import something,must back of this line
+
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routes import photo_routes, user_routes, building_routes
 from fastapi.staticfiles import StaticFiles
-import os
-from dotenv import load_dotenv
-load_dotenv()
 
 app = FastAPI()
 

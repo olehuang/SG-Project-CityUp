@@ -22,9 +22,11 @@ class MongoDB:
             raise Exception("This class is a singleton!")
         else:
             MongoDB._instance = self
-            uri = os.getenv("MONGO_DB_URL", "mongodb://localhost:27017")
+            uri = os.getenv("MONGO_DB_URL")
+
             self.client = MongoClient(uri)
             self.db = self.client["city_photo_app"]
+
 
     def get_collection(self, collection_name):
         return self.db[collection_name]
