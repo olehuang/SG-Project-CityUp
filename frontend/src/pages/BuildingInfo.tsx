@@ -1,10 +1,12 @@
-import pageBackgroundStyles from "../pages/pageBackgroundStyles";
+import ListItemIcon from "@mui/material/ListItemIcon";
+import ListItemText from "@mui/material/ListItemText";
+import ListItemButton  from "@mui/material/ListItemButton";
+import pageBackgroundStyles from "./pageBackgroundStyles";
 import {Box, Typography} from "@mui/material";
 import React from "react";
 
-
-const PhotoReview=()=>{
-    return (
+const BuildingInfo=()=>{
+    return(
         <Box sx={pageBackgroundStyles.container}>
             <Box sx={pageBackgroundStyles.wrapper}>
                 <Typography variant="h1" component="h1" sx={pageBackgroundStyles.title}>
@@ -14,5 +16,4 @@ const PhotoReview=()=>{
         </Box>
     )
 }
-
-export default PhotoReview
+export default BuildingInfo;

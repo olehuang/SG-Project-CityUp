@@ -20,7 +20,8 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     return (
         <AppBar position="static" sx={{
             // backgroundColor: '#1976d2',
-            backgroundColor: '#5D4037'
+            backgroundColor: '#5D4037',
+            marginBottom:0,
         }}>
             <Toolbar>
                 <IconButton

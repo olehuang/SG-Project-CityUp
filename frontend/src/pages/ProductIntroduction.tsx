@@ -1,11 +1,11 @@
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton  from "@mui/material/ListItemButton";
-import pageBackgroundStyles from "../pages/pageBackgroundStyles";
+import pageBackgroundStyles from "./pageBackgroundStyles";
 import {Box, Typography} from "@mui/material";
 import React from "react";
 
-const UploadHistory=()=>{
+const ProductIntroduction=()=>{
     return(
         <Box sx={pageBackgroundStyles.container}>
             <Box sx={pageBackgroundStyles.wrapper}>
@@ -16,4 +16,4 @@ const UploadHistory=()=>{
         </Box>
     )
 }
-export default UploadHistory;
+export default ProductIntroduction;

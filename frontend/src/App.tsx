@@ -11,12 +11,12 @@ import {AuthProvider} from "./components/AuthProvider";
 import KeycloakClient from "./components/keycloak";
 import Keycloakinit from "./components/Keycloakinit";
 import ProtectedRouter from "./components/ProtectedRouter";
-import Upload from "./components/Upload";
-import Tutorial from "./components/Tutorial";
-import BuildingInfo from "./components/BuildingInfo";
-import UploadHistory from "./components/UploadHistory";
-import ProductIntroduction from "./components/ProductIntroduction";
-import PhotoReview from "./components/PhotoReview";
+import Upload from "./pages/Upload";
+import Tutorial from "./pages/Tutorial";
+import BuildingInfo from "./pages/BuildingInfo";
+import UploadHistory from "./pages/UploadHistory";
+import ProductIntroduction from "./pages/ProductIntroduction";
+import PhotoReview from "./pages/PhotoReview";
 import axios from "axios";
 
 
