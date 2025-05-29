@@ -5,13 +5,14 @@ import {useAuthHook} from "./AuthProvider";
 import {useEffect, useState} from "react";
 import {routes} from "@keycloak/keycloak-account-ui/lib/routes";
 
+import axios from "axios";
 
 
 const KeycloakInit = () => {
 
     const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading,setToken}=useAuthHook();
     const [userInfo,setUserInfo]=useState<any>({});
-
+    const [role0,setRole0]=useState<string>("");
     //listen Keycloak Certification status changes
     useEffect(() => {
         //macke sure login
@@ -20,7 +21,11 @@ const KeycloakInit = () => {
             setAuthLoading(false);
 
         };
-        //after user Login fetch user Setting from MongoDB
+       //if use no in DB storaged, save in DB
+        if (user_id){
+            checkUser(user_id);
+            checkRole(user_id);
+        }
     }, [user_id,auth]);
 
 
@@ -33,15 +38,10 @@ const KeycloakInit = () => {
                 .then(userInfo => {
                     if (userInfo) {
                         setUserInfo(userInfo);
-                        saveUser(userInfo);
                         setUserID(userInfo.userId)//global
                         setAuthLoading(false);
                         setToken(token);
-                        if (userInfo.roles.includes("admin")) {
-                            uploadRole(userInfo.userId,"admin");
-                        }else{
-                            uploadRole(userInfo.userId);
-                        }
+                        setRole0(userInfo.roles[0])
                         console.log(userInfo);
                     }
                 });
@@ -74,6 +74,49 @@ const KeycloakInit = () => {
          }
     }
 
+    const checkUser=async (user_id:any)=>{
+        const url=`http://127.0.0.1:8000/users/check_user`;
+        try{
+            const response = await axios.get(url,{ params: { user_id } });
+            const data = response.data;
+            console.log("response checkUser:",data);
+            if (data===false){
+                saveUser(userInfo)
+            }
+        }catch (error:any){
+            console.error("Something wrong with checking user ：", error);
+        }
+    }
+
+    const checkRole=async (user_id:any)=>{
+        const url=`http://127.0.0.1:8000/users/check_role`;
+        try{
+            const response = await fetch(url,
+                {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(user_id)
+                }
+            );
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.detail || "Error");
+            }
+            const data = await response.json();
+            console.log("response check role:",data);
+            if (data!==userInfo.roles[0]){
+                if (userInfo.roles[0]==="admin") {
+                    uploadRole(userInfo.userId,"admin");
+                }else{
+                    uploadRole(userInfo.userId);
+                };
+            }
+        }catch (error:any){
+            console.error("Something wrong with checking role ：", error);
+        }
+    }
     const saveUser=async (userInfo:any)=>{
         const url=`http://127.0.0.1:8000/users/save_user`;
         const payload={

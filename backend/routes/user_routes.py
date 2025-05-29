@@ -51,3 +51,27 @@ async def delete_user(user_id:str):
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
+@router.get("/check_user")
+async def check_user(user_id:str):
+    try:
+        response= await db_userEntities.get_user(user_id)
+        if response is None:
+            return False
+        else:
+            return True
+    except Exception as e:
+        print("Exception while getting user",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get("/check_role")
+async def check_role(user_id:str):
+    try:
+        response= await db_userEntities.get_user(user_id)
+        if response is None:
+            return False
+        else:
+            return response.role
+    except Exception as e:
+        print("Exception while getting user",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

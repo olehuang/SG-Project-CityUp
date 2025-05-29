@@ -19,6 +19,8 @@ async def save_user_or_create(user: User):
             new_user = User(user.user_id, user.username, user.email,user.role)
             new_user_dict = new_user.__dict__.copy()
             new_user_dict["_id"] = str(new_user.user_id)
+            await users.insert_one(new_user_dict)
+            print("save seccessful")
             return new_user_dict
     except Exception as e:
         log_error("Error from save_user : {}".format(e),

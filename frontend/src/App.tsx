@@ -17,6 +17,7 @@ import BuildingInfo from "./components/BuildingInfo";
 import UploadHistory from "./components/UploadHistory";
 import ProductIntroduction from "./components/ProductIntroduction";
 import PhotoReview from "./components/PhotoReview";
+import axios from "axios";
 
 
 function App() {

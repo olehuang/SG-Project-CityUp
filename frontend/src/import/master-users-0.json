@@ -1,0 +1,166 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "54332d9c-a1d2-4c1c-8103-d4ce2a3d83fc",
+    "username" : "hxinyi",
+    "firstName" : "Xinyi",
+    "lastName" : "Huang",
+    "email" : "hxinyi53@gmail.com",
+    "emailVerified" : true,
+    "createdTimestamp" : 1747646740198,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "efa876ba-ac94-439e-a796-8456251cb6e8",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1747646753220,
+      "secretData" : "{\"value\":\"9MGrSmcZ/KoHDz1yB3NT6jmHa6HD75yn8AAqeCxTsRk=\",\"salt\":\"lefH6m2II9wdApfa+dZ2kg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "clientRoles" : {
+      "cityup" : [ "admin" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ "/user/admin", "/user" ]
+  }, {
+    "id" : "cda063e3-5114-4dae-91a5-6f8fa6b0626e",
+    "username" : "hxinyi53+cityupuser@gmail.com",
+    "firstName" : "Xinyi",
+    "lastName" : "Huang",
+    "email" : "hxinyi53+cityupuser@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747737184708,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "1c021b95-2c1d-4924-a94d-09238144bb6c",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1747737202302,
+      "secretData" : "{\"value\":\"TjdNAe6LdrpI/+NItM7S/DPznvzzpOfXWgyOk5p+fjg=\",\"salt\":\"OJbAFDNgFjwNvgd+kEWkww==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master" ],
+    "notBefore" : 0,
+    "groups" : [ "/user" ]
+  }, {
+    "id" : "15ee9579-4dc9-4332-85a0-cc1ac58af13b",
+    "username" : "hxinyi53+user02@gmail.com",
+    "firstName" : "Xi",
+    "lastName" : "Hua",
+    "email" : "hxinyi53+user02@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1748530602538,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "e9e0f14f-fe8d-411b-ab6d-8a8d059437a1",
+      "type" : "password",
+      "createdDate" : 1748530602622,
+      "secretData" : "{\"value\":\"odtgvZfeIACRd+RjJjanVsLfQmGlHdC5z18MZo9M7gg=\",\"salt\":\"FExkR/JQMXtq6YGakW8gdQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master" ],
+    "notBefore" : 0,
+    "groups" : [ "/user" ]
+  }, {
+    "id" : "48582a1f-9a03-4b12-8271-97857312b5c3",
+    "username" : "vienna769@gmail.com",
+    "firstName" : "Muzi",
+    "lastName" : "Pan",
+    "email" : "vienna769@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747769859276,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "e2d353a6-7d7f-4eb5-89a4-53aca55253ff",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1747769885332,
+      "secretData" : "{\"value\":\"53YitI/9rmPSWp+Hb6UwzzylBGaZGRXZDI4LspnmYNk=\",\"salt\":\"BDS2Jg/JsZBdoG7sPZuGjg==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master" ],
+    "notBefore" : 0,
+    "groups" : [ "/user/admin", "/user" ]
+  }, {
+    "id" : "b8f723bd-1371-441a-b750-db0ea359f5b3",
+    "username" : "xinyi",
+    "emailVerified" : false,
+    "attributes" : {
+      "is_temporary_admin" : [ "true" ]
+    },
+    "createdTimestamp" : 1747646692079,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "7d0b5bd0-c373-41ac-b3f1-7b8516905227",
+      "type" : "password",
+      "createdDate" : 1747646692191,
+      "secretData" : "{\"value\":\"pyqYvf9pAGYUGWI8c2Dc9A5Y3ETmMYT3Qb88CBpY194=\",\"salt\":\"Wx5epw7DPBJ4BMyKUQw6gA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "0733cf92-8469-4744-a263-53103d164584",
+    "username" : "yulinkrenzel@gmail.com",
+    "firstName" : "Yulin",
+    "lastName" : "Krenzel",
+    "email" : "yulinkrenzel@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747770055701,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "2dfbdb7b-2df8-4495-9d90-3494eec31c72",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1747770067329,
+      "secretData" : "{\"value\":\"61KAra+4/191+enump2qOMWoI2l7FDhP954dqO5yhmU=\",\"salt\":\"Ul1JRK6xfNF+hftXh2cHQQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "uma_authorization", "create-realm", "default-roles-master", "offline_access", "admin" ],
+    "notBefore" : 0,
+    "groups" : [ "/user/admin" ]
+  }, {
+    "id" : "afecfe53-c267-4762-be63-875a8d5e9398",
+    "username" : "zxy2521493201@gmail.com",
+    "firstName" : "Xinyue",
+    "lastName" : "Zhang",
+    "email" : "zxy2521493201@gmail.com",
+    "emailVerified" : false,
+    "createdTimestamp" : 1747769957426,
+    "enabled" : true,
+    "totp" : false,
+    "credentials" : [ {
+      "id" : "412b8726-8fd5-4a7e-99ae-bb1764194443",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1747769972082,
+      "secretData" : "{\"value\":\"bstlWGAmNK2UGiCHYKxILjjwb7Caku9x9tB/t6gRfYg=\",\"salt\":\"ssEre5nOEsN0zFkzRsw8CQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":5,\"algorithm\":\"argon2\",\"additionalParameters\":{\"hashLength\":[\"32\"],\"memory\":[\"7168\"],\"type\":[\"id\"],\"version\":[\"1.3\"],\"parallelism\":[\"1\"]}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "uma_authorization", "default-roles-master", "offline_access", "admin" ],
+    "notBefore" : 0,
+    "groups" : [ "/user/admin" ]
+  } ]
+}
