@@ -67,8 +67,7 @@ async def check_user(user_id:str):
 @router.get("/check_role")
 async def check_role(user_id:str):
     try:
-        response= await db_userEntities.get_user(user_id)
-        print("response：",response)
+        response= await db_userEntities.get_user_role_in_DB(user_id)
         if response is None:
             return False
         else:

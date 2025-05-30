@@ -14,17 +14,17 @@ import { Link } from 'react-router-dom';                 // ← 引入 Link
 
 
 import  {useNavigate} from 'react-router-dom';
-import Keycloak from "../components/keycloak";
-import AuthProvider, {useAuthHook} from "../components/AuthProvider";
-import LogOut from "../components/LogOut";
-import Profile from "../components/Profile";
-import UploadHistory from "./UploadHistory";
-import Upload from "./Upload";
-import Tutorial from "./Tutorial";
-import ProductIntroduction from "./ProductIntroduction";
-import BuildingInfo from "./BuildingInfo";
+import Keycloak from "./keycloak";
+import AuthProvider, {useAuthHook} from "./AuthProvider";
+import LogOut from "./LogOut";
+import Profile from "./Profile";
+import UploadHistory from "../pages/UploadHistory";
+import Upload from "../pages/Upload";
+import Tutorial from "../pages/Tutorial";
+import ProductIntroduction from "../pages/ProductIntroduction";
+import BuildingInfo from "../pages/BuildingInfo";
 import {useEffect, useState} from "react";
-import KeycloakClient from "../components/keycloak";
+import KeycloakClient from "./keycloak";
 
 interface SidebarProps {
     open: boolean;
