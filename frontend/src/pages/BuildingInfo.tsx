@@ -18,10 +18,11 @@ import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 
 
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import AdressSearchField from "../components/AdressSearchField";
 import PhotoGrid from "../components/PhotoGrid";
 import {hover} from "@testing-library/user-event/dist/hover";
+import axios from "axios";
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
@@ -45,11 +46,25 @@ const BuildingInfo=()=>{
     const photos = new Array(9).fill(null);
     const [updateTime,setUpdateTime]=useState(`${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`);
     const [photoNr,setPhotoNr]=useState(0);
-    const [searchResult, setSearchResult] = useState<string[]>(mockResults);
+
     const [leftWidth, setLeftWidth] = useState(80);
-
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+    const [newSearchResult,setNewSearchResult]=useState<string[]>([])
+    const [searchResult, setSearchResult] = useState<string[]>(newSearchResult.length=== 0 ? mockResults:newSearchResult);
 
+    useEffect(() => {
+        const fetchAddr=async ()=>{
+            const url="http://127.0.0.1:8000/buildings/get_all_build_addr"
+            try {
+                const response = await axios.get(url);
+                const addr_list =response.data
+                setNewSearchResult(addr_list);
+            }catch (e:any) {
+                console.log(e.message || "Unknown error")
+            }
+        }
+        fetchAddr();
+    }, []);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();

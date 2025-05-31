@@ -55,6 +55,13 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect}) => {
                     type="search"
                     fullWidth
                     size="medium"
+                    onKeyDown={(even)=>{
+                        if (even.key==="Enter"){
+                            even.preventDefault();
+                            handleSearch()
+                        }
+                    }
+                    }
                     InputProps={{
                         ...params.InputProps,
                         startAdornment: (

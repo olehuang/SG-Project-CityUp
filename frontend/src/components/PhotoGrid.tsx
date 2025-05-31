@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { Box, Typography,Dialog, DialogTitle, DialogContent} from "@mui/material";
+import {Box, Typography, Dialog, DialogTitle, DialogContent, Button} from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
@@ -7,9 +7,16 @@ import Modal from '@mui/material/Modal';
 interface PhotoGridProps {
     address: string;
 }
+interface Photo {
+    src: string;
+    title: string;
+    uploader: string;
+    uploadTime: string;
+}
+
 
 const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
-    const [photos, setPhotos] = useState<string[]>([]);//backend return photo list
+    const [photos, setPhotos] = useState<Photo[]>([]);//backend return photo list
     const [loading, setLoading] = useState(false); //loding photo
     const [error, setError] = useState<string | null>(null); // error
     const [open,setOpen]=useState(false);
@@ -23,7 +30,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             setLoading(true);
             setError(null)
             try{
-
+                const testPhotos: Photo[]=images;
+                setPhotos(testPhotos)
             }catch (err: any) {
                 setError(err.message || "Unknown error");
             } finally {
@@ -31,6 +39,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             }
 
         }
+        fetchPhoto(address)
     }, [address]);
 
     const handleOpen = (index: number) => {
@@ -42,6 +51,13 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
+
+    const handleOfDownload=(photo:Photo)=>{
+        const link = document.createElement('a');
+        link.href=photo.src;
+        link.download=`${photo.title||"download"}.jpg`;
+        link.click();
+    }
 
     if (loading) {
         return (
@@ -64,29 +80,89 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 gap: 2,             // 块之间的间距，单位是 theme.spacing(2)
             }}
         >
-            {[...Array(10)].map((_, index) => (
+            {photos.map((photo, index) => (
                 <Box
                     key={index}
                     sx={styles.photoBox}
                     onClick={() => handleOpen(index)}
                 >
-                    <Typography>Photo {index + 1}</Typography>
+                    <Box
+                        component="img"
+                        src={photo.src}
+                        alt={photo.title}
+                        sx={{
+                            width: '100%',
+                            height: '100%',
+                            objectFit: 'cover',
+                            borderRadius: 1
+                        }}
+                    />
                 </Box>
             ))}
         </Box>
 
             {/* Dialog */}
-            <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+            <Dialog open={open}
+                    onClose={handleClose}
+                    maxWidth={'lg'}
+            >
                 <DialogTitle>Photo Detail</DialogTitle>
-                <DialogContent>
+                <Box >
                     {selectedPhotoIndex !== null && (
-                        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: 200 }}>
-                            <Typography variant="h6">
-                                This is photo {selectedPhotoIndex + 1}
-                            </Typography>
-                        </Box>
+                        <DialogContent sx={{
+                            display: "flex", flexDirection: "row",
+                            alignItems: "flex-start", gap: 4
+                        }}>
+                            <Box
+                                sx={{
+                                    display: "flex",
+                                    flexDirection: "row",
+                                    alignItems: "flex-start",
+                                    gap: 2,
+                                    minHeight: 500, // 增加对话框整体高度
+                                    p: 2,
+                                }}
+                            > {/* 图片区域 */}
+                                <Box
+                                    component="img"
+                                    src={photos[selectedPhotoIndex].src}
+                                    alt={photos[selectedPhotoIndex].title}
+                                    sx={{
+                                        width: "100%",
+                                        maxWidth: "800px",
+                                        height: "auto",
+                                        maxHeight: 500,
+                                        objectFit: "contain",
+                                        borderRadius: 2,
+                                        border: "1px solid black",
+                                    }}
+                                />
+
+                                {/* 信息区域 */}
+                                <Box sx={{
+                                    width: "100%",
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    textAlign: "left",
+                                    justifyContent: "space-between",
+                                }}><Box sx={{mb: 2, textAlign: "left"}}>
+                                    <Typography variant="h6">{photos[selectedPhotoIndex].title}</Typography>
+                                    <Typography variant="body1">Upload
+                                        Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
+                                    <Typography variant="body1">Upload
+                                        User: {photos[selectedPhotoIndex].uploader}</Typography>
+                                </Box>
+                                    <Button variant="contained"
+                                            sx={{alignSelf: "flex-start" }}
+                                            onClick={()=>handleOfDownload(photos[selectedPhotoIndex])}
+                                    >
+                                        Download
+                                    </Button>
+                                </Box>
+                            </Box>
+                        </DialogContent>
                     )}
-                </DialogContent>
+                </Box>
             </Dialog>
         </>
     )
@@ -122,6 +198,22 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          boxShadow: 24,
          p: 4,
      },
+
  }
+
+const images = [
+    {
+        src: "/luisenplatz.jpg",
+        title: "Luisenplatz",
+        uploader: "John Doe",
+        uploadTime: "2024-05-31 12:00",
+    },
+    {
+        src: "/luisenplatz.jpg", // 可重复使用同一张图片测试
+        title: "Luisenplatz 2",
+        uploader: "Jane Smith",
+        uploadTime: "2024-05-30 10:45",
+    }
+];
 
 export default PhotoGrid;
