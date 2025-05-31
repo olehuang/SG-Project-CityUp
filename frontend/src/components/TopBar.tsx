@@ -5,7 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
-import {useNavigate,useLocation} from "react-router-dom";
+import {useNavigate,useLocation,Link} from "react-router-dom";
 
 interface TopBarProps {
     onMenuClick: () => void;
@@ -60,7 +60,19 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         CityUp
                     </Typography>
                 </Box>
-                <Box sx={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)' }}>
+                <Box sx=
+                         {{
+                             position: 'absolute',
+                             left: '50%',
+                             transform: 'translateX(-50%)',
+                             color: "#fff",
+                             textDecoration: 'none',
+                             "&hover": {
+                                 textDecoration:"underline"
+                             }
+                         }}
+                     component={Link}
+                     to="/dashboard">
                     <Typography variant="h6" component="div" sx={{justifyContent: "space-between",}}>
                         {getPageTitle()}
                     </Typography>

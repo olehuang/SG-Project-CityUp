@@ -1,11 +1,37 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import { Box, Typography,Dialog, DialogTitle, DialogContent} from "@mui/material";
+import CircularProgress from '@mui/material/CircularProgress';
+import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
 
-const PhotoGrid = (props: any) => {
-    const [open,setOpen]=useState(false);
+interface PhotoGridProps {
+    address: string;
+}
 
+const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
+    const [photos, setPhotos] = useState<string[]>([]);//backend return photo list
+    const [loading, setLoading] = useState(false); //loding photo
+    const [error, setError] = useState<string | null>(null); // error
+    const [open,setOpen]=useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+
+
+    useEffect(() => {
+        if(!address) return;
+
+        const fetchPhoto= async (address:string)=>{
+            setLoading(true);
+            setError(null)
+            try{
+
+            }catch (err: any) {
+                setError(err.message || "Unknown error");
+            } finally {
+                setLoading(false);
+            }
+
+        }
+    }, [address]);
 
     const handleOpen = (index: number) => {
         setSelectedPhotoIndex(index);
@@ -16,6 +42,18 @@ const PhotoGrid = (props: any) => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
+
+    if (loading) {
+        return (
+            <Box >
+                <CircularProgress size="3rem"/>
+                <Typography>Loading photos...</Typography>
+            </Box>
+        );
+    }
+
+    if(error)return(<Alert variant="filled" severity="error">Error by Fetch Photo, Detail: {error}</Alert>)
+
 
     return (
         <>

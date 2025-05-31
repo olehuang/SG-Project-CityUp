@@ -8,6 +8,16 @@ import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import Grid from '@mui/material/Grid';
 
+
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+
+
 import React, {useState} from "react";
 import AdressSearchField from "../components/AdressSearchField";
 import PhotoGrid from "../components/PhotoGrid";
@@ -30,13 +40,16 @@ const mockResults = [
 ].sort((a,b)=>a.localeCompare(b));
 
 const BuildingInfo=()=>{
-    const utcString = new Date().toUTCString();
+    const now = new Date();
 
     const photos = new Array(9).fill(null);
-    const [updateTime,setUpdateTime]=useState(utcString);
+    const [updateTime,setUpdateTime]=useState(`${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`);
     const [photoNr,setPhotoNr]=useState(0);
-    const [searchResult, setSearchResult] = useState<string[]>([]);
+    const [searchResult, setSearchResult] = useState<string[]>(mockResults);
     const [leftWidth, setLeftWidth] = useState(80);
+
+    const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
+
 
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -62,6 +75,7 @@ const BuildingInfo=()=>{
 
 
     const handleSearch = (query: string) => {
+
         const result = mockResults.filter((addr) =>
             addr.toLowerCase().includes(query.toLowerCase())
         );
@@ -70,7 +84,8 @@ const BuildingInfo=()=>{
 
     const handleSelect = (selected: string) => {
         // 也可以在这里记录用户选择的地址
-        handleSearch(selected);
+        //handleSearch(selected);
+        setSelectedAddress(selected);
 
     };
     return(
@@ -78,27 +93,53 @@ const BuildingInfo=()=>{
             <Box  sx={styles.container}>
                 <AdressSearchField  onSearch={handleSearch} onSelect={handleSelect}/>
                 <Box id="resizable-container" sx={styles.innerContainer}>
-                    <Box sx={{...styles.leftContainer, width : `${leftWidth}%`}}>
-                        {searchResult.length > 0 ? (
-                            searchResult.map((addr, idx) => <Box
-                                key={idx}
-                                sx={styles.serachResault}
-                            >
-                                <Typography variant="body2">{addr} </Typography>
-                                <Typography variant="body2">Last Update: {updateTime}</Typography>
-                                <Typography variant="body2">Count:{photoNr}</Typography>
-
-                            </Box>)
-                        ) : (
-                            <Box>No Match</Box>
-                        )}
-                    </Box>
+                    <TableContainer component={Paper} style={{}}>
+                        <Table size="medium" aria-label="building table">
+                            <TableHead >
+                                <TableRow >
+                                    <TableCell><strong>Address</strong></TableCell>
+                                    <TableCell><strong>Last Update Time</strong></TableCell>
+                                    <TableCell><strong>Photo Count</strong></TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {searchResult.length > 0 ? (
+                                    searchResult.map((addr, idx) => (
+                                        <TableRow
+                                            key={idx}
+                                            hover
+                                            sx={{...styles.serachResault,
+                                                ...(addr === selectedAddress && {
+                                                    backgroundColor: "#b2ebf2",  // click address highlight
+                                                }),}}
+                                            onClick={() => handleSelect(addr)}
+                                        >
+                                            <TableCell>{addr}</TableCell>
+                                            <TableCell>{updateTime}</TableCell>
+                                            <TableCell>{photoNr}</TableCell>
+                                        </TableRow>
+                                    ))
+                                ) : (
+                                    <TableRow>
+                                        <TableCell colSpan={3}>No Match</TableCell>
+                                    </TableRow>
+                                )}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
                     <Box onMouseDown={handleMouseDown} sx={styles.resizer} />
                     <Box sx={{ ...styles.rightContainer, width: `${100 - leftWidth}%` }}>
 
                         <Typography title="h1">Photo Area </Typography>
                         <Box>
-                            <PhotoGrid/>
+                            {selectedAddress ? (
+                                <PhotoGrid address={selectedAddress}/>
+                            ) : (
+                                <Typography variant="body2" color="textSecondary">
+                                    Please select an address to view photos.
+                                </Typography>
+                            )}
+
                         </Box>
                     </Box>
                 </Box>
@@ -151,16 +192,25 @@ const styles={
         borderRadius:"5px",
         overflowY: "auto",
     },
-    serachResault:{
+    searchTitle:{
+        position: "absolut",
         display: "flex",
-        height:"15%",
         justifyContent:"space-between",
-        padding: "8px 12px",
-        //border: "1px solid #ccc",
-        borderRadius: "5px",
-        backgroundColor: "#fff",
-        cursor: "pointer",
-        transition: "all 0.2s ease-in-out",
+        backgroundColor:"#fff",
+        width:"100%",
+        gridTemplateColumns: "50% 30% 20%",
+    },
+    serachResault:{
+        //cursor: "pointer", transition: "all 0.2s ease-in-out"
+        // display: "flex",
+        // justifyContent:"space-between",
+        // padding: "8px 12px",
+        // gridTemplateColumns: "50% 30% 20%",
+        // //border: "1px solid #ccc",
+        // borderRadius: "5px",
+        // backgroundColor: "#fff",
+         cursor: "pointer",
+         transition: "all 0.2s ease-in-out",
         "&:hover()":{
             backgroundColor: "#e0f7fa",
             borderColor: "#128d9e",
