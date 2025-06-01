@@ -109,43 +109,19 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 <DialogTitle>Photo Detail</DialogTitle>
                 <Box >
                     {selectedPhotoIndex !== null && (
-                        <DialogContent sx={{
-                            display: "flex", flexDirection: "row",
-                            alignItems: "flex-start", gap: 4
-                        }}>
+                        <DialogContent sx={styles.dialogContainer}>
                             <Box
-                                sx={{
-                                    display: "flex",
-                                    flexDirection: "row",
-                                    alignItems: "flex-start",
-                                    gap: 2,
-                                    minHeight: 500, // 增加对话框整体高度
-                                    p: 2,
-                                }}
+                                sx={styles.dialogFirstBox}
                             > {/* 图片区域 */}
                                 <Box
                                     component="img"
                                     src={photos[selectedPhotoIndex].src}
                                     alt={photos[selectedPhotoIndex].title}
-                                    sx={{
-                                        width: "100%",
-                                        maxWidth: "800px",
-                                        height: "auto",
-                                        maxHeight: 500,
-                                        objectFit: "contain",
-                                        borderRadius: 2,
-                                        border: "1px solid black",
-                                    }}
+                                    sx={styles.dialogPhotoArea}
                                 />
 
                                 {/* 信息区域 */}
-                                <Box sx={{
-                                    width: "100%",
-                                    display: "flex",
-                                    flexDirection: "column",
-                                    textAlign: "left",
-                                    justifyContent: "space-between",
-                                }}><Box sx={{mb: 2, textAlign: "left"}}>
+                                <Box sx={styles.dialogInfoArea}><Box sx={{mb: 2, textAlign: "left"}}>
                                     <Typography variant="h6">{photos[selectedPhotoIndex].title}</Typography>
                                     <Typography variant="body1">Upload
                                         Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
@@ -168,6 +144,36 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     )
  }
  const styles={
+    dialogContainer:{
+        display: "flex",
+        flexDirection: "row",
+        alignItems: "flex-start",
+        gap: 4
+    },
+     dialogFirstBox:{
+         display: "flex",
+         flexDirection: "row",
+         alignItems: "flex-start",
+         gap: 2,
+         minHeight: 500, // 增加对话框整体高度
+         p: 2,
+     },
+     dialogPhotoArea:{
+         width: "100%",
+         maxWidth: "800px",
+         height: "auto",
+         maxHeight: 500,
+         objectFit: "contain",
+         borderRadius: 2,
+         border: "1px solid black",
+     },
+     dialogInfoArea:{
+         width: "100%",
+         display: "flex",
+         flexDirection: "column",
+         textAlign: "left",
+         justifyContent: "space-between",
+     },
     photoBox:{
         flex: "0 0 30%",                  // width 1/3 - space（gap*2）
         aspectRatio: "3 / 4",               // （width:height = 3:4）
