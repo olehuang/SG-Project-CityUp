@@ -92,14 +92,14 @@ const KeycloakInit = () => {
         const url=`http://127.0.0.1:8000/users/check_role`;
         try{
             const response = await axios.get(url,{ params: { user_id } });
-            const data =  response.data.role;
+            const data =  response.data;
 
             if (data!==userInfo.roles[0]){
                 if (userInfo.roles[0]==="admin") {
                     uploadRole(userInfo.userId,"admin");
                 }else{
                     uploadRole(userInfo.userId);
-                };
+                }
             }else if(!data){return}
         }catch (error:any){
             console.error("Something wrong with checking role ：", error);

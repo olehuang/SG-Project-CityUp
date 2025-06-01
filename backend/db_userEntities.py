@@ -17,11 +17,12 @@ async def save_user_or_create(user: User):
         result = await users.find_one(query)
         if result is None:
             new_user = User(user.user_id, user.username, user.email,user.role)
-            new_user_dict = new_user.__dict__.copy()
-            new_user_dict["_id"] = str(new_user.user_id)
+            new_user_dict = new_user.__dict__
             await users.insert_one(new_user_dict)
             print("save seccessful")
             return new_user_dict
+        else:
+            return result
     except Exception as e:
         log_error("Error from save_user : {}".format(e),
                   stack_data=traceback.format_exc(),
@@ -56,12 +57,25 @@ async def get_user(user_id:str):
     query = {"user_id": user_id}
     try:
         users = MongoDB.get_instance().get_collection('users')
-        return await users.find_one(query)
+        user= await users.find_one(query)
+        return user
     except Exception as e:
         log_error("Error from get_user : {}".format(e)
                   ,stack_data=traceback.format_exc(),
                   time_stamp=datetime.now().isoformat())
         raise
+
+async def get_user_role_in_DB(user_id:str):
+    query = {"user_id":user_id}
+    try:
+        user=await get_user(user_id)
+        return user['role']
+    except Exception as e:
+        log_error("Error from get_user : {}".format(e)
+                  ,stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
 
 """
 brief: give back all user information from DB
