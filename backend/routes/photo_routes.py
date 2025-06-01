@@ -40,7 +40,7 @@ class BatchReviewRequest(BaseModel):
 class PhotoResponse(BaseModel):
     photo_id: str
     user_id: str
-    building_id: str
+    building_addr: str
     # upload_time: str
     upload_time: datetime
     image_url: Optional[str]
@@ -53,7 +53,7 @@ class PhotoResponse(BaseModel):
 @router.post("/", status_code=201)
 async def upload_photo(
         user_id: str = Form(...),
-        building_id: str = Form(...),
+        building_addr: str = Form(...),
         photos: List[UploadFile] = File(...)
 ):
     try:
@@ -83,7 +83,7 @@ async def upload_photo(
 
             photo_obj = Photo(
                 user_id=user_id,
-                building_id=building_id,
+                building_addr=building_addr,
                 image_url=image_url,
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending
