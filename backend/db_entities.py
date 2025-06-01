@@ -62,15 +62,13 @@ class User:
 
 # 建筑信息
 class Building:
-    def __init__(self, building_id: str, address: str,
+    def __init__(self, address: str,
                  geo_coords: Optional[dict] = None):
-        self.building_id = building_id
         self.address = address
         self.geo_coords = geo_coords  # {"lat": ..., "lon": ...}
 
     def to_dict(self):
         return {
-            "building_id": self.building_id,
             "address": self.address,
             "geo_coords": self.geo_coords
         }
@@ -78,10 +76,8 @@ class Building:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            building_id=data["building_id"],
             address=data["address"],
             geo_coords=data.get("geo_coords")
-
         )
 
 
@@ -95,7 +91,7 @@ class ReviewStatus(Enum):
 
 # 上传的照片信息
 class Photo:
-    def __init__(self, user_id: str, building_id: str,
+    def __init__(self, user_id: str, building_addr: str,
                  upload_time: Optional[datetime] = None,
                  image_url: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
@@ -105,7 +101,7 @@ class Photo:
                  _id: Optional[ObjectId] = None):
         self._id = _id or ObjectId()
         self.user_id = user_id
-        self.building_id = building_id
+        self.building_addr = building_addr
         self.upload_time = upload_time or datetime.now()
         self.image_url = image_url
         self.status = status
@@ -117,7 +113,7 @@ class Photo:
         return {
             "_id": self._id,
             "user_id": self.user_id,
-            "building_id": self.building_id,
+            "building_addr": self.building_addr,
             "upload_time": self.upload_time,
             "image_url": self.image_url,
             "status": self.status.value,
@@ -131,7 +127,7 @@ class Photo:
         return cls(
             _id=data.get("_id"),
             user_id=data["user_id"],
-            building_id=data["building_id"],
+            building_addr=data["building_addr"],
             upload_time=data.get("upload_time"),
             image_url=data.get("image_url"),
             status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),

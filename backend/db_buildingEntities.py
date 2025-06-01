@@ -47,27 +47,6 @@ async def take_building_info(address:str):
                   time_stamp=datetime.now())
         raise
 
-
-"""
-@:parameter string : id of building
-brief: whith address can take Building Information from DB
-"""
-async def take_building_info(id:str):
-    query={"building_id":id}
-    try:
-        buildings=MongoDB.get_instance().get_buildings("buildings")
-        result = await buildings.find_one(query)
-        if result is None:
-            return -1
-        else:
-            return result
-    except Exception as e:
-        log_error("Error from take_building : {}".format(e),
-                  stack_data=traceback.format_exc(),
-                  time_stamp=datetime.now())
-        raise
-
-
 """
 brief: give back all Building address from DB
 """
