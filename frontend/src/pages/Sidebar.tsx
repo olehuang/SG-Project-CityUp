@@ -59,6 +59,10 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 <ListItemText primary='dashboard' />
                             </ListItemButton>
                         </ListItem>
+                    </List>
+                    <Divider />
+                    <List>
+                        <Profile token={token}/>
                         {/* Upload 页面入口 */}
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
@@ -66,10 +70,6 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 <ListItemText primary="Upload" />
                             </ListItemButton>
                         </ListItem>
-                    </List>
-                    <Divider />
-                    <List>
-                        <Profile token={token}/>
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/tutorial">
                                 <ListItemIcon></ListItemIcon>
