@@ -23,6 +23,8 @@ class MongoDB:
         else:
             MongoDB._instance = self
             uri = os.getenv("MONGO_DB_URL")
+            if not uri:
+                raise ValueError("MONGO_DB_URL environment variable not set.")
 
             self.client = AsyncMongoClient(uri)
             self.db = self.client["city_photo_app"]
@@ -98,6 +100,8 @@ class Photo:
                  image_url: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
                  feedback: Optional[str] = None,
+                 reviewer_id: Optional[str] = None,
+                 review_time: Optional[datetime] = None,
                  _id: Optional[ObjectId] = None):
         self._id = _id or ObjectId()
         self.user_id = user_id
@@ -106,6 +110,8 @@ class Photo:
         self.image_url = image_url
         self.status = status
         self.feedback = feedback
+        self.reviewer_id = reviewer_id
+        self.review_time = review_time
 
     def to_dict(self):
         return {
@@ -115,7 +121,9 @@ class Photo:
             "upload_time": self.upload_time,
             "image_url": self.image_url,
             "status": self.status.value,
-            "feedback": self.feedback
+            "feedback": self.feedback,
+            "reviewer_id": self.reviewer_id,
+            "review_time": self.review_time
         }
 
     @classmethod
@@ -126,6 +134,8 @@ class Photo:
             building_id=data["building_id"],
             upload_time=data.get("upload_time"),
             image_url=data.get("image_url"),
-            status=ReviewStatus(data.get("status", "pending")),
-            feedback=data.get("feedback")
+            status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),
+            feedback=data.get("feedback"),
+            reviewer_id = data.get("reviewer_id"),
+            review_time = data.get("review_time")
         )
