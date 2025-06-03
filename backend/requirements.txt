@@ -5,3 +5,5 @@ pydantic==2.9.2
 python-dotenv==1.0.1
 fastapi==0.115.5
 python-multipart
+
+#py -3.13 -m uvicorn main:app --reload
