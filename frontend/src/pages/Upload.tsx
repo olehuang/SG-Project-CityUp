@@ -2,8 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
+import { useAuthHook } from "../components/AuthProvider";
 
-//TODO 3：想实现这个页面随着页面比例扩大缩小
+
 
 // 默认达姆施塔特市中心 Default Darmstadt city centre
 const DEFAULT_CENTER: [number, number] = [49.8728, 8.6512];
@@ -23,6 +24,7 @@ const markerIcon = L.icon({
 });
 
 const Upload: React.FC = () => {
+    const { user_id, auth } = useAuthHook();
     const [latlng, setLatlng] = useState<[number, number] | null>(null);
     const [address, setAddress] = useState<string>("");
     const [photos, setPhotos] = useState<UploadPhoto[]>([]);
@@ -61,19 +63,45 @@ const Upload: React.FC = () => {
                 `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`
             );
             const data = await res.json();
-            // 暂时：只要地址字符串里包含 darmstadt 即认为有效
-            //TODO 4：搜索范围待改进：需要让这个搜索仅仅对于Darmstadt城市范围。已发现问题：如果输入范围不准确会去到其他城市含有Darmstadt的地址，
-            const addrStr = JSON.stringify(data.address).toLowerCase();
-            if (addrStr.includes("darmstadt")) {
-                setAddress(data.display_name || "");
-                setError(null);
-            } else {
+            const addr = data.address || {};
+
+            const locationString = [
+                addr.city,
+                addr.town,
+                addr.village,
+                addr.municipality,
+                addr.state_district,
+                addr.city_district,
+                addr.county,
+                addr.state,
+                addr.suburb
+            ]
+                .filter(Boolean)
+                .join(", ")
+                .toLowerCase();
+
+            const isInDarmstadt = locationString.includes("darmstadt");
+            if (!isInDarmstadt) {
                 setAddress("");
-                setError("当前位置不在达姆施塔特范围");
+                setError("Current location is not in Darmstadt");
+                return;
             }
+            setError(null);
+            const parts = [
+                addr.house_number,
+                addr.road,
+                "Darmstadt",
+                addr.postcode,
+                "Hessen",
+                "Deutschland"
+            ].filter(Boolean);
+
+            setAddress(parts.join(", "));
+
         } catch {
-            setError("地址解析失败");
+            setError("Address resolution failure");
         }
+
     };
 
 
@@ -194,6 +222,11 @@ const Upload: React.FC = () => {
     // 提交照片本身以及其信息到后端
     const handleSubmit = async () => {
         setError(null);
+
+        if (!auth || !user_id) {
+            setError("You must be logged in to upload photos.");
+            return;
+        }
         if (!latlng) {
             setError("Please select the location of the building on the map");
             return;
@@ -211,55 +244,68 @@ const Upload: React.FC = () => {
         try {
             // FormData里有建筑的经纬度门牌号和照片
             const formData = new FormData();
+            formData.append("user_id", user_id);//用户id
             formData.append("lat", latlng[0].toString());//纬度 Latitude
             formData.append("lng", latlng[1].toString());//经度 Longitude
-            formData.append("address", address); //门牌号
+            formData.append("building_addr", address); //门牌号作为 building_addr
             photos.forEach((photo) => { //照片组
                 formData.append("photos", photo.file, photo.file.name);
             });
 
-            //TODO 2：实际上传请求（得先连接后端）
-            /*
-            const res = await fetch("/api/upload", {
+
+            const res = await fetch("http://localhost:8000/photos/", {
                 method: "POST",
                 body: formData,
             });
-            if (!res.ok) throw new Error("Upload failed");
-
-            // 你可以根据需要在这里获取后端返回的内容
-            // const result = await res.json();
-            */
-
-            // 没有后端时，模拟一个延时和成功提示
-            setTimeout(() => {
-                setError(
-                    "Upload successful! Your photos have been submitted for review. " +
-                    "Thank you for contributing to this project. " +
-                    "Approved submissions will be rewarded with corresponding points. :)"
-                );
-                setPhotos([]);
-                setIsSubmitting(false);
-            }, 1500);
-
-        } catch (e: any) {
+            if (!res.ok) {
+                const err = await res.text();
+                throw new Error(err);
+            }
+            const data = await res.json();
+            setError("Upload successful! " + data.message);
+            setPhotos([]);
+        } catch (e:any) {
             setError("Upload failed: " + (e?.message || "Unknown error"));
-            setIsSubmitting(false);
         }
+        setIsSubmitting(false);
     };
 
 
     return (
-        <div style={{ background: "#FFF8E1", minHeight: "100vh", padding: 0 }}>
-            <div style={{ maxWidth: 680, margin: "0 auto", padding: 20 }}>
-                <h1 style={{ fontSize: 32, fontWeight: 700, margin: "18px 0" }}>Upload Building Photos</h1>
+        <div
+            style={{
+                height: "100%",         // 让内容充满剩余空间
+                width: "100%",
+                overflowY: "auto",      // 出现竖向滚动条
+                background: "#FFF8E1",
+            }}
+        >
+
+            <div
+                style={{
+                    maxWidth: 680,
+                    width: "95%",
+                    margin: "0 auto",
+                    padding: "3vw 0.5vw",
+                    boxSizing: "border-box",
+                }}
+            >
+                <h1
+                    style={{
+                        fontSize: "2rem",
+                        fontWeight: 700,
+                        margin: "18px 0"
+                    }}
+                >
+                    Upload Building Photos
+                </h1>
                 {/* 地址输入和搜索 */}
                 <div style={{ marginBottom: 14 }}>
-                    <label
-                        htmlFor="address"
+                    <label htmlFor="address"
                         style={{
                             display: "block",
                             fontWeight: 500,
-                            fontSize: 18,
+                            fontSize: "1.15rem",
                             marginBottom: 4,
                         }}
                     >
@@ -274,11 +320,13 @@ const Upload: React.FC = () => {
                             placeholder="Type the address or click on the map to select."
                             style={{
                                 width: "100%",
-                                fontSize: 18,
-                                padding: 8,
+                                fontSize: "1rem",
+                                padding: "0.6em 0.8em",
                                 border: "1px solid #aaa",
                                 borderRadius: 5,
-                                maxWidth: 420,
+                                boxSizing: "border-box",
+                                maxWidth: "420px",
+                                minWidth: "0px"
                             }}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") handleAddressSearch();
@@ -291,9 +339,10 @@ const Upload: React.FC = () => {
                                 color: "#fff",
                                 border: "none",
                                 borderRadius: 5,
-                                padding: "8px 16px",
-                                fontSize: 16,
+                                padding: "0.5em 1.3em",
+                                fontSize: "1rem",
                                 cursor: "pointer",
+                                flexShrink: 0,
                             }}
                         >
                              Search
@@ -304,12 +353,13 @@ const Upload: React.FC = () => {
                 <div
                     style={{
                         width: "100%",
-                        height: 320,
+                        height: "35vw",
+                        maxHeight: 350,
+                        minHeight: 220,
                         borderRadius: 16,
                         overflow: "hidden",
                         marginBottom: 14,
                         border: "1px solid #eee",
-                        minHeight: 220,
                         background: "#e0e0e0",
                     }}
                 >
@@ -352,13 +402,12 @@ const Upload: React.FC = () => {
                     )}
                 </div>
                 {/* Upload area 上传区 */}
-                <div style={{ marginBottom: 12 }}>
+                <div style={{ marginBottom: 12,display: "flex", flexWrap: "wrap", gap: 10 }}>
                     <button
                         onClick={handleTakePhoto}
                         style={{
                             fontSize: 16,
                             padding: "6px 12px",
-                            marginRight: 12,
                             borderRadius: 7,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -372,7 +421,6 @@ const Upload: React.FC = () => {
                         style={{
                             fontSize: 16,
                             padding: "6px 12px",
-                            marginRight: 12,
                             borderRadius: 7,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -391,7 +439,7 @@ const Upload: React.FC = () => {
                     />
                 </div>
                 {/* 照片缩略图 */}
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10 }}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10,overflowX: "auto",}}>
                     {photos.map((photo) => (
                         <div key={photo.id} style={{ position: "relative" }}>
                             <img
@@ -403,14 +451,15 @@ const Upload: React.FC = () => {
                                     objectFit: "cover",
                                     borderRadius: 8,
                                     border: "1px solid #ddd",
+                                    display: "block"
                                 }}
                             />
                             <button
                                 onClick={() => removePhoto(photo.id)}
                                 style={{
                                     position: "absolute",
-                                    top: -8,
-                                    right: -8,
+                                    top: 1,
+                                    right: 1,
                                     width: 22,
                                     height: 22,
                                     borderRadius: "50%",
@@ -420,6 +469,7 @@ const Upload: React.FC = () => {
                                     fontSize: 14,
                                     cursor: "pointer",
                                     lineHeight: "20px",
+                                    zIndex: 2,
                                 }}
                                 title="delete photo"
                             >
@@ -431,12 +481,13 @@ const Upload: React.FC = () => {
                 {/* 照片要求说明 */}
                 <div
                     style={{
-                        fontSize: 15,
+                        fontSize: "1rem",
                         background: "#fffde7",
                         borderRadius: 8,
                         padding: "10px 16px",
                         marginBottom: 20,
                         border: "1px solid #f5e79e",
+                        boxSizing: "border-box"
                     }}
                 >
                     <b>Photo shooting requirements：</b>
@@ -471,7 +522,7 @@ const Upload: React.FC = () => {
                         width: "100%",
                         background: isSubmitting ? "#aaa" : "#4da151",
                         color: "#fff",
-                        fontSize: 18,
+                        fontSize: "1.1rem",
                         fontWeight: 700,
                         border: "none",
                         borderRadius: 8,
@@ -487,261 +538,3 @@ const Upload: React.FC = () => {
 };
 
 export default Upload;
-
-
-
-
-// import React, {useState, useRef} from 'react';
-// import { Box, TextField, Typography, Button, Card, CardContent ,IconButton,CircularProgress} from '@mui/material';
-// import DeleteIcon from '@mui/icons-material/Delete';
-// import EXIF from 'exif-js';
-// /**
-//  * Upload 组件 Props
-//  * @param onUpload 完成上传后回调，传出用户所选照片列表以及其 EXIF 经纬度
-//  */
-//
-// interface FileWithCoords {
-//     file: File;
-//     latitude: number | null;
-//     longitude: number | null;
-//     url: string;
-// }
-//
-// // 把最新的文件列表（含坐标与 URL）回传给父组件。
-// //interface UploadProps {
-// //    onUpload: (files: FileWithCoords[]) => void;
-// //}
-//
-// //{ onUpload }UploadProps
-// const Upload: React.FC = () => {
-//     const [address, setAddress] = useState<string>(''); // Optional building door number
-//     const [selectedFiles, setSelectedFiles] = useState<FileWithCoords[]>([]); // recorded files
-//     const [uploading, setUploading] = useState<boolean>(false); // Uploading logo in progress
-//     const [uploadMessage, setUploadMessage] = useState<string>(''); //Prompt after successful upload
-//     const cameraInputRef = useRef<HTMLInputElement | null>(null);
-//     const galleryInputRef = useRef<HTMLInputElement | null>(null);
-//
-//     /** 请求摄像头和定位权限 Request camera and location permissions */
-//     const requestPermissions = async (): Promise<boolean> => {
-//         try {
-//             await navigator.mediaDevices.getUserMedia({ video: true });
-//         } catch (err) {
-//             console.warn('Camera permissions not granted', err);
-//             return false;
-//         }
-//         return new Promise(resolve => {
-//             if (navigator.geolocation) {
-//                 navigator.geolocation.getCurrentPosition(
-//                     () => resolve(true),
-//                     () => { console.warn('Positioning permission not granted'); resolve(true); }
-//                 );
-//             } else resolve(true);
-//         });
-//     };
-//
-//     /** DMS 转十进制度
-//      * DMS to decimal degrees for latitude/longitude reverse coding
-//      * with latitude/longitude to door numbering service */
-//     const dmsToDecimal = (dms: number[], ref: string) => {
-//         const [deg, min, sec] = dms;
-//         const dec = deg + min / 60 + sec / 3600;
-//         return ref === 'S' || ref === 'W' ? -dec : dec;
-//     };
-//
-//     /** 解析单张照片的 EXIF 经纬度 Parsing single photo EXIF latitude and longitude */
-//     const parseExif = (file: File): Promise<{ latitude: number | null; longitude: number | null }> => {
-//         return new Promise(resolve => {
-//             const reader = new FileReader();
-//             reader.onload = () => {
-//                 const result = reader.result;
-//                 if (result instanceof ArrayBuffer) {
-//                     const tags = EXIF.readFromBinaryFile(result) as any;
-//                     // 从标签里取出 GPSLatitude、GPSLongitude 及对应 Ref
-//                     // Remove GPSLatitude, GPSLongitude and the corresponding Ref from the label.
-//                     const lat = tags.GPSLatitude;
-//                     const lon = tags.GPSLongitude;
-//                     const latRef = tags.GPSLatitudeRef;
-//                     const lonRef = tags.GPSLongitudeRef;
-//                     if (lat && lon && latRef && lonRef) {
-//                         resolve({ latitude: dmsToDecimal(lat, latRef), longitude: dmsToDecimal(lon, lonRef) });
-//                     } else resolve({ latitude: null, longitude: null });
-//                 } else resolve({ latitude: null, longitude: null });
-//             };
-//             reader.readAsArrayBuffer(file);
-//         });
-//     };
-//
-//     /** 选择文件并处理 Selecting files and EXIF parsing */
-//     const handleFileChange = async (files: FileList | null) => {
-//         if (!files) return;
-//         const list = Array.from(files);
-//         const processed: FileWithCoords[] = await Promise.all(
-//             list.map(async file => {
-//                 //并行解析每个文件的 EXIF，生成本地预览 url
-//                 // Parallel parsing of each file's EXIF to generate local preview urls
-//                 const { latitude, longitude } = await parseExif(file);
-//                 const url = URL.createObjectURL(file);
-//                 return { file, latitude, longitude, url };
-//             })
-//         );
-//         const next = [...selectedFiles, ...processed];
-//
-//         setSelectedFiles(next);
-//        // onUpload(next);
-//     };
-//
-//     /** 触发拍照选择 for shooting photo */
-//     const handleShootClick = async () => {
-//         //检查权限是否被打开
-//         if (await requestPermissions()) {
-//             cameraInputRef.current?.click();
-//         }
-//     };
-//
-//     /** 触发相册选择 for Selecting Pictures from Albums */
-//     const handleSelectClick = () => {
-//         galleryInputRef.current?.click();
-//     };
-//
-//     /** 删除某张已选文件 Delete Selected Photos*/
-//     const handleRemove = (idx: number) => {
-//         const next = selectedFiles.filter((_, i) => i !== idx);
-//         setSelectedFiles(next);
-//         //onUpload(next);
-//     };
-//
-//     /** 将所选文件提交到后端 Submitting to the backend */
-//     const handleSubmit = async () => {
-//         if (selectedFiles.length === 0) return;
-//         setUploading(true);
-//
-//         const formData = new FormData();
-//         // 如果用户输入了地址，则附加，否则跳过
-//         // If the user has entered an address, append it, otherwise skip it
-//         if (address.trim()) {
-//             formData.append('address', address.trim());
-//         }
-//
-//         selectedFiles.forEach((item, idx) => {
-//             formData.append(`file${idx}`, item.file);
-//             formData.append(`latitude${idx}`, String(item.latitude));
-//             formData.append(`longitude${idx}`, String(item.longitude));
-//         });
-//         try {
-//             const resp = await fetch('/api/upload', {
-//                 method: 'POST',
-//                 body: formData,
-//             });
-//             // 后端未接通时可以注释掉下面那行 if(!resp.ok)...以测试submit能否成功
-//             if (!resp.ok) throw new Error(`Upload failed: ${resp.status}`);
-//
-//             // 上传成功后：清空选项，并显示提示
-//             // After successful upload: Clear Options & Show Tips
-//             setSelectedFiles([]);
-//             setUploadMessage('You have successfully uploaded the photos of this building and you will be awarded points after it has been reviewed!');
-//
-//         } catch (err) {
-//             console.error(err);
-//         } finally {
-//             setUploading(false);
-//         }
-//     };
-//
-//     return (
-//         <Box sx={{ p: 2 }}>
-//             <Typography variant="h4" gutterBottom>Upload Building Mapping Photos</Typography>
-//             <Card sx={{ mb: 2 }}><CardContent>
-//                 <Typography variant="subtitle1" gutterBottom>
-//                     Please enter the door number of the building you want to upload (optional)
-//                 </Typography>
-//                 <TextField
-//                     fullWidth
-//                     placeholder="e.g. Luisenplatz 1"
-//                     value={address}
-//                     onChange={e => setAddress(e.target.value)}
-//                 />
-//             </CardContent></Card>
-//
-//             {/* 拍照上传的交互框 Interactive box for photo upload */}
-//             <Card sx={{ mb: 2 }}><CardContent>
-//                 <Typography variant="subtitle1" gutterBottom>
-//                     Please only upload different pictures of the same building at a time! Please take unobstructed, unshadowed, parallel & perpendicular building photos.
-//                 </Typography>
-//                 <Button variant="contained" onClick={handleShootClick}>Shoot for Upload</Button>
-//                 <input
-//                     ref={cameraInputRef}
-//                     type="file"
-//                     accept="image/*"
-//                     capture="environment"
-//                     hidden
-//                     onChange={e => handleFileChange(e.target.files)}
-//                 />
-//             </CardContent></Card>
-//
-//             {/* 相册上传的交互框 Interactive box for album upload */}
-//             <Card sx={{ mb: 2 }}><CardContent>
-//                 <Typography variant="subtitle1" gutterBottom>
-//                     Select photos from album to upload
-//                 </Typography>
-//                 <Button variant="contained" onClick={handleSelectClick}>Select for Upload</Button>
-//                 <input
-//                     ref={galleryInputRef}
-//                     type="file"
-//                     accept="image/*"
-//                     multiple
-//                     hidden
-//                     onChange={e => handleFileChange(e.target.files)}
-//                 />
-//             </CardContent></Card>
-//
-//             {/* 缩略图预览 + 删除按钮 Thumbnail Preview + Delete Button*/}
-//             {selectedFiles.length > 0 && (
-//                 <Box sx={{ mt: 2, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
-//                     {selectedFiles.map((item, idx) => (
-//                         <Box key={idx} sx={{ position: 'relative' }}>
-//                             <Box
-//                                 component="img"
-//                                 src={item.url}
-//                                 alt={item.file.name}
-//                                 sx={{ width: 100, height: 100, objectFit: 'cover', borderRadius: 1 }}
-//                                 onLoad={() => URL.revokeObjectURL(item.url)}
-//                             />
-//                             <IconButton
-//                                 size="small"
-//                                 sx={{ position: 'absolute', top: 0, right: 0 }}
-//                                 onClick={() => {
-//                                     const next = selectedFiles.filter((_, i) => i !== idx);
-//                                     setSelectedFiles(next);
-//                                     //onUpload(next);
-//                                 }}
-//                             >
-//                                 <DeleteIcon fontSize="small" />
-//                             </IconButton>
-//                         </Box>
-//                     ))}
-//                 </Box>
-//             )}
-//
-//             <Box sx={{ mt: 2 }}>
-//                 <Button
-//                     variant="contained"
-//                     onClick={handleSubmit}
-//                     disabled={uploading}
-//                     startIcon={uploading ? <CircularProgress size={20} /> : undefined}
-//                 >
-//                     {uploading ? 'Uploading...' : 'Submit'}
-//                 </Button>
-//             </Box>
-//             {/* 渲染成功后提示 Prompt after success */}
-//             {uploadMessage && (
-//                 <Typography color="success.main" sx={{ mt: 2 }}>
-//                     {uploadMessage}
-//                 </Typography>
-//             )}
-//         </Box>
-//     );
-// };
-//
-// export default Upload;
-
-

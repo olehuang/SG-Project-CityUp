@@ -92,6 +92,8 @@ class ReviewStatus(Enum):
 # 上传的照片信息
 class Photo:
     def __init__(self, user_id: str, building_addr: str,
+                 lat:Optional[float]=None,
+                 lng:Optional[float]=None,
                  upload_time: Optional[datetime] = None,
                  image_url: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
@@ -102,6 +104,8 @@ class Photo:
         self._id = _id or ObjectId()
         self.user_id = user_id
         self.building_addr = building_addr
+        self.lat = lat;
+        self.lng = lng;
         self.upload_time = upload_time or datetime.now()
         self.image_url = image_url
         self.status = status
@@ -114,6 +118,8 @@ class Photo:
             "_id": self._id,
             "user_id": self.user_id,
             "building_addr": self.building_addr,
+            "lat": self.lat,
+            "lng": self.lng,
             "upload_time": self.upload_time,
             "image_url": self.image_url,
             "status": self.status.value,
