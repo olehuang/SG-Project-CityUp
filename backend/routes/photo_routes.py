@@ -47,10 +47,9 @@ class BatchReviewRequest(BaseModel):
 class PhotoResponse(BaseModel):
     photo_id: str
     user_id: str
-    building_id: str
+    building_addr: Optional[str] = None
     lat: Optional[float] = None  # 新增：纬度
     lng: Optional[float] = None  # 新增：经度
-    building_addr: Optional[str] = None
     # upload_time: str
     upload_time: datetime
     image_url: Optional[str]
@@ -89,8 +88,8 @@ async def upload_photo(
             photo_obj = Photo(
                 user_id=user_id,
                 building_addr=building_addr,# building address
-                lat=lat,#纬度
-                lng=lng,#经度
+                lat=lat,
+                lng=lng,
                 image_url=image_url,
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending

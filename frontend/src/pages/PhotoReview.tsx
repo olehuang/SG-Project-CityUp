@@ -16,103 +16,26 @@ import {
 } from "@mui/material";
 import pageBackgroundStyles from "./pageBackgroundStyles";
 import { useNavigate } from "react-router-dom";
-
+import { useAuthHook } from "../components/AuthProvider";
+import axios from "axios"
 
 interface PhotoItem {
     photo_id: string;
     user_id: string;
-    building_id: string;
+    building_addr: string;
     upload_time: string;
     image_url: string;
     status: string;
     feedback?: string;
     selected?: boolean;
+    reviewer_id?: string;
+    review_time?: string;
 }
 
 const PhotoReview = () => {
     // const [photos, setPhotos] = useState<PhotoItem[]>([]);
     const [photos, setPhotos] = useState<PhotoItem[]>([
-        {
-            photo_id: "test1",
-            user_id: "user001",
-            building_id: "building001",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test2",
-            user_id: "user002",
-            building_id: "building002",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test3",
-            user_id: "user003",
-            building_id: "building003",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test4",
-            user_id: "user004",
-            building_id: "building002",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test5",
-            user_id: "user005",
-            building_id: "building002",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test6",
-            user_id: "user006",
-            building_id: "building002",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test7",
-            user_id: "user002",
-            building_id: "building007",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test8",
-            user_id: "user008",
-            building_id: "building008",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
-        {
-            photo_id: "test9",
-            user_id: "user009",
-            building_id: "building008",
-            upload_time: new Date().toISOString(),
-            image_url: "https://via.placeholder.com/150",
-            status: "Pending",
-            selected: false,
-        },
+
     ]);
     const [selectMode, setSelectMode] = useState(false);
     const [selectAll, setSelectAll] = useState(false);
@@ -120,25 +43,18 @@ const PhotoReview = () => {
     const [error, setError] = useState<string>("");
     const [success, setSuccess] = useState<string>("");
     const navigate = useNavigate();
+    const { auth, user_id } = useAuthHook();
+
+
 
     const fetchPhotos = async () => {
         try {
             setLoading(true);
             setError("");
-
-            // 调用后端的批量获取待审核照片接口
-            const res = await fetch("/photos/review/batch_fetch", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                // 可以指定批量大小，默认30
-                body: JSON.stringify({}),
-            });
-
+            const res = await fetch(`http://127.0.0.1:8000/photos/review/batch_fetch?reviewer_id=${user_id}`, { method: "GET" });
             if (!res.ok) {
                 if (res.status === 404) {
-                    setError("暂无待审核照片");
+                    setError("No photos pending review");
                     setPhotos([]);
                     return;
                 }
@@ -146,19 +62,18 @@ const PhotoReview = () => {
             }
 
             const data: PhotoItem[] = await res.json();
-            console.log("获取到的照片数据:", data);
 
-            // 为每个照片添加selected属性
+            console.log("Fetched photo data:", data);
+
             const photosWithSelected = data.map(photo => ({
                 ...photo,
                 selected: false
             }));
-
             setPhotos(photosWithSelected);
-            setSuccess(`成功获取 ${data.length} 张待审核照片`);
+            setSuccess(`Successfully fetched ${data.length} Photos`);
         } catch (err) {
-            console.error("获取照片失败", err);
-            setError("获取照片失败，请检查网络连接或服务器状态");
+            console.error("Failed to fetch photos", err);
+            setError("Failed to fetch photos. Please check your network connection or server status.");
             setPhotos([]);
         } finally {
             setLoading(false);
@@ -170,19 +85,19 @@ const PhotoReview = () => {
             setLoading(true);
             setError("");
 
-            // 根据result确定状态
             const status = result === "success" ? "Reviewed" : "Reviewed";
-            const feedback = result === "success" ? "审核通过" : "审核未通过";
+            const feedback = result === "success" ? "Approved" : "Rejected";
 
-            const res = await fetch("/photos/review/single", {
+            const res = await fetch("http://127.0.0.1:8000/photos/review/single", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
                     photo_id: photo_id,
-                    status: status,
-                    feedback: feedback
+                    status_result: result,
+                    feedback: feedback,
+                    reviewer_id: user_id
                 }),
             });
 
@@ -192,10 +107,10 @@ const PhotoReview = () => {
 
             // 从列表中移除已审核的照片
             setPhotos((prev) => prev.filter((photo) => photo.photo_id !== photo_id));
-            setSuccess(`照片审核${result === "success" ? "通过" : "失败"}，已从列表中移除`);
+            setSuccess(`Photo review${result === "success" ? "approved" : "rejected"}, and removed from the list`);
         } catch (err) {
-            console.error("单个审核失败", err);
-            setError("审核失败，请重试");
+            console.error("Single review failed", err);
+            setError("Review failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -205,7 +120,7 @@ const PhotoReview = () => {
         const selectedPhotos = photos.filter((p) => p.selected);
 
         if (selectedPhotos.length === 0) {
-            setError("请先选择要审核的照片");
+            setError("Please select photos to review first");
             return;
         }
 
@@ -215,7 +130,7 @@ const PhotoReview = () => {
 
             const selectedIds = selectedPhotos.map((p) => p.photo_id);
 
-            const res = await fetch("/photos/review/batch_submit", {
+            const res = await fetch("http://127.0.0.1:8000/photos/review/batch_submit", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json"
@@ -223,7 +138,8 @@ const PhotoReview = () => {
                 body: JSON.stringify({
                     ids: selectedIds,
                     result: result,
-                    feedback: result === "success" ? "批量审核通过" : "批量审核未通过"
+                    feedback: result === "success" ? "Batch approved" : "Batch rejected",
+                    reviewer_id: user_id
                 }),
             });
 
@@ -231,20 +147,35 @@ const PhotoReview = () => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            // 从列表中移除已审核的照片
             setPhotos((prev) => prev.filter((p) => !p.selected));
-            setSuccess(`批量审核${result === "success" ? "通过" : "失败"} ${selectedIds.length} 张照片`);
+            setSuccess(`Batch review ${result === "success" ? "approved" : "rejected"} for ${selectedIds.length} photos`);
 
-            // 重置选择状态
             setSelectAll(false);
             setSelectMode(false);
         } catch (err) {
-            console.error("批量审核失败", err);
-            setError("批量审核失败，请重试");
+            console.error("Batch review failed", err);
+            setError("Batch review failed. Please try again.");
         } finally {
             setLoading(false);
         }
     };
+
+    // 页面卸载时释放照片
+    useEffect(() => {
+        return () => {
+            if (user_id) {
+                fetch("http://127.0.0.1:8000/photos/review/release_all", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        reviewer_id: user_id
+                    }),
+                }).catch(err => console.error("Failed to release photos:", err));
+            }
+        };
+    }, [user_id]);
 
     const toggleSelectAll = () => {
         const newSelect = !selectAll;
@@ -310,7 +241,7 @@ const PhotoReview = () => {
                     px: 2,
                 }}
             >
-                {/* 消息提示 */}
+                
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                     <Box display="flex" alignItems="center" gap={2}>
                         <Button
@@ -319,10 +250,9 @@ const PhotoReview = () => {
                             disabled={loading}
                             startIcon={loading ? <CircularProgress size={20} /> : null}
                         >
-                            {loading ? "拉取中..." : "Fetch Photos"}
+                            {loading ? "Fetching..." : "Fetch Photos"}
                         </Button>
 
-                        {/* 错误和成功消息显示在按钮右侧 */}
                         {(error || success) && (
                             <Alert
                                 severity={error ? "error" : "success"}
@@ -422,7 +352,7 @@ const PhotoReview = () => {
                                         </TableCell>
                                         <TableCell>
                                             <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
-                                                Building ID: {photo.building_id}
+                                                Building ID: {photo.building_addr}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>{photo.user_id}</TableCell>
@@ -465,7 +395,6 @@ const PhotoReview = () => {
                 </TableContainer>
 
                 {/* 统计信息 */}
-                {/* 底部区域 - 始终显示 */}
                 <Box
                     sx={{
                         mb: 2,
@@ -476,17 +405,13 @@ const PhotoReview = () => {
                         px: 1,
                     }}
                 >
-                    {/* 左侧：统计信息 */}
                     <Typography variant="body2" color="text.secondary">
                         {photos.length > 0
                             ? `Currently showing ${photos.length} pending photos for review`
                             : "No photos loaded"
                         }
                     </Typography>
-
-                    {/* 右侧：操作按钮 - 在同一行 */}
                     <Box display="flex" gap={1} alignItems="center">
-                        {/* 批量操作按钮 - 条件显示 */}
                         {selectMode && photos.some((p) => p.selected) && (
                             <>
                                 <Button
@@ -509,8 +434,6 @@ const PhotoReview = () => {
                                 </Button>
                             </>
                         )}
-
-                        {/* Exit 按钮 - 始终显示 */}
                         <Button
                             variant="outlined"
                             color="primary"

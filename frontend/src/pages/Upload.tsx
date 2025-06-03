@@ -223,6 +223,8 @@ const Upload: React.FC = () => {
     const handleSubmit = async () => {
         setError(null);
 
+        //少一行
+
         if (!auth || !user_id) {
             setError("You must be logged in to upload photos.");
             return;
@@ -247,7 +249,7 @@ const Upload: React.FC = () => {
             formData.append("user_id", user_id);//用户id
             formData.append("lat", latlng[0].toString());//纬度 Latitude
             formData.append("lng", latlng[1].toString());//经度 Longitude
-            formData.append("building_id", address); //门牌号作为 building_id
+            formData.append("building_addr", address); //门牌号作为 building_addr
             photos.forEach((photo) => { //照片组
                 formData.append("photos", photo.file, photo.file.name);
             });
