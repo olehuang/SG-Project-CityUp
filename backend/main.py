@@ -40,7 +40,7 @@ app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(photo_routes.router, prefix="/photos", tags=["Photos"])
 app.include_router(building_routes.router, prefix="/buildings", tags=["Buildings"])
 
-print("✅ app 路由列表:")
+print(" app 路由列表:")
 for r in app.routes:
     if isinstance(r, APIRoute):
         print(f"Path: {r.path}, Methods: {r.methods}, Name: {r.name}")

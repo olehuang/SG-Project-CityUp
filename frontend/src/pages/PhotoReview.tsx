@@ -70,7 +70,7 @@ const PhotoReview = () => {
                 selected: false
             }));
             setPhotos(photosWithSelected);
-            setSuccess(`Successfully fetched ${data.length} 张待审核照片`);
+            setSuccess(`Successfully fetched ${data.length} Photos`);
         } catch (err) {
             console.error("Failed to fetch photos", err);
             setError("Failed to fetch photos. Please check your network connection or server status.");
@@ -85,7 +85,6 @@ const PhotoReview = () => {
             setLoading(true);
             setError("");
 
-            // 根据result确定状态
             const status = result === "success" ? "Reviewed" : "Reviewed";
             const feedback = result === "success" ? "Approved" : "Rejected";
 
@@ -148,7 +147,6 @@ const PhotoReview = () => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            // 从列表中移除已审核的照片
             setPhotos((prev) => prev.filter((p) => !p.selected));
             setSuccess(`Batch review ${result === "success" ? "approved" : "rejected"} for ${selectedIds.length} photos`);
 
@@ -162,10 +160,10 @@ const PhotoReview = () => {
         }
     };
 
+    // 页面卸载时释放照片
     useEffect(() => {
         return () => {
             if (user_id) {
-                // 页面卸载时释放照片
                 fetch("http://127.0.0.1:8000/photos/review/release_all", {
                     method: "POST",
                     headers: {
@@ -243,7 +241,7 @@ const PhotoReview = () => {
                     px: 2,
                 }}
             >
-                {/* 消息提示 */}
+                
                 <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
                     <Box display="flex" alignItems="center" gap={2}>
                         <Button
@@ -252,10 +250,9 @@ const PhotoReview = () => {
                             disabled={loading}
                             startIcon={loading ? <CircularProgress size={20} /> : null}
                         >
-                            {loading ? "拉取中..." : "Fetch Photos"}
+                            {loading ? "Fetching..." : "Fetch Photos"}
                         </Button>
 
-                        {/* 错误和成功消息显示在按钮右侧 */}
                         {(error || success) && (
                             <Alert
                                 severity={error ? "error" : "success"}
