@@ -10,12 +10,12 @@ import traceback
 brief: save/create Building Information into DB
 """
 async def save_building_or_create(building: Building):
-    query={"building_id": building.building_id}
+    query={"building_id": building.building_addr}
     try:
         buildings=MongoDB.get_instance().get_buildings("buildings")
         result = buildings.find_one(query)
         if result is None:
-            new_building=Building(building.building_id, building.address,building.geo_coords)
+            new_building=Building(building.building_addr, building.address,building.geo_coords)
             neu_building_dict=new_building.__dict__
             await buildings.insert_one(neu_building_dict)
             return neu_building_dict
