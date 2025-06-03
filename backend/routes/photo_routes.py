@@ -41,6 +41,8 @@ class PhotoResponse(BaseModel):
     photo_id: str
     user_id: str
     building_id: str
+    lat: Optional[float] = None  # 新增：纬度
+    lng: Optional[float] = None  # 新增：经度
     # upload_time: str
     upload_time: datetime
     image_url: Optional[str]
@@ -49,11 +51,13 @@ class PhotoResponse(BaseModel):
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
 
-
+#储存格式（用户id，建筑id,纬度，经度，图片组）
 @router.post("/", status_code=201)
 async def upload_photo(
         user_id: str = Form(...),
         building_id: str = Form(...),
+        lat: float = Form(...),
+        lng: float = Form(...),
         photos: List[UploadFile] = File(...)
 ):
     try:
@@ -83,7 +87,9 @@ async def upload_photo(
 
             photo_obj = Photo(
                 user_id=user_id,
-                building_id=building_id,
+                building_id=building_id,# building address
+                lat=lat,#纬度
+                lng=lng,#经度
                 image_url=image_url,
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending
