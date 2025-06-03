@@ -7,7 +7,6 @@ router = APIRouter()
 
 
 class Building(BaseModel):
-    building_addr:str
     building_address:str
     geo_coords:Optional[dict] = None
 
