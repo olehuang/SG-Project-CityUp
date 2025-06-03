@@ -88,8 +88,7 @@ async def upload_photo(
             image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
             photo_obj = Photo(
                 user_id=user_id,
-                building_addr=building_addr,
-                building_id=building_id,# building address
+                building_addr=building_addr,# building address
                 lat=lat,#纬度
                 lng=lng,#经度
                 image_url=image_url,
