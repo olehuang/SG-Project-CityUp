@@ -223,8 +223,6 @@ const Upload: React.FC = () => {
     const handleSubmit = async () => {
         setError(null);
 
-        //少一行
-
         if (!auth || !user_id) {
             setError("You must be logged in to upload photos.");
             return;
