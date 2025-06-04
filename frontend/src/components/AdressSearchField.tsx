@@ -19,9 +19,12 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect}) => {
     const [selectedAddress, setSelectedAddress] = useState<string|null>("");
 
     const handleSearch = () => {
-        onSearch(inputValue);
-        setInputValue("");           // clear Input field
-        setSelectedAddress("");
+        const trimmedInput = inputValue.trim();
+        if (trimmedInput !== "") {
+            onSearch(trimmedInput);
+            setInputValue(""); // 搜索完再清空
+            setSelectedAddress(null);
+        }
     };
 
     const handleChange = (event: any, newValue: string | null) => {

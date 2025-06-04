@@ -66,11 +66,18 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         setSelectedPhotoIndex(null);
     };
 
-    const handleOfDownload=(photo:Photo)=>{
-        const link = document.createElement('a');
-        link.href=photo.src;
-        link.download=`${photo.title||"download"}.jpg`;
-        link.click();
+    const handleOfDownload=async (photo:Photo)=>{
+        try{
+            const blob = await (await fetch(photo.src)).blob();
+            const url = URL.createObjectURL(blob);
+            Object.assign(document.createElement('a'), {
+                href: url,
+                download: `${photo.title || 'download'}.jpg`
+            }).click();
+            URL.revokeObjectURL(url);
+        }catch (e:any) {
+            setError(e.message || "Unknown error");
+        }
     }
 
     const getUsername=async (user_id:string)=>{

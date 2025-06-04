@@ -47,7 +47,7 @@ const BuildingInfo=()=>{
     const [updateTime,setUpdateTime]=useState(`${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`);
     const [photoNr,setPhotoNr]=useState(0);
 
-    const [leftWidth, setLeftWidth] = useState(80);
+    const [leftWidth, setLeftWidth] = useState(60);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
     const [allAddresses, setAllAddresses] = useState<string[]>([]);
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
@@ -170,7 +170,8 @@ const BuildingInfo=()=>{
                             </TableHead>
                             <TableBody>
                                 {searchResult.length > 0 ? (
-                                    searchResult.map((addr, idx) => (
+                                    searchResult.filter(addr => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
+                                        .map((addr, idx) => (
                                         <TableRow
                                             key={idx}
                                             hover
@@ -180,7 +181,7 @@ const BuildingInfo=()=>{
                                                 }),}}
                                             onClick={() => handleSelect(addr)}
                                         >
-                                            <TableCell>{addr}</TableCell>
+                                            <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi,'')}</TableCell>
                                             <TableCell>{photoInfoMap[addr]?.updateTime || "Loading..."}</TableCell>
                                             <TableCell>{photoInfoMap[addr]?.photoNr ?? "-"}</TableCell>
                                         </TableRow>
@@ -277,7 +278,7 @@ const styles={
         // backgroundColor: "#fff",
          cursor: "pointer",
          transition: "all 0.2s ease-in-out",
-        "&:hover()":{
+        "&:hover":{
             backgroundColor: "#e0f7fa",
             borderColor: "#128d9e",
         },
