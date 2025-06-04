@@ -49,22 +49,71 @@ const BuildingInfo=()=>{
 
     const [leftWidth, setLeftWidth] = useState(80);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-    const [newSearchResult,setNewSearchResult]=useState<string[]>([])
-    const [searchResult, setSearchResult] = useState<string[]>(newSearchResult.length=== 0 ? mockResults:newSearchResult);
+    const [allAddresses, setAllAddresses] = useState<string[]>([]);
+    const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
+    const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
+
+    const url="http://127.0.0.1:8000"
     useEffect(() => {
-        const fetchAddr=async ()=>{
-            const url="http://127.0.0.1:8000/buildings/get_all_build_addr"
+        const fetchAllData=async ()=>{
+
             try {
-                const response = await axios.get(url);
-                const addr_list =response.data
-                setNewSearchResult(addr_list);
+                const response = await axios.get(url+"/buildings/get_all_build_addr");
+                const addrList =response.data.sort((a: string, b: string) => a.localeCompare(b));
+                console.log("addr_list:",addrList)
+                setAllAddresses(addrList);
+                setSearchResult([...addrList]);
+
+                const infoMap: Record<string, { updateTime: string, photoNr: number }> = {};
+                await Promise.all(
+                    addrList.map(async (address:string) => {
+                        try {
+                            const [updateResp, countResp] = await Promise.all([
+                                axios.get(url + "/photos/get_first_upload_time", { params: { address } }),
+                                axios.get(url + "/photos/photoNumber", { params: { address } }),
+                            ]);
+
+                            infoMap[address] = {
+                                updateTime: updateResp.data,
+                                photoNr: countResp.data,
+                            };
+                        } catch (err: any) {
+                            console.warn(`Failed to fetch info for ${address}:`, err.message);
+                            infoMap[address] = {
+                                updateTime: "Error",
+                                photoNr: -1,
+                            };
+                        }
+                    })
+                );
+                setPhotoInfoMap(infoMap);
             }catch (e:any) {
                 console.log(e.message || "Unknown error")
+                setAllAddresses(mockResults);
+                setSearchResult(mockResults);
             }
         }
-        fetchAddr();
+        fetchAllData();
     }, []);
+
+    const getFirshUploadTime= async (address:string)=>{
+        try{
+            const response = await axios.get(url+"/get_firsh_upload_time",{params: {address: address}});
+            setUpdateTime(response.data)
+        }catch (e:any) {
+            console.log(e.message || "Unknown error")
+        }
+    }
+
+    const getPhotoNumber = async (address:string)=>{
+        try{
+            const response = await axios.get(url+"/photoNumber",{params: {address: address}});
+            setUpdateTime(response.data)
+        }catch (e:any) {
+            console.log(e.message || "Unknown error")
+        }
+    }
 
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -90,12 +139,14 @@ const BuildingInfo=()=>{
 
 
     const handleSearch = (query: string) => {
-
-        const result = mockResults.filter((addr) =>
+        const result = allAddresses.filter((addr) =>
             addr.toLowerCase().includes(query.toLowerCase())
         );
         setSearchResult(result);
+
     };
+
+
 
     const handleSelect = (selected: string) => {
         // 也可以在这里记录用户选择的地址
@@ -130,8 +181,8 @@ const BuildingInfo=()=>{
                                             onClick={() => handleSelect(addr)}
                                         >
                                             <TableCell>{addr}</TableCell>
-                                            <TableCell>{updateTime}</TableCell>
-                                            <TableCell>{photoNr}</TableCell>
+                                            <TableCell>{photoInfoMap[addr]?.updateTime || "Loading..."}</TableCell>
+                                            <TableCell>{photoInfoMap[addr]?.photoNr ?? "-"}</TableCell>
                                         </TableRow>
                                     ))
                                 ) : (
@@ -148,7 +199,7 @@ const BuildingInfo=()=>{
                         <Typography title="h1">Photo Area </Typography>
                         <Box>
                             {selectedAddress ? (
-                                <PhotoGrid address={selectedAddress}/>
+                                <PhotoGrid address={selectedAddress} />
                             ) : (
                                 <Typography variant="body2" color="textSecondary">
                                     Please select an address to view photos.

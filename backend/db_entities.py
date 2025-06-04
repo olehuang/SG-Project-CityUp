@@ -7,6 +7,7 @@ from bson import ObjectId
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 # MongoDB初始化
+from pydantic import BaseModel
 
 class MongoDB:
     _instance = None
@@ -141,3 +142,18 @@ class Photo:
             reviewer_id = data.get("reviewer_id"),
             review_time = data.get("review_time")
         )
+
+
+class PhotoResponse(BaseModel):
+    photo_id: str
+    user_id: str
+    building_addr: Optional[str] = None
+    lat: Optional[float] = None  # 新增：纬度
+    lng: Optional[float] = None  # 新增：经度
+    # upload_time: str
+    upload_time: datetime
+    image_url: Optional[str]
+    status: str
+    feedback: Optional[str]
+    reviewer_id: Optional[str]
+    review_time: Optional[datetime]

@@ -14,11 +14,12 @@ brief: save/create Building Information into DB
 async def save_building(building: Building):
     query={"address": building.address}
     try:
-        buildings = MongoDB.get_instance().get_buildings("buildings")
+        buildings = MongoDB.get_instance().get_collection("buildings")
         neu_building_dict = {
             "address": building.address,
             "geo_coords": building.geo_coords
         }
+
         await buildings.insert_one(neu_building_dict)
         print(f"Building '{building.address}' Saved")
     except Exception as e:
@@ -74,18 +75,17 @@ async def update_addr_from_photo():
 
         existing_addresses = set() #caching existing_addr
         async for building in buildings.find({}, {"address": 1, "_id": 0}):
-            existing_addresses.add(building["address"])
+            if building.get("address"):
+              existing_addresses.add(building["address"])
 
         async for photo in photos:
-            address=photo.get("address")
+            address = photo.get("building_addr")
             if not address or address in existing_addresses:
                 continue
-
-            geo_coords = photo.get("geo_coords")
+            geo_coords = {"lat": photo.get("lat"), "lng": photo.get("lng")}
             building = Building(address=address, geo_coords=geo_coords)
             await save_building(building)
             existing_addresses.add(address) #address add in caching existing_addr
-
     except Exception as e:
         log_error("fError saving building for photo: {photo}",
                   stack_data=traceback.format_exc(),

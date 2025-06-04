@@ -75,3 +75,11 @@ async def check_role(user_id:str):
     except Exception as e:
         print("Exception while getting user",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.get("/get_user_name")
+async def get_user_name(user_id:str):
+    try:
+        user= await db_userEntities.get_user(user_id)
+        return user.get("username")
+    except Exception as e:
+        print("Exception while getting user",traceback.format_exc())

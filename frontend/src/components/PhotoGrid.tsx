@@ -3,6 +3,7 @@ import {Box, Typography, Dialog, DialogTitle, DialogContent, Button} from "@mui/
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
+import axios from "axios";
 
 interface PhotoGridProps {
     address: string;
@@ -28,10 +29,22 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
         const fetchPhoto= async (address:string)=>{
             setLoading(true);
-            setError(null)
+            setError(null);
+            console.log("address:",address);
+
+            const url="http://127.0.0.1:8000/photos/get_photo_list"
             try{
-                const testPhotos: Photo[]=images;
-                setPhotos(testPhotos)
+                const response = await axios.get(url, {params: {address: address}});
+                const data=response.data;
+                console.log(data);
+
+                const formattedPhotos: Photo[] = data.map((item: any) => ({
+                    src: item.image_url,
+                    title: item.title,
+                    uploader: item.user_id,
+                    uploadTime: item.upload_time
+                }));
+                setPhotos(formattedPhotos);
             }catch (err: any) {
                 setError(err.message || "Unknown error");
             } finally {
@@ -41,6 +54,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         }
         fetchPhoto(address)
     }, [address]);
+
 
     const handleOpen = (index: number) => {
         setSelectedPhotoIndex(index);
@@ -57,6 +71,15 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         link.href=photo.src;
         link.download=`${photo.title||"download"}.jpg`;
         link.click();
+    }
+
+    const getUsername=async (user_id:string)=>{
+        try{
+            const response= await axios.get(`http://127.0.0.1:8000/users/get_user_name`, {params: {user_id:user_id}});
+            return response.data;
+        }catch (e:any) {
+            setError(e.message || "Unknown error");
+        }
     }
 
     if (loading) {
@@ -126,7 +149,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                     <Typography variant="body1">Upload
                                         Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
                                     <Typography variant="body1">Upload
-                                        User: {photos[selectedPhotoIndex].uploader}</Typography>
+                                        User: {getUsername(photos[selectedPhotoIndex].uploader)}</Typography>
                                 </Box>
                                     <Button variant="contained"
                                             sx={{alignSelf: "flex-start" }}

@@ -11,7 +11,7 @@ import time
 from pymongo import ReturnDocument
 
 import db_photoEntities
-from db_entities import MongoDB, Photo, ReviewStatus
+from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 # from utils.logger import log_error
 
@@ -45,19 +45,19 @@ class BatchReviewRequest(BaseModel):
     feedback: Optional[str] = ""
     reviewer_id: str
 
-class PhotoResponse(BaseModel):
-    photo_id: str
-    user_id: str
-    building_addr: Optional[str] = None
-    lat: Optional[float] = None  # 新增：纬度
-    lng: Optional[float] = None  # 新增：经度
-    # upload_time: str
-    upload_time: datetime
-    image_url: Optional[str]
-    status: str
-    feedback: Optional[str]
-    reviewer_id: Optional[str]
-    review_time: Optional[datetime]
+# class PhotoResponse(BaseModel): from db_entities import
+#     photo_id: str
+#     user_id: str
+#     building_addr: Optional[str] = None
+#     lat: Optional[float] = None  # 新增：纬度
+#     lng: Optional[float] = None  # 新增：经度
+#     # upload_time: str
+#     upload_time: datetime
+#     image_url: Optional[str]
+#     status: str
+#     feedback: Optional[str]
+#     reviewer_id: Optional[str]
+#     review_time: Optional[datetime]
 
 #储存格式（用户id，建筑id,纬度，经度，图片组）
 @router.post("/", status_code=201)
@@ -357,11 +357,29 @@ async def get_user_photos(user_id: str):
 # Backend: photos_routes.py
 
 
-@router.get("/photo/get_photo_under_same_address")
+@router.get("/get_photo_list")
 async def get_photo_list(address: str):
     try:
-        photo_list=await db_photoEntities.get_all_photos_under_same_address(address)
+        photo_list= await db_photoEntities.get_all_photos_under_same_address(address)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+
+@router.get("/photoNumber")
+async def get_photo_number(address: str):
+    try:
+       photo_list= await db_photoEntities.get_photo_list(address)
+       return len(photo_list)
+    except Exception as e:
+        print(f"get_photo_number error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+@router.get("/get_first_upload_time")
+async def get_first_upload_time(address: str):
+    try:
+        return await db_photoEntities.get_first_upload_time(address)
+    except Exception as e:
+        print(f"get_firsh_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
