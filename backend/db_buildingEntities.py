@@ -1,6 +1,8 @@
 from datetime import datetime
 import dotenv
-from db_entities import MongoDB, User,Building
+
+import db_entities
+from db_entities import MongoDB,Building
 from error_logging import log_error
 import traceback
 
@@ -9,18 +11,16 @@ import traceback
 @:parameter building : Building object include(building_id, building_address,geo information)
 brief: save/create Building Information into DB
 """
-async def save_building_or_create(building: Building):
+async def save_building(building: Building):
     query={"address": building.address}
     try:
-        buildings=MongoDB.get_instance().get_buildings("buildings")
-        result = buildings.find_one(query)
-        if result is None:
-            new_building=Building(building.address,building.geo_coords)
-            neu_building_dict=new_building.__dict__
-            await buildings.insert_one(neu_building_dict)
-            return neu_building_dict
-        else:
-            return result
+        buildings = MongoDB.get_instance().get_buildings("buildings")
+        neu_building_dict = {
+            "address": building.address,
+            "geo_coords": building.geo_coords
+        }
+        await buildings.insert_one(neu_building_dict)
+        print(f"Building '{building.address}' Saved")
     except Exception as e:
         log_error("Error from save_Building : {}".format(e),
                   stack_data=traceback.format_exc(),
@@ -35,10 +35,10 @@ brief: whith address can take Building Information from DB
 async def take_building_info(address:str):
     query={"address":address}
     try:
-        buildings=MongoDB.get_instance().get_buildings("buildings")
+        buildings=MongoDB.get_instance().get_collection("buildings")
         result = await buildings.find_one(query)
         if result is None:
-            return -1
+            return None
         else:
             return result
     except Exception as e:
@@ -52,11 +52,9 @@ brief: give back all Building address from DB
 """
 async def take_all_building_address():
     try:
-        buildings=MongoDB.get_instance().get_buildings("buildings")
-        building_list= await buildings.find().to_list()
-        buildings_address_list=[]
-        for building in building_list:
-            buildings_address_list.append(building["address"])
+        buildings=MongoDB.get_instance().get_collection("buildings")
+        building_list= await buildings.find({}, {"address": 1, "_id": 0}).to_list(length=None)
+        buildings_address_list = [b["address"] for b in building_list if "address" in b]
         return buildings_address_list
     except Exception as e:
         log_error("Error from take_all_building_address : {}".format(e),
@@ -64,5 +62,34 @@ async def take_all_building_address():
                   time_stamp=datetime.now())
         raise
 
+
+"""
+@brief: save addresse from photo collection
+"""
+async def update_addr_from_photo():
+    try:
+        photos_collection=MongoDB.get_instance().get_collection("photos")  #table of photos
+        photos= photos_collection.find({}, batch_size=1000)
+        buildings=MongoDB.get_instance().get_collection("buildings")
+
+        existing_addresses = set() #caching existing_addr
+        async for building in buildings.find({}, {"address": 1, "_id": 0}):
+            existing_addresses.add(building["address"])
+
+        async for photo in photos:
+            address=photo.get("address")
+            if not address or address in existing_addresses:
+                continue
+
+            geo_coords = photo.get("geo_coords")
+            building = Building(address=address, geo_coords=geo_coords)
+            await save_building(building)
+            existing_addresses.add(address) #address add in caching existing_addr
+
+    except Exception as e:
+        log_error("fError saving building for photo: {photo}",
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now())
+        raise
 
 

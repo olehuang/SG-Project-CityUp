@@ -14,6 +14,7 @@ class Building(BaseModel):
 @router.get("/get_all_build_addr")
 async def get_all_build_addr():
     try:
+        await db_buildingEntities.update_addr_from_photo() # fresh_building_addresses
         response = await db_buildingEntities.take_all_building_address()
         return response
     except Exception as e:

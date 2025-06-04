@@ -10,6 +10,7 @@ import uuid
 import time
 from pymongo import ReturnDocument
 
+import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus
 import db_userEntities
 # from utils.logger import log_error
@@ -354,3 +355,13 @@ async def get_user_photos(user_id: str):
 #         # log_error("Exception while retrieving user photo history\n" + traceback.format_exc(), e, user_id=user_id)
 #         raise HTTPException(status_code=500, detail="Server error, failed to retrieve photo records")
 # Backend: photos_routes.py
+
+
+@router.get("/photo/get_photo_under_same_address")
+async def get_photo_list(address: str):
+    try:
+        photo_list=await db_photoEntities.get_all_photos_under_same_address(address)
+        return photo_list
+    except Exception as e:
+        print(f"get_photo_list error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
