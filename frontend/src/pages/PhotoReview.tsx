@@ -12,8 +12,12 @@ import {
     Typography,
     Paper,
     Alert,
-    CircularProgress
+    CircularProgress,
+    Dialog,
+    DialogContent,
+    IconButton
 } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 import pageBackgroundStyles from "./pageBackgroundStyles";
 import { useNavigate } from "react-router-dom";
 import { useAuthHook } from "../components/AuthProvider";
@@ -22,6 +26,7 @@ import axios from "axios"
 interface PhotoItem {
     photo_id: string;
     user_id: string;
+    username?: string;
     building_addr: string;
     upload_time: string;
     image_url: string;
@@ -42,10 +47,26 @@ const PhotoReview = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>("");
     const [success, setSuccess] = useState<string>("");
+    // 添加大图预览相关状态
+    const [previewOpen, setPreviewOpen] = useState(false);
+    const [previewImage, setPreviewImage] = useState<string>("");
+    const [previewPhotoInfo, setPreviewPhotoInfo] = useState<PhotoItem | null>(null);
+
     const navigate = useNavigate();
     const { auth, user_id } = useAuthHook();
 
 
+    const handleImageClick = (photo: PhotoItem) => {
+        setPreviewImage(photo.image_url);
+        setPreviewPhotoInfo(photo);
+        setPreviewOpen(true);
+    };
+
+    const handleClosePreview = () => {
+        setPreviewOpen(false);
+        setPreviewImage("");
+        setPreviewPhotoInfo(null);
+    };
 
     const fetchPhotos = async () => {
         try {
@@ -220,35 +241,320 @@ const PhotoReview = () => {
         }
     }, [error, success]);
 
+    const styles = {
+        mainContainer: {
+            ...pageBackgroundStyles.container,
+            padding: "1px 0px",
+            height: "100vh",
+            boxSizing: "border-box",
+            display: "flex",
+            flexDirection: "column",
+            overflow: "hidden",
+        } as const,
+        contentWrapper: {
+            flex: 1,
+            display: "flex",
+            flexDirection: "column",
+            width: "95%",
+            maxWidth: "none",
+            margin: "0 auto",
+            px: 2,
+        },
+        topActionContainer: {
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "flex-start",
+            mb: 2,
+        },
+        leftActionGroup: {
+            display: "flex",
+            alignItems: "center",
+            gap: 2,
+        },
+        fetchButton: {
+            borderRadius: 12,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 14,
+            backgroundColor: "#5D4037",
+            color: "#FFF8E1",
+            px: 3,
+            py: 1.5,
+            "&:hover": {
+                backgroundColor: "#4E342E",
+            },
+            "&:disabled": {
+                backgroundColor: "#A1887F",
+                color: "#D7CCC8",
+            }
+        },
+        selectButton: {
+            borderRadius: 12,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 14,
+            borderColor: "#5D4037",
+            color: "#5D4037",
+            px: 3,
+            py: 1.5,
+            "&:hover": {
+                borderColor: "#4E342E",
+                backgroundColor: "#FFF8E1",
+            },
+            "&:disabled": {
+                borderColor: "#D7CCC8",
+                color: "#A1887F",
+            }
+        },
+        alert: (hasError: boolean) => ({
+            minWidth: 0,
+            flex: 1,
+            maxWidth: "400px",
+            borderRadius: 2,
+            backgroundColor: hasError ? "#FFEBEE" : "#E8F5E8",
+            color: hasError ? "#C62828" : "#2E7D32",
+            "& .MuiAlert-icon": {
+                color: hasError ? "#C62828" : "#2E7D32",
+            }
+        }),
+        tableContainer: {
+            width: "100%",
+            maxWidth: "100%",
+            margin: 0,
+            mb: 2,
+            flex: 1,
+            overflow: "auto",
+            maxHeight: "calc(100vh - 220px)",
+            borderRadius: 3,
+            boxShadow: "0 4px 12px rgba(93, 64, 55, 0.1)",
+            backgroundColor: "#FFFEF7",
+        },
+        table: {
+            minWidth: 700,
+        },
+
+        headerCheckboxCell: {
+            width: 48,
+            backgroundColor: "#F5F5F5",
+            borderBottom: "2px solid #D7CCC8"
+        },
+        headerCell: (width: number) => ({
+            width: width,
+            backgroundColor: "#F5F5F5",
+            borderBottom: "2px solid #D7CCC8",
+            fontWeight: "bold",
+            color: "#3E2723"
+        }),
+        checkbox: {
+            color: "#5D4037",
+            "&.Mui-checked": {
+                color: "#5D4037",
+            },
+            "&.MuiCheckbox-indeterminate": {
+                color: "#5D4037",
+            }
+        },
+        noDataCell: (selectMode: boolean) => ({
+            colSpan: selectMode ? 6 : 5,
+            align: "center" as const,
+            py: 6,
+            backgroundColor: "#FFFEF7"
+        }),
+
+        noDataText: {
+            color: "#6D4C41",
+            fontSize: 16,
+            fontWeight: "500"
+        },
+
+        tableRow: (selectMode: boolean, selected: boolean) => ({
+            backgroundColor: selectMode && selected ? "#FFF8E1" : "#FFFEF7",
+            height: "120px",
+            "&:hover": {
+                backgroundColor: "#F3E5F5",
+            }
+        }),
+        imageCell: {
+            padding: "8px"
+        },
+        image: {
+            width: "150px",
+            height: "110px",
+            objectFit: "cover" as const,
+            borderRadius: "8px",
+            border: "2px solid #D7CCC8",
+            cursor: "pointer",
+            transition: "transform 0.2s ease, box-shadow 0.2s ease",
+            "&:hover": {
+                transform: "scale(1.05)",
+                boxShadow: "0 4px 8px rgba(0,0,0,0.2)",
+            }
+        },
+        addressText: {
+            wordBreak: "break-word",
+            color: "#3E2723",
+            fontWeight: "500"
+        },
+        userText: {
+            color: "#3E2723",
+            fontWeight: "500"
+        },
+        timeText: {
+            color: "#6D4C41"
+        },
+        actionButtonContainer: {
+            display: "flex",
+            gap: 1
+        },
+        approveButton: {
+            borderRadius: 8,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 12,
+            backgroundColor: "#4CAF50",
+            color: "#FFF",
+            px: 2,
+            py: 1,
+            "&:hover": {
+                backgroundColor: "#45A049",
+            },
+            "&:disabled": {
+                backgroundColor: "#A1887F",
+                color: "#D7CCC8",
+            }
+        },
+        rejectButton: {
+            borderRadius: 8,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 12,
+            backgroundColor: "#F44336",
+            color: "#FFF",
+            px: 2,
+            py: 1,
+            "&:hover": {
+                backgroundColor: "#E53935",
+            },
+            "&:disabled": {
+                backgroundColor: "#A1887F",
+                color: "#D7CCC8",
+            }
+        },
+        statsContainer: {
+            mb: 2,
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            width: "100%",
+            px: 1,
+        },
+        statsText: {
+            color: "#6D4C41",
+            fontWeight: "500"
+        },
+        bottomActionGroup: {
+            display: "flex",
+            gap: 2,
+            alignItems: "center"
+        },
+        batchApproveButton: {
+            borderRadius: 10,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 13,
+            backgroundColor: "#4CAF50",
+            color: "#FFF",
+            px: 3,
+            py: 1.2,
+            "&:hover": {
+                backgroundColor: "#45A049",
+            },
+            "&:disabled": {
+                backgroundColor: "#A1887F",
+                color: "#D7CCC8",
+            }
+        },
+        batchRejectButton: {
+            borderRadius: 10,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 13,
+            backgroundColor: "#F44336",
+            color: "#FFF",
+            px: 3,
+            py: 1.2,
+            "&:hover": {
+                backgroundColor: "#E53935",
+            },
+            "&:disabled": {
+                backgroundColor: "#A1887F",
+                color: "#D7CCC8",
+            }
+        },
+        exitButton: {
+            borderRadius: 10,
+            textTransform: "none",
+            fontWeight: "bold",
+            fontSize: 13,
+            borderColor: "#5D4037",
+            color: "#5D4037",
+            px: 3,
+            py: 1.2,
+            "&:hover": {
+                borderColor: "#4E342E",
+                backgroundColor: "#FFF8E1",
+            }
+        },
+        // 大图预览对话框样式
+        previewDialog: {
+            "& .MuiDialog-paper": {
+                maxWidth: "90vw",
+                maxHeight: "90vh",
+                backgroundColor: "transparent",
+                boxShadow: "none",
+                overflow: "hidden"
+            }
+        },
+        previewContent: {
+            position: "relative",
+            padding: 0,
+            backgroundColor: "transparent",
+            overflow: "hidden",
+            "&:first-child": {
+                paddingTop: 0
+            }
+        },
+        closeButton: {
+            position: "absolute",
+            right: -40,
+            top: -40,
+            backgroundColor: "rgba(0,0,0,0.6)",
+            color: "white",
+            zIndex: 1,
+            "&:hover": {
+                backgroundColor: "rgba(0,0,0,0.8)",
+            }
+        },
+        previewImage: {
+            maxWidth: "80vw",
+            maxHeight: "80vh",
+            objectFit: "contain" as const,
+            borderRadius: "8px",
+            boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
+        }
+    };
+
     return (
-        <Box
-            sx={{
-                ...pageBackgroundStyles.container,
-                padding: "1px 0px",
-                height: "100vh",
-                boxSizing: "border-box",
-                display: "flex",
-                flexDirection: "column",
-                overflow: "hidden",
-            }}
-        >
-            <Box
-                sx={{
-                    flex: 1,
-                    display: "flex",
-                    flexDirection: "column",
-                    width: "95%",
-                    px: 2,
-                }}
-            >
-                
-                <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={2}>
-                    <Box display="flex" alignItems="center" gap={2}>
+        <Box sx={styles.mainContainer}>
+            <Box sx={styles.contentWrapper}>
+                <Box sx={styles.topActionContainer}>
+                    <Box sx={styles.leftActionGroup}>
                         <Button
                             variant="contained"
                             onClick={fetchPhotos}
                             disabled={loading}
                             startIcon={loading ? <CircularProgress size={20} /> : null}
+                            sx={styles.fetchButton}
                         >
                             {loading ? "Fetching..." : "Fetch Photos"}
                         </Button>
@@ -256,11 +562,7 @@ const PhotoReview = () => {
                         {(error || success) && (
                             <Alert
                                 severity={error ? "error" : "success"}
-                                sx={{
-                                    minWidth: 0,
-                                    flex: 1,
-                                    maxWidth: "400px"
-                                }}
+                                sx={styles.alert(!!error)}
                             >
                                 {error || success}
                             </Alert>
@@ -271,6 +573,7 @@ const PhotoReview = () => {
                         variant="outlined"
                         onClick={toggleSelectMode}
                         disabled={photos.length === 0}
+                        sx={styles.selectButton}
                     >
                         {selectMode ? "Cancel Selection" : "Select"}
                     </Button>
@@ -279,21 +582,16 @@ const PhotoReview = () => {
                 {/* 照片列表 */}
                 <TableContainer
                     component={Paper}
-                    sx={{
-                        width: "100%",
-                        maxWidth: "100%",
-                        margin: 0,
-                        mb: 2,
-                        flex: 1,
-                        overflow: "auto",
-                        maxHeight: "calc(100vh - 220px)",
-                    }}
+                    sx={styles.tableContainer}
                 >
-                    <Table stickyHeader sx={{ minWidth: 700 }}>
+                    <Table stickyHeader sx={styles.table}>
                         <TableHead>
                             <TableRow>
                                 {selectMode && (
-                                    <TableCell padding="checkbox" sx={{ width: 48 }}>
+                                    <TableCell
+                                        padding="checkbox"
+                                        sx={styles.headerCheckboxCell}
+                                    >
                                         <Checkbox
                                             checked={selectAll}
                                             onChange={toggleSelectAll}
@@ -301,87 +599,109 @@ const PhotoReview = () => {
                                                 photos.some((p) => p.selected) &&
                                                 !photos.every((p) => p.selected)
                                             }
+                                            sx={styles.checkbox}
                                         />
                                     </TableCell>
                                 )}
-                                <TableCell sx={{ width: 120 }}>Photo</TableCell>
-                                <TableCell sx={{ width: 180 }}>Building Address</TableCell>
-                                <TableCell sx={{ width: 150 }}>Upload User</TableCell>
-                                <TableCell sx={{ width: 180 }}>Upload Time</TableCell>
-                                <TableCell sx={{ width: 150 }}>Review Result</TableCell>
+                                <TableCell sx={styles.headerCell(120)}>
+                                    Photo
+                                </TableCell>
+                                <TableCell sx={styles.headerCell(180)}>
+                                    Building Address
+                                </TableCell>
+                                <TableCell sx={styles.headerCell(150)}>
+                                    Upload User
+                                </TableCell>
+                                <TableCell sx={styles.headerCell(180)}>
+                                    Upload Time
+                                </TableCell>
+                                <TableCell sx={styles.headerCell(150)}>
+                                    Review Result
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {photos.length === 0 ? (
                                 <TableRow>
                                     <TableCell
-                                        colSpan={selectMode ? 6 : 5}
-                                        align="center"
-                                        sx={{ py: 4 }}
+                                        {...styles.noDataCell(selectMode)}
                                     >
-                                        <Typography color="text.secondary">
+                                        <Typography sx={styles.noDataText}>
                                             No pending photos for review, click 'Fetch Photos' to get data
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
                             ) : (
-                                photos.map((photo) => (
-                                    <TableRow key={photo.photo_id}>
+                                photos.map((photo, index) => (
+                                    <TableRow
+                                        key={photo.photo_id}
+                                        sx={styles.tableRow(selectMode, !!photo.selected)}
+                                    >
                                         {selectMode && (
                                             <TableCell padding="checkbox">
                                                 <Checkbox
                                                     checked={!!photo.selected}
                                                     onChange={() => togglePhotoSelection(photo.photo_id)}
+                                                    sx={styles.checkbox}
                                                 />
                                             </TableCell>
                                         )}
-                                        <TableCell>
+                                        <TableCell sx={styles.imageCell}>
                                             <img
                                                 src={photo.image_url}
                                                 alt="Building Photo"
-                                                style={{
-                                                    width: "110px",
-                                                    height: "82px",
-                                                    objectFit: "cover",
-                                                    borderRadius: "4px",
-                                                }}
+                                                style={styles.image}
+                                                onClick={() => handleImageClick(photo)}
                                                 onError={(e) => {
                                                     e.currentTarget.style.display = "none";
                                                 }}
                                             />
                                         </TableCell>
                                         <TableCell>
-                                            <Typography variant="body2" sx={{ wordBreak: "break-word" }}>
+                                            <Typography
+                                                variant="body2"
+                                                sx={styles.addressText}
+                                            >
                                                 Building ID: {photo.building_addr}
                                             </Typography>
                                         </TableCell>
-                                        <TableCell>{photo.user_id}</TableCell>
                                         <TableCell>
-                                            <Typography variant="body2">
+                                            <Typography
+                                                variant="body2"
+                                                sx={styles.userText}
+                                            >
+                                                {photo.username || photo.user_id}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography
+                                                variant="body2"
+                                                sx={styles.timeText}
+                                            >
                                                 {new Date(photo.upload_time).toLocaleString("zh-CN")}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
-                                            <Box sx={{ display: "flex", gap: 1 }}>
+                                            <Box sx={styles.actionButtonContainer}>
                                                 <Button
                                                     variant="contained"
-                                                    color="success"
                                                     size="small"
                                                     onClick={() =>
                                                         handleSingleReview(photo.photo_id, "success")
                                                     }
                                                     disabled={loading}
+                                                    sx={styles.approveButton}
                                                 >
                                                     Approve
                                                 </Button>
                                                 <Button
                                                     variant="contained"
-                                                    color="error"
                                                     size="small"
                                                     onClick={() =>
                                                         handleSingleReview(photo.photo_id, "fail")
                                                     }
                                                     disabled={loading}
+                                                    sx={styles.rejectButton}
                                                 >
                                                     Reject
                                                 </Button>
@@ -395,40 +715,34 @@ const PhotoReview = () => {
                 </TableContainer>
 
                 {/* 统计信息 */}
-                <Box
-                    sx={{
-                        mb: 2,
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                        width: "100%",
-                        px: 1,
-                    }}
-                >
-                    <Typography variant="body2" color="text.secondary">
+                <Box sx={styles.statsContainer}>
+                    <Typography
+                        variant="body2"
+                        sx={styles.statsText}
+                    >
                         {photos.length > 0
                             ? `Currently showing ${photos.length} pending photos for review`
                             : "No photos loaded"
                         }
                     </Typography>
-                    <Box display="flex" gap={1} alignItems="center">
+                    <Box sx={styles.bottomActionGroup}>
                         {selectMode && photos.some((p) => p.selected) && (
                             <>
                                 <Button
                                     variant="contained"
-                                    color="success"
                                     onClick={() => handleBatchReview("success")}
                                     disabled={loading}
                                     size="small"
+                                    sx={styles.batchApproveButton}
                                 >
                                     Batch Approve ({photos.filter((p) => p.selected).length})
                                 </Button>
                                 <Button
                                     variant="contained"
-                                    color="error"
                                     onClick={() => handleBatchReview("fail")}
                                     disabled={loading}
                                     size="small"
+                                    sx={styles.batchRejectButton}
                                 >
                                     Batch Reject ({photos.filter((p) => p.selected).length})
                                 </Button>
@@ -436,15 +750,49 @@ const PhotoReview = () => {
                         )}
                         <Button
                             variant="outlined"
-                            color="primary"
                             onClick={() => navigate("/dashboard")}
                             size="small"
+                            sx={styles.exitButton}
                         >
                             Exit
                         </Button>
                     </Box>
                 </Box>
             </Box>
+
+            {/* 大图预览对话框 */}
+            <Dialog
+                open={previewOpen}
+                onClose={handleClosePreview}
+                maxWidth={false}
+                sx={styles.previewDialog}
+                BackdropProps={{
+                    sx: {
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    }
+                }}
+            >
+                <DialogContent sx={styles.previewContent}>
+                    <IconButton
+                        onClick={handleClosePreview}
+                        sx={styles.closeButton}
+                        size="large"
+                    >
+                        <CloseIcon />
+                    </IconButton>
+
+                    {previewImage && (
+                        <img
+                            src={previewImage}
+                            alt="Photo Preview"
+                            style={styles.previewImage}
+                            onError={(e) => {
+                                console.error("Preview image failed to load");
+                            }}
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </Box>
     );
 

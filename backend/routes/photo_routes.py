@@ -45,19 +45,7 @@ class BatchReviewRequest(BaseModel):
     feedback: Optional[str] = ""
     reviewer_id: str
 
-# class PhotoResponse(BaseModel): from db_entities import
-#     photo_id: str
-#     user_id: str
-#     building_addr: Optional[str] = None
-#     lat: Optional[float] = None  # 新增：纬度
-#     lng: Optional[float] = None  # 新增：经度
-#     # upload_time: str
-#     upload_time: datetime
-#     image_url: Optional[str]
-#     status: str
-#     feedback: Optional[str]
-#     reviewer_id: Optional[str]
-#     review_time: Optional[datetime]
+
 
 #储存格式（用户id，建筑id,纬度，经度，图片组）
 @router.post("/", status_code=201)
@@ -119,7 +107,6 @@ async def upload_photo(
 
 @router.get("/review/batch_fetch")
 async def fetch_photos_for_review(reviewer_id:str):
-    print(f"--- VERY IMPORTANT: Entered GET batch_fetch for reviewer: {reviewer_id} ---")
     try:
         timeout_threshold = datetime.now(timezone.utc) - timedelta(hours=1)
 
@@ -165,6 +152,17 @@ async def fetch_photos_for_review(reviewer_id:str):
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             del photo_doc["_id"]
+
+            try:
+                user_info = await db_userEntities.get_user(photo_doc["user_id"])
+                if user_info and "username" in user_info:
+                    photo_doc["username"] = user_info["username"]
+                else:
+                    photo_doc["username"] = photo_doc["user_id"]
+            except Exception as e:
+                print(f"Failed to get username for user_id {photo_doc['user_id']}: {e}")
+                photo_doc["username"] = photo_doc["user_id"]
+
             locked_photos.append(PhotoResponse(**photo_doc))
 
         if not locked_photos:
@@ -179,7 +177,7 @@ async def fetch_photos_for_review(reviewer_id:str):
         raise HTTPException(status_code=500, detail=f"Server error while fetching photos: {e}")
 
 
-@router.post("/review/single", response_model=PhotoResponse)
+@router.post("/review/single")
 async def review_single_photo(request: PhotoReviewRequest):
     try:
         final_status = ReviewStatus.Approved if request.status_result == "success" else ReviewStatus.Rejected
@@ -219,11 +217,6 @@ async def review_single_photo(request: PhotoReviewRequest):
         print("review_single_photo error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while reviewing single photo.")
 
-class BatchReviewRequest(BaseModel):
-    ids: List[str]  # 直接接收数组
-    result: str
-    feedback: Optional[str] = ""
-    reviewer_id: str
 
 @router.post("/review/batch_submit", response_model=List[PhotoResponse])
 async def review_batch_photos(request: BatchReviewRequest):

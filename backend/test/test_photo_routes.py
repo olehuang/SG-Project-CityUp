@@ -35,7 +35,9 @@ def test_upload_multiple_photos():
         "/photos/",
         data={
             "user_id": "test_user",
-            "building_addr": "test_building_address_123"
+            "building_addr": "test_building_address_123",
+            "lat": 39.9042,
+            "lng": 116.4074
         },
         files=files
     )

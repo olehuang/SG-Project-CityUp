@@ -32,7 +32,7 @@ const styles = {
     bottomRow: {
         display: "flex",
         justifyContent: "center",
-        gap: 10,
+        gap: 15,
     },
     buttonBase: {
         borderRadius: 16,

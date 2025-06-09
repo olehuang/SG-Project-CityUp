@@ -147,6 +147,7 @@ class Photo:
 class PhotoResponse(BaseModel):
     photo_id: str
     user_id: str
+    username: Optional[str] = None
     building_addr: Optional[str] = None
     lat: Optional[float] = None  # 新增：纬度
     lng: Optional[float] = None  # 新增：经度
