@@ -2,7 +2,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton  from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import {Box, Typography, Container, Button} from "@mui/material";
+import {Box, Typography, Container, Button,Dialog, DialogTitle,} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -23,6 +23,7 @@ import AdressSearchField from "../components/AdressSearchField";
 import PhotoGrid from "../components/PhotoGrid";
 import {hover} from "@testing-library/user-event/dist/hover";
 import axios from "axios";
+import PhotoViewDialog from "../components/PhotoViewDialog";
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
@@ -44,20 +45,19 @@ const BuildingInfo=()=>{
     const now = new Date();
 
     const photos = new Array(9).fill(null);
-    const [updateTime,setUpdateTime]=useState(`${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`);
-    const [photoNr,setPhotoNr]=useState(0);
 
     const [leftWidth, setLeftWidth] = useState(60);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
     const [allAddresses, setAllAddresses] = useState<string[]>([]);
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
+    const [open,setOpen]=useState(false);//Photo dialog
+
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
         const fetchAllData=async ()=>{
-
             try {
                 const response = await axios.get(url+"/buildings/get_all_build_addr");
                 const addrList =response.data.sort((a: string, b: string) => a.localeCompare(b));
@@ -96,24 +96,34 @@ const BuildingInfo=()=>{
         }
         fetchAllData();
     }, []);
+    //
+    // const getFirshUploadTime= async (address:string)=>{
+    //     try{
+    //         const response = await axios.get(url+"/get_firsh_upload_time",{params: {address: address}});
+    //         setUpdateTime(response.data)
+    //     }catch (e:any) {
+    //         console.log(e.message || "Unknown error")
+    //     }
+    // }
 
-    const getFirshUploadTime= async (address:string)=>{
-        try{
-            const response = await axios.get(url+"/get_firsh_upload_time",{params: {address: address}});
-            setUpdateTime(response.data)
-        }catch (e:any) {
-            console.log(e.message || "Unknown error")
-        }
-    }
+    // const getPhotoNumber = async (address:string)=>{
+    //     try{
+    //         const response = await axios.get(url+"/photoNumber",{params: {address: address}});
+    //         setUpdateTime(response.data)
+    //     }catch (e:any) {
+    //         console.log(e.message || "Unknown error")
+    //     }
+    // }
 
-    const getPhotoNumber = async (address:string)=>{
-        try{
-            const response = await axios.get(url+"/photoNumber",{params: {address: address}});
-            setUpdateTime(response.data)
-        }catch (e:any) {
-            console.log(e.message || "Unknown error")
-        }
-    }
+    const handleDialogOpen = (index: number) => {
+
+        setOpen(true);
+    };
+
+    const handleDialogClose = () => {
+        setOpen(false);
+
+    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
@@ -199,12 +209,12 @@ const BuildingInfo=()=>{
                         <Box >
                             <Box sx={{
                                 display:"flex",
-                                direction:"row",
+                                flexDirection:"row",
                                 border:"1px solid black",
                                 justifyContent:"space-between",
                                 alignItems:"center"}}>
                                 <Typography >Photos Preview </Typography>
-                                <Button>View all photos</Button>
+                                <Button onClick={()=>setOpen(true)}>View all</Button>
                             </Box>
                             <Box sx={{border:"1px solid black",marginTop:"1%"}}>
                                 {selectedAddress ? (
@@ -214,14 +224,12 @@ const BuildingInfo=()=>{
                                         Please select an address to view photos.
                                     </Typography>
                                 )}
-
                             </Box>
                         </Box>
                     </Box>
                 </Box>
-
             </Box>
-
+            <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
         </Box>
     )
 

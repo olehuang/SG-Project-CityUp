@@ -359,6 +359,15 @@ async def get_photo_list(address: str):
         print(f"get_photo_list error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
+@router.get("/get_first_9_photo")
+async def get_first_9_photo(address: str):
+    try:
+        photo_list= await db_photoEntities.get_first_nine_photo(address)
+        return photo_list
+    except Exception as e:
+        print(f"get_photo_list error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
 
 @router.get("/photoNumber")
 async def get_photo_number(address: str):

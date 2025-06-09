@@ -60,6 +60,19 @@ async def get_photo_list(address:str):
                   time_stamp=datetime.now())
         raise
 
+async def get_first_nine_photo(address:str):
+    try:
+        photo_list = await get_photo_list(address)
+        if not photo_list:return None
+        first_9_photo =photo_list[:9]
+        return first_9_photo
+    except Exception as e:
+        log_error(f'get_first_9_photo: {e}',
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now())
+        raise
+
+
 def serialize_photo(photo: dict) -> dict:
     return {
         "src": photo.get("src", ""),

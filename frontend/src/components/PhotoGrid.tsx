@@ -32,7 +32,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             setError(null);
             console.log("address:",address);
 
-            const url="http://127.0.0.1:8000/photos/get_photo_list"
+            const url="http://127.0.0.1:8000/photos/get_first_9_photo"
             try{
                 const response = await axios.get(url, {params: {address: address}});
                 const data=response.data;
@@ -106,8 +106,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         <Box
             sx={{
                 display: "flex",
-                flexWrap: "wrap",   // 自动换行
-                gap: 2,             // 块之间的间距，单位是 theme.spacing(2)
+                flexWrap: "wrap",   // automatic change row
+                gap: 2,             // space between photo
             }}
         >
             {photos.map((photo, index) => (

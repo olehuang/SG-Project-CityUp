@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends
+from fastapi import APIRouter, HTTPException, status, Query,File, UploadFile, Form, Depends
 from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
@@ -83,3 +83,20 @@ async def get_user_name(user_id:str):
         return user.get("username")
     except Exception as e:
         print("Exception while getting user",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get("/get_usernames")
+async def get_user_name(user_ids:List[str] = Query(...)):
+    result={}
+    try:
+        for user_id in user_ids:
+            user= await db_userEntities.get_user(user_id)
+            if user:
+                result[user_id]=user.get("username")
+            else:
+                result[user_id]="Unknow"
+        return result
+    except Exception as e:
+        print("Exception while getting user",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
