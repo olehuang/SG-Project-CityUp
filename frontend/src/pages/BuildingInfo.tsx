@@ -196,17 +196,26 @@ const BuildingInfo=()=>{
                     </TableContainer>
                     <Box onMouseDown={handleMouseDown} sx={styles.resizer} />
                     <Box sx={{ ...styles.rightContainer, width: `${100 - leftWidth}%` }}>
+                        <Box >
+                            <Box sx={{
+                                display:"flex",
+                                direction:"row",
+                                border:"1px solid black",
+                                justifyContent:"space-between",
+                                alignItems:"center"}}>
+                                <Typography >Photos Preview </Typography>
+                                <Button>View all photos</Button>
+                            </Box>
+                            <Box sx={{border:"1px solid black",marginTop:"1%"}}>
+                                {selectedAddress ? (
+                                    <PhotoGrid address={selectedAddress}/>
+                                ) : (
+                                    <Typography variant="body2" color="textSecondary">
+                                        Please select an address to view photos.
+                                    </Typography>
+                                )}
 
-                        <Typography title="h1">Photo Area </Typography>
-                        <Box>
-                            {selectedAddress ? (
-                                <PhotoGrid address={selectedAddress} />
-                            ) : (
-                                <Typography variant="body2" color="textSecondary">
-                                    Please select an address to view photos.
-                                </Typography>
-                            )}
-
+                            </Box>
                         </Box>
                     </Box>
                 </Box>
@@ -268,14 +277,6 @@ const styles={
         gridTemplateColumns: "50% 30% 20%",
     },
     serachResault:{
-        //cursor: "pointer", transition: "all 0.2s ease-in-out"
-        // display: "flex",
-        // justifyContent:"space-between",
-        // padding: "8px 12px",
-        // gridTemplateColumns: "50% 30% 20%",
-        // //border: "1px solid #ccc",
-        // borderRadius: "5px",
-        // backgroundColor: "#fff",
          cursor: "pointer",
          transition: "all 0.2s ease-in-out",
         "&:hover":{
@@ -289,8 +290,6 @@ const styles={
     },
 
     rightContainer:{
-        // justifyContent:"flex-start",
-        // alignItems:"flex-start",
         paddingBottom:"0",
         display:"flex",
         flexDirection: "column",
