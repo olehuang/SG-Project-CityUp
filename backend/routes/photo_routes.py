@@ -305,57 +305,28 @@ async def release_all_reviewing_photos(request: ReleasePhotosRequest):
         raise HTTPException(status_code=500, detail="Server error while releasing photos.")
 
 
-@router.get("/user/{user_id}", response_model=List[PhotoResponse])
-async def get_user_photos(user_id: str):
-    """
-    Retrieves all photos uploaded by a specific user.
-    """
-    try:
-        photos_cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
-        user_photos = []
-        async for photo_doc in photos_cursor:
-            photo_doc["photo_id"] = str(photo_doc["_id"])
-            del photo_doc["_id"]
-            if "building_id" in photo_doc and "building_addr" not in photo_doc:
-                photo_doc["building_addr"] = photo_doc["building_id"] # Use building_id as building_addr for old data
-
-            user_photos.append(PhotoResponse(**photo_doc))
-
-        if not user_photos:
-            raise HTTPException(status_code=404, detail=f"No photos found for user {user_id}")
-
-        return user_photos
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
-
-# # history
 # @router.get("/user/{user_id}", response_model=List[PhotoResponse])
 # async def get_user_photos(user_id: str):
 #     try:
-#         cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
-#         photos = []
+#         photos_cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
+#         user_photos = []
+#         async for photo_doc in photos_cursor:
+#             photo_doc["photo_id"] = str(photo_doc["_id"])
+#             del photo_doc["_id"]
+#             if "building_id" in photo_doc and "building_addr" not in photo_doc:
+#                 photo_doc["building_addr"] = photo_doc["building_id"] # Use building_id as building_addr for old data
 #
-#         for doc in cursor:
-#             photos.append(PhotoResponse(
-#                 photo_id=str(doc["_id"]),
-#                 user_id=doc["user_id"],
-#                 building_id=doc["building_id"],
-#                 image_url=doc.get("image_url"),
-#                 upload_time=doc["upload_time"].isoformat(),
-#                 status=doc["status"],
-#                 feedback=doc.get("feedback")
-#             ))
+#             user_photos.append(PhotoResponse(**photo_doc))
 #
-#         return photos
+#         if not user_photos:
+#             raise HTTPException(status_code=404, detail=f"No photos found for user {user_id}")
 #
+#         return user_photos
+#     except HTTPException:
+#         raise
 #     except Exception as e:
-#         print("get_user_photos error:", traceback.format_exc())
-#         # log_error("Exception while retrieving user photo history\n" + traceback.format_exc(), e, user_id=user_id)
-#         raise HTTPException(status_code=500, detail="Server error, failed to retrieve photo records")
-# Backend: photos_routes.py
+#         print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
+#         raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
 
 
 @router.get("/get_photo_list")
