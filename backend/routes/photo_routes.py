@@ -9,6 +9,7 @@ import shutil
 import uuid
 import time
 from pymongo import ReturnDocument
+import math
 
 import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
@@ -45,6 +46,13 @@ class BatchReviewRequest(BaseModel):
     feedback: Optional[str] = ""
     reviewer_id: str
 
+# 新增 upload History
+class UploadHistoryResponse(BaseModel):
+    photos: List[PhotoResponse]
+    total_count: int
+    page: int
+    limit: int
+    total_pages: int
 
 
 #储存格式（用户id，建筑id,纬度，经度，图片组）
@@ -385,3 +393,123 @@ async def get_first_upload_time(address: str):
     except Exception as e:
         print(f"get_firsh_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+# 新增：上传历史记录接口
+@router.get("/history", response_model=UploadHistoryResponse)
+async def get_upload_history(
+        request: Request,
+        user_id: str = Query(..., description="用户ID"),
+        page: int = Query(1, ge=1, description="页码"),
+        limit: int = Query(10, ge=1, le=100, description="每页数量"),
+        status: Optional[str] = Query(None, description="筛选状态: pending, reviewing, approved, rejected")
+):
+    """
+    获取用户的上传历史记录，支持分页和状态筛选
+    """
+    try:
+        # 构建查询条件
+        query = {"user_id": user_id}
+        if status:
+            # 将状态字符串转换为对应的枚举值
+            status_mapping = {
+                "pending": ReviewStatus.Pending.value,
+                "reviewing": ReviewStatus.Reviewing.value,
+                "approved": ReviewStatus.Approved.value,
+                "rejected": ReviewStatus.Rejected.value
+            }
+            if status in status_mapping:
+                query["status"] = status_mapping[status]
+            else:
+                raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
+
+        # 计算总数
+        total_count = await photo_collection.count_documents(query)
+
+        if total_count == 0:
+            return UploadHistoryResponse(
+                photos=[],
+                total_count=0,
+                page=page,
+                limit=limit,
+                total_pages=0
+            )
+
+        # 计算总页数
+        total_pages = math.ceil(total_count / limit)
+
+        # 计算跳过的文档数
+        skip = (page - 1) * limit
+
+        # 查询数据
+        photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
+        print("Query for history:", query)
+
+        photos = []
+        async for photo_doc in photos_cursor:
+            photo_doc["photo_id"] = str(photo_doc["_id"])
+            del photo_doc["_id"]
+
+            # 兼容旧数据
+            if "building_id" in photo_doc and "building_addr" not in photo_doc:
+                photo_doc["building_addr"] = photo_doc["building_id"]
+
+            # 拼接完整图片 URL
+            filename = photo_doc.get("filename")
+            if filename:
+                photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+
+            photos.append(PhotoResponse(**photo_doc))
+
+        return UploadHistoryResponse(
+            photos=photos,
+            total_count=total_count,
+            page=page,
+            limit=limit,
+            total_pages=total_pages
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"get_upload_history error for user {user_id}:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching upload history.")
+
+# 新增：获取照片统计信息
+@router.get("/stats/{user_id}")
+async def get_user_photo_stats(user_id: str):
+    """
+    获取用户照片统计信息
+    """
+    try:
+        # 使用聚合管道统计各状态照片数量
+        pipeline = [
+            {"$match": {"user_id": user_id}},
+            {"$group": {
+                "_id": "$status",
+                "count": {"$sum": 1}
+            }}
+        ]
+
+        stats_cursor = photo_collection.aggregate(pipeline)
+        stats_dict = {}
+        total_count = 0
+
+        async for stat in stats_cursor:
+            status = stat["_id"]
+            count = stat["count"]
+            stats_dict[status] = count
+            total_count += count
+
+        return {
+            "user_id": user_id,
+            "total_photos": total_count,
+            "pending": stats_dict.get(ReviewStatus.Pending.value, 0),
+            "reviewing": stats_dict.get(ReviewStatus.Reviewing.value, 0),
+            "approved": stats_dict.get(ReviewStatus.Approved.value, 0),
+            "rejected": stats_dict.get(ReviewStatus.Rejected.value, 0)
+        }
+
+    except Exception as e:
+        print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")
+
