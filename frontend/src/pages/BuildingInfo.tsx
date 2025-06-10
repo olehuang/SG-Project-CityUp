@@ -167,8 +167,11 @@ const BuildingInfo=()=>{
     return(
         <Box sx={pageBackgroundStyles.container} style={{justifyContent:"left",display:'contents',overflow: "hidden"}}>
             <Box  sx={styles.container}>
+                {/*Search box*/}
                 <AdressSearchField  onSearch={handleSearch} onSelect={handleSelect}/>
+                {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container" sx={styles.innerContainer}>
+                    {/*Adresse Table */}
                     <TableContainer component={Paper} style={{}}>
                         <Table size="medium" aria-label="building table">
                             <TableHead >
@@ -204,19 +207,19 @@ const BuildingInfo=()=>{
                             </TableBody>
                         </Table>
                     </TableContainer>
+                    {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
                     <Box onMouseDown={handleMouseDown} sx={styles.resizer} />
                     <Box sx={{ ...styles.rightContainer, width: `${100 - leftWidth}%` }}>
                         <Box >
                             <Box sx={{
                                 display:"flex",
                                 flexDirection:"row",
-                                border:"1px solid black",
                                 justifyContent:"space-between",
                                 alignItems:"center"}}>
                                 <Typography >Photos Preview </Typography>
                                 <Button onClick={()=>setOpen(true)}>View all</Button>
                             </Box>
-                            <Box sx={{border:"1px solid black",marginTop:"1%"}}>
+                            <Box sx={{marginTop:"1%"}}>
                                 {selectedAddress ? (
                                     <PhotoGrid address={selectedAddress}/>
                                 ) : (
@@ -229,6 +232,7 @@ const BuildingInfo=()=>{
                     </Box>
                 </Box>
             </Box>
+            {/*All photo Dialog */}
             <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
         </Box>
     )

@@ -10,7 +10,8 @@ import {Box, Dialog, DialogTitle, Typography,ImageList,
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import PhotoOrderSelector from "./PhotoOrderSelector";
-import qs from "qs"
+import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import PhotoCarousel from "./PhotoCarousel";
 
 
 
@@ -169,9 +170,25 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         }
     };
 
+
     const handlePreview =(photo:Photo)=>{
+        const index = sortedPhotos.findIndex(p => p.id === photo.id);
+        setPreviewIndex(index);
         setPreviewPhoto(photo);
         setPreviewOpen(true)
+    }
+
+    //come to next photo
+    const handleNext=()=>{
+        const nextIndex = (previewIndex+ 1) % sortedPhotos.length;
+        setPreviewIndex(nextIndex);
+        setPreviewPhoto(sortedPhotos[nextIndex]);
+    }
+    //come to last Photo
+    const handlePrev = ()=>{
+        const prevIndex = (previewIndex-1+sortedPhotos.length)% sortedPhotos.length;
+        setPreviewIndex(prevIndex);
+        setPreviewPhoto(sortedPhotos[prevIndex]);
     }
 
     return(
@@ -185,8 +202,11 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 <Box sx={{padding: 2}}>
                     <Box sx={{
                         display: "flex",
-                        mb: 2, alignItems: "center"}}>
+                        mb: 2,
+                        alignItems: "center"}}
+                    >
                         <Typography variant="h5">Photos Preview</Typography>
+                        {/*Download button*/}
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
                             {isSelecting && selectedPhotoIds.size > 0 && (
                                 <Button
@@ -197,7 +217,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                     Download ({selectedPhotoIds.size})
                                 </Button>
                             )}
-
+                            {/*Select Button*/}
                             <Button
                                 variant="contained"
                                 onClick={() => {
@@ -208,7 +228,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                             >
                                 {isSelecting ? "Cancel" : "Select"}
                             </Button>
-
+                            {/*Order Selector */}
                             <PhotoOrderSelector
                                 setSelectOrder={setSelectOrder}
                                 selectOrder={selectOrder}
@@ -222,7 +242,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                         </Box>
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
-                    ) : (<ImageList variant="masonry" cols={3} gap={12}>
+                    ) : (
+                        <ImageList variant="masonry" cols={3} gap={12}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
@@ -248,7 +269,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                             isSelecting && (
                                                 <Checkbox
                                                     checked={selectedPhotoIds.has(photo.id)}
-                                                    onClick={(e) => e.stopPropagation()} // 阻止冒泡，避免点击 checkbox 时触发外层的 toggleSelect
+                                                    onClick={(e) => e.stopPropagation()} // stop bubble,click checkbox will not  toggleSelect
                                                     onChange={() => toggleSelect(photo.id)}
                                                     sx={{ color: 'white' }}
                                                 />
@@ -262,39 +283,17 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     }
                 </Box>
             </Dialog>
-            <Dialog open={previewOpen} onClose={() => setPreviewOpen(false)} maxWidth="md" fullWidth>
-                <Box sx={{display: "flex", flexDirection:"row",alignItems: "center"}}>
-                    {/*<DialogTitle>{previewPhoto?.title}</DialogTitle>*/}
-                    <Box sx={{textAlign: "center", padding: 1}}>
-                        <img
-                            src={previewPhoto?.src}
-                            alt={previewPhoto?.title}
-                            style={{maxWidth: "100%", maxHeight: "80vh", borderRadius: 8}}
-                        />
-                    </Box>
-                    <Box >
-                        <Typography variant="body2" sx={{mt: 1}}>
-                            Uploaded by {previewPhoto?.uploader}
-                        </Typography>
-                        <Typography variant="body2" sx={{mt: 1}}>
-                            Uploaded on {previewPhoto?.uploadTime}
-                        </Typography>
-                        { isSelecting && previewPhoto && (
-                            <FormControlLabel
-                                control={
-                                    <Checkbox
-                                        checked={selectedPhotoIds.has(previewPhoto.id)}
-                                        onChange={() => {
-                                            toggleSelect(previewPhoto.id);
-                                        }}
-                                    />
-                                }
-                                label="Select this photo"
-                            />
-                        )}
-                    </Box>
-                </Box>
-            </Dialog>
+            {/*click Photo can bigger Photo to see */}
+            <PhotoCarousel
+                open={previewOpen}
+                photo={previewPhoto}
+                onClose={()=>setPreviewOpen(false)}
+                onPrev={handlePrev}
+                onNext={handleNext}
+                isSelecting={isSelecting}
+                selectedPhotoIds={selectedPhotoIds}
+                toggleSelect={toggleSelect}
+            />
         </>
     )
 }
