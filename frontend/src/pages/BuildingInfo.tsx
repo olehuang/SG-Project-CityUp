@@ -74,8 +74,14 @@ const BuildingInfo=()=>{
                                 axios.get(url + "/photos/photoNumber", { params: { address } }),
                             ]);
 
+                            const rawtime = updateResp.data;
+                            const formatTime = new Intl.DateTimeFormat("de-DE",{
+                                dateStyle: "medium",
+                                timeStyle: "short",
+                                timeZone: "Europe/Berlin"}).format(new Date(rawtime));
+
                             infoMap[address] = {
-                                updateTime: updateResp.data,
+                                updateTime: formatTime,
                                 photoNr: countResp.data,
                             };
                         } catch (err: any) {

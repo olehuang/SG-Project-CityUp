@@ -84,7 +84,11 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 const updatedPhotos = formattedPhotos.map(p => ({
                     ...p,
                     id: p.src,
-                    uploader: userMap[p.uploader] ?? "Unknown"
+                    uploader: userMap[p.uploader] ?? "Unknown",
+                    uploadTime: new Intl.DateTimeFormat("de-DE",{
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                            timeZone: "Europe/Berlin"}).format(new Date(p.uploadTime))
                 }));
                 setPhotos(updatedPhotos);
             } catch (err: any) {
@@ -265,8 +269,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                     }}
                                 >
                                     <ImageListItemBar
-                                        title={photo.title}
-                                        subtitle={`Uploader: ${photo.uploader} | Time: ${photo.uploadTime}`}
+                                        //title={photo.title}
+                                        subtitle={`Uploader: ${photo.uploader} | Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
                                             isSelecting && (
                                                 <Checkbox

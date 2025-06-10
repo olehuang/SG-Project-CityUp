@@ -80,10 +80,13 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     </Box>
                     <Box>
                         <Typography variant="body2" sx={{}}>
-                            Uploaded by {photo?.uploader}
+                            Uploader:  {photo?.uploader}
                         </Typography>
                         <Typography variant="body2" sx={{}}>
-                            Uploaded on {photo?.uploadTime}
+                            Uploadtime : {new Intl.DateTimeFormat("de-DE",{
+                            dateStyle: "medium",
+                            timeStyle: "short",
+                            timeZone: "Europe/Berlin"}).format(new Date(photo?.uploadTime))}
                         </Typography>
                         {isSelecting && photo && (
                             <FormControlLabel
