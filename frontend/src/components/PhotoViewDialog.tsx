@@ -270,7 +270,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 >
                                     <ImageListItemBar
                                         //title={photo.title}
-                                        subtitle={`Uploader: ${photo.uploader} | Upload Time: ${photo.uploadTime}`}
+                                        subtitle={`Upload User: ${photo.uploader} | Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
                                             isSelecting && (
                                                 <Checkbox

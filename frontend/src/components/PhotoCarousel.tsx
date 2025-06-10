@@ -80,7 +80,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     </Box>
                     <Box>
                         <Typography variant="body2" sx={{}}>
-                            Uploader:  {photo?.uploader}
+                            Upload User:  {photo?.uploader}
                         </Typography>
                         <Typography variant="body2" sx={{}}>
                             Uploadtime : {new Intl.DateTimeFormat("de-DE",{
