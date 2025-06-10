@@ -98,7 +98,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                         }}
                                     />
                                 }
-                                label="Select this photo"
+                                label="Select to download"
                             />
                         )}
                     </Box>

@@ -206,10 +206,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
             >
                 <DialogTitle> Photos Under Adresse - {selectedAddress}</DialogTitle>
                 <Box sx={{padding: 2}}>
-                    <Box sx={{
-                        display: "flex",
-                        mb: 2,
-                        alignItems: "center"}}
+                    <Box sx={{display: "flex", mb: 2, alignItems: "center"}}
                     >
                         <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}
@@ -270,7 +267,14 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 >
                                     <ImageListItemBar
                                         //title={photo.title}
-                                        subtitle={`Upload User: ${photo.uploader} | Upload Time: ${photo.uploadTime}`}
+                                        subtitle={
+                                            `Upload User: ${photo.uploader} 
+                                            | Upload Time: ${
+                                                new Intl.DateTimeFormat("de-DE", {
+                                                    dateStyle: "medium",
+                                                    timeStyle: "short",
+                                                    timeZone: "Europe/Berlin"
+                                                }).format(new Date(photo.uploadTime))}`}
                                         actionIcon={
                                             isSelecting && (
                                                 <Checkbox

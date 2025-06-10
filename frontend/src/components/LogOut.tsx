@@ -20,7 +20,7 @@ const LogOut = () => {
     return (
         <List>
             <ListItemButton onClick={handleLogOut} style={{textAlign:"center"}}>
-                <ListItemText primary="LogOut" />
+                <ListItemText primary="Log out" />
                 <ListItemIcon>
                 </ListItemIcon>
             </ListItemButton>

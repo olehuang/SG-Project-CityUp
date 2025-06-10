@@ -106,41 +106,41 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     return (
         <>
-        <Box
-            sx={{
-                display: "flex",
-                flexWrap: "wrap",   // automatic change row
-                gap: 2,             // space between photo
-            }}
-        >
-            {photos.map((photo, index) => (
-                <Box
-                    key={index}
-                    sx={styles.photoBox}
-                    onClick={() => handleOpen(index)}
-                >
+            <Box
+                sx={{
+                    display: "flex",
+                    flexWrap: "wrap",   // automatic change row
+                    gap: 2,             // space between photo
+                }}
+            >
+                {photos.map((photo, index) => (
                     <Box
-                        component="img"
-                        src={photo.src}
-                        alt={photo.title}
-                        sx={{
-                            width: '100%',
-                            height: '100%',
-                            objectFit: 'cover',
-                            borderRadius: 1
-                        }}
-                    />
-                </Box>
-            ))}
-        </Box>
+                        key={index}
+                        sx={styles.photoBox}
+                        onClick={() => handleOpen(index)}
+                    >
+                        <Box
+                            component="img"
+                            src={photo.src}
+                            alt={photo.title}
+                            sx={{
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                borderRadius: 1
+                            }}
+                        />
+                    </Box>
+                ))}
+            </Box>
 
             {/* Dialog */}
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={'lg'}
             >
-                <DialogTitle>Photo Detail</DialogTitle>
-                <Box >
+                <DialogTitle >Photo Detail</DialogTitle>
+                <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>
                             <Box
@@ -162,8 +162,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         User: {getUsername(photos[selectedPhotoIndex].uploader)}</Typography>
                                 </Box>
                                     <Button variant="contained"
-                                            sx={{alignSelf: "flex-start" }}
-                                            onClick={()=>handleOfDownload(photos[selectedPhotoIndex])}
+                                            sx={{alignSelf: "flex-start"}}
+                                            onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
                                     >
                                         Download
                                     </Button>
@@ -178,6 +178,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
  }
  const styles={
     dialogContainer:{
+        padding:"0 0 1% 0 ",
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
@@ -188,11 +189,12 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          flexDirection: "row",
          alignItems: "flex-start",
          gap: 2,
-         minHeight: 500, // 增加对话框整体高度
+         minHeight: 500, //
          p: 2,
+         paddingBottom:0,
      },
      dialogPhotoArea:{
-         width: "100%",
+         width: "90%",
          maxWidth: "800px",
          height: "auto",
          maxHeight: 500,
@@ -226,33 +228,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             backgroundColor: "#b2ebf2",
         },
     },
-     photoModal:{
-         position: 'absolute',
-         top: '50%',
-         left: '50%',
-         transform: 'translate(-50%, -50%)',
-         width: 400,
-         bgcolor: 'background.paper',
-         border: '2px solid #000',
-         boxShadow: 24,
-         p: 4,
-     },
 
  }
-
-const images = [
-    {
-        src: "/luisenplatz.jpg",
-        title: "Luisenplatz",
-        uploader: "John Doe",
-        uploadTime: "2024-05-31 12:00",
-    },
-    {
-        src: "/luisenplatz.jpg", // 可重复使用同一张图片测试
-        title: "Luisenplatz 2",
-        uploader: "Jane Smith",
-        uploadTime: "2024-05-30 10:45",
-    }
-];
 
 export default PhotoGrid;
