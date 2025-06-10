@@ -96,27 +96,9 @@ const BuildingInfo=()=>{
         }
         fetchAllData();
     }, []);
-    //
-    // const getFirshUploadTime= async (address:string)=>{
-    //     try{
-    //         const response = await axios.get(url+"/get_firsh_upload_time",{params: {address: address}});
-    //         setUpdateTime(response.data)
-    //     }catch (e:any) {
-    //         console.log(e.message || "Unknown error")
-    //     }
-    // }
 
-    // const getPhotoNumber = async (address:string)=>{
-    //     try{
-    //         const response = await axios.get(url+"/photoNumber",{params: {address: address}});
-    //         setUpdateTime(response.data)
-    //     }catch (e:any) {
-    //         console.log(e.message || "Unknown error")
-    //     }
-    // }
 
     const handleDialogOpen = (index: number) => {
-
         setOpen(true);
     };
 

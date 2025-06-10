@@ -121,8 +121,10 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
             return [...photos].sort((a, b) => {
                 const timeA = new Date(a.uploadTime).getTime();
                 const timeB = new Date(b.uploadTime).getTime();
-                const nameA = a.uploader
-                const nameB = b.uploader
+                const nameA = a.uploader.toLowerCase();
+                const nameB = b.uploader.toLowerCase();
+                console.log("NameA:",nameA);
+                console.log("NameB:",nameB);
 
                 switch (order) {
                     case 'tasc':
