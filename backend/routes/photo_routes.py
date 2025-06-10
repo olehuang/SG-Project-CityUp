@@ -1,5 +1,3 @@
-from idlelib.history import History
-
 from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query
 from pydantic import BaseModel
 from typing import Optional, List
@@ -13,7 +11,8 @@ import time
 from pymongo import ReturnDocument
 import math
 
-from db_entities import MongoDB, Photo, ReviewStatus
+import db_photoEntities
+from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 # from utils.logger import log_error
 
@@ -47,20 +46,6 @@ class BatchReviewRequest(BaseModel):
     feedback: Optional[str] = ""
     reviewer_id: str
 
-class PhotoResponse(BaseModel):
-    photo_id: str
-    user_id: str
-    building_addr: Optional[str] = None
-    lat: Optional[float] = None  # 新增：纬度
-    lng: Optional[float] = None  # 新增：经度
-    # upload_time: str
-    upload_time: datetime
-    image_url: Optional[str]
-    status: str
-    feedback: Optional[str]
-    reviewer_id: Optional[str]
-    review_time: Optional[datetime]
-
 # 新增 upload History
 class UploadHistoryResponse(BaseModel):
     photos: List[PhotoResponse]
@@ -69,86 +54,6 @@ class UploadHistoryResponse(BaseModel):
     limit: int
     total_pages: int
 
-
-# 新增：上传历史记录接口
-@router.get("/history", response_model=UploadHistoryResponse)
-async def get_upload_history(
-        request: Request,
-        user_id: str = Query(..., description="用户ID"),
-        page: int = Query(1, ge=1, description="页码"),
-        limit: int = Query(10, ge=1, le=100, description="每页数量"),
-        status: Optional[str] = Query(None, description="筛选状态: pending, reviewing, approved, rejected")
-):
-    """
-    获取用户的上传历史记录，支持分页和状态筛选
-    """
-    try:
-        # 构建查询条件
-        query = {"user_id": user_id}
-        if status:
-            # 将状态字符串转换为对应的枚举值
-            status_mapping = {
-                "pending": ReviewStatus.Pending.value,
-                "reviewing": ReviewStatus.Reviewing.value,
-                "approved": ReviewStatus.Approved.value,
-                "rejected": ReviewStatus.Rejected.value
-            }
-            if status in status_mapping:
-                query["status"] = status_mapping[status]
-            else:
-                raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
-
-        # 计算总数
-        total_count = await photo_collection.count_documents(query)
-
-        if total_count == 0:
-            return UploadHistoryResponse(
-                photos=[],
-                total_count=0,
-                page=page,
-                limit=limit,
-                total_pages=0
-            )
-
-        # 计算总页数
-        total_pages = math.ceil(total_count / limit)
-
-        # 计算跳过的文档数
-        skip = (page - 1) * limit
-
-        # 查询数据
-        photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
-        print("Query for history:", query)
-
-        photos = []
-        async for photo_doc in photos_cursor:
-            photo_doc["photo_id"] = str(photo_doc["_id"])
-            del photo_doc["_id"]
-
-            # 兼容旧数据
-            if "building_id" in photo_doc and "building_addr" not in photo_doc:
-                photo_doc["building_addr"] = photo_doc["building_id"]
-
-            # 拼接完整图片 URL
-            filename = photo_doc.get("filename")
-            if filename:
-                photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
-
-            photos.append(PhotoResponse(**photo_doc))
-
-        return UploadHistoryResponse(
-            photos=photos,
-            total_count=total_count,
-            page=page,
-            limit=limit,
-            total_pages=total_pages
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"get_upload_history error for user {user_id}:", traceback.format_exc())
-        raise HTTPException(status_code=500, detail="Server error while fetching upload history.")
 
 #储存格式（用户id，建筑id,纬度，经度，图片组）
 @router.post("/", status_code=201)
@@ -210,7 +115,6 @@ async def upload_photo(
 
 @router.get("/review/batch_fetch")
 async def fetch_photos_for_review(reviewer_id:str):
-    print(f"--- VERY IMPORTANT: Entered GET batch_fetch for reviewer: {reviewer_id} ---")
     try:
         timeout_threshold = datetime.now(timezone.utc) - timedelta(hours=1)
 
@@ -256,6 +160,17 @@ async def fetch_photos_for_review(reviewer_id:str):
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             del photo_doc["_id"]
+
+            try:
+                user_info = await db_userEntities.get_user(photo_doc["user_id"])
+                if user_info and "username" in user_info:
+                    photo_doc["username"] = user_info["username"]
+                else:
+                    photo_doc["username"] = photo_doc["user_id"]
+            except Exception as e:
+                print(f"Failed to get username for user_id {photo_doc['user_id']}: {e}")
+                photo_doc["username"] = photo_doc["user_id"]
+
             locked_photos.append(PhotoResponse(**photo_doc))
 
         if not locked_photos:
@@ -270,8 +185,7 @@ async def fetch_photos_for_review(reviewer_id:str):
         raise HTTPException(status_code=500, detail=f"Server error while fetching photos: {e}")
 
 
-
-@router.post("/review/single", response_model=PhotoResponse)
+@router.post("/review/single")
 async def review_single_photo(request: PhotoReviewRequest):
     try:
         final_status = ReviewStatus.Approved if request.status_result == "success" else ReviewStatus.Rejected
@@ -311,11 +225,6 @@ async def review_single_photo(request: PhotoReviewRequest):
         print("review_single_photo error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while reviewing single photo.")
 
-class BatchReviewRequest(BaseModel):
-    ids: List[str]  # 直接接收数组
-    result: str
-    feedback: Optional[str] = ""
-    reviewer_id: str
 
 @router.post("/review/batch_submit", response_model=List[PhotoResponse])
 async def review_batch_photos(request: BatchReviewRequest):
@@ -422,6 +331,148 @@ async def get_user_photos(user_id: str):
         print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
 
+# # history
+# @router.get("/user/{user_id}", response_model=List[PhotoResponse])
+# async def get_user_photos(user_id: str):
+#     try:
+#         cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
+#         photos = []
+#
+#         for doc in cursor:
+#             photos.append(PhotoResponse(
+#                 photo_id=str(doc["_id"]),
+#                 user_id=doc["user_id"],
+#                 building_id=doc["building_id"],
+#                 image_url=doc.get("image_url"),
+#                 upload_time=doc["upload_time"].isoformat(),
+#                 status=doc["status"],
+#                 feedback=doc.get("feedback")
+#             ))
+#
+#         return photos
+#
+#     except Exception as e:
+#         print("get_user_photos error:", traceback.format_exc())
+#         # log_error("Exception while retrieving user photo history\n" + traceback.format_exc(), e, user_id=user_id)
+#         raise HTTPException(status_code=500, detail="Server error, failed to retrieve photo records")
+# Backend: photos_routes.py
+
+
+@router.get("/get_photo_list")
+async def get_photo_list(address: str):
+    try:
+        photo_list= await db_photoEntities.get_all_photos_under_same_address(address)
+        return photo_list
+    except Exception as e:
+        print(f"get_photo_list error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+@router.get("/get_first_9_photo")
+async def get_first_9_photo(address: str):
+    try:
+        photo_list= await db_photoEntities.get_first_nine_photo(address)
+        return photo_list
+    except Exception as e:
+        print(f"get_photo_list error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+
+@router.get("/photoNumber")
+async def get_photo_number(address: str):
+    try:
+       photo_list= await db_photoEntities.get_photo_list(address)
+       return len(photo_list)
+    except Exception as e:
+        print(f"get_photo_number error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+@router.get("/get_first_upload_time")
+async def get_first_upload_time(address: str):
+    try:
+        return await db_photoEntities.get_first_upload_time(address)
+    except Exception as e:
+        print(f"get_firsh_upload_time error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
+
+# 新增：上传历史记录接口
+@router.get("/history", response_model=UploadHistoryResponse)
+async def get_upload_history(
+        request: Request,
+        user_id: str = Query(..., description="用户ID"),
+        page: int = Query(1, ge=1, description="页码"),
+        limit: int = Query(10, ge=1, le=100, description="每页数量"),
+        status: Optional[str] = Query(None, description="筛选状态: pending, reviewing, approved, rejected")
+):
+    """
+    获取用户的上传历史记录，支持分页和状态筛选
+    """
+    try:
+        # 构建查询条件
+        query = {"user_id": user_id}
+        if status:
+            # 将状态字符串转换为对应的枚举值
+            status_mapping = {
+                "pending": ReviewStatus.Pending.value,
+                "reviewing": ReviewStatus.Reviewing.value,
+                "approved": ReviewStatus.Approved.value,
+                "rejected": ReviewStatus.Rejected.value
+            }
+            if status in status_mapping:
+                query["status"] = status_mapping[status]
+            else:
+                raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
+
+        # 计算总数
+        total_count = await photo_collection.count_documents(query)
+
+        if total_count == 0:
+            return UploadHistoryResponse(
+                photos=[],
+                total_count=0,
+                page=page,
+                limit=limit,
+                total_pages=0
+            )
+
+        # 计算总页数
+        total_pages = math.ceil(total_count / limit)
+
+        # 计算跳过的文档数
+        skip = (page - 1) * limit
+
+        # 查询数据
+        photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
+        print("Query for history:", query)
+
+        photos = []
+        async for photo_doc in photos_cursor:
+            photo_doc["photo_id"] = str(photo_doc["_id"])
+            del photo_doc["_id"]
+
+            # 兼容旧数据
+            if "building_id" in photo_doc and "building_addr" not in photo_doc:
+                photo_doc["building_addr"] = photo_doc["building_id"]
+
+            # 拼接完整图片 URL
+            filename = photo_doc.get("filename")
+            if filename:
+                photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+
+            photos.append(PhotoResponse(**photo_doc))
+
+        return UploadHistoryResponse(
+            photos=photos,
+            total_count=total_count,
+            page=page,
+            limit=limit,
+            total_pages=total_pages
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"get_upload_history error for user {user_id}:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching upload history.")
 
 # 新增：获取照片统计信息
 @router.get("/stats/{user_id}")
@@ -461,3 +512,4 @@ async def get_user_photo_stats(user_id: str):
     except Exception as e:
         print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")
+
