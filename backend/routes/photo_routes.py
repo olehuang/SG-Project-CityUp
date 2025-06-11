@@ -75,14 +75,16 @@ async def upload_photo(
             if not photo.content_type.startswith("image/"):
                 raise HTTPException(status_code=400,
                                     detail=f"The uploaded file '{photo.filename}' must be in image format")
-            # 生成唯一文件名
+
+            image_binary_data = await photo.read()
+            # # 生成唯一文件名
             file_extension = os.path.splitext(photo.filename)[1]
             unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
             file_path = os.path.join(UPLOAD_DIR, unique_filename)
             # 保存文件
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(photo.file, buffer)
-            # 生成访问URL
+            # # 生成访问URL
             image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
             photo_obj = Photo(
                 user_id=user_id,
@@ -189,7 +191,7 @@ async def fetch_photos_for_review(reviewer_id:str):
             locked_photos.append(PhotoResponse(**photo_doc))
 
         if not locked_photos:
-           raise HTTPException(status_code=404, detail="All available photos were taken by another reviewer, or none could be assigned.")
+            raise HTTPException(status_code=404, detail="All available photos were taken by another reviewer, or none could be assigned.")
 
         return locked_photos
 
@@ -395,8 +397,8 @@ async def get_first_9_photo(address: str):
 @router.get("/photoNumber")
 async def get_photo_number(address: str):
     try:
-       photo_list= await db_photoEntities.get_photo_list(address)
-       return len(photo_list)
+        photo_list= await db_photoEntities.get_photo_list(address)
+        return len(photo_list)
     except Exception as e:
         print(f"get_photo_number error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")

@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from bson import ObjectId
+from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 # MongoDB初始化
@@ -98,6 +98,8 @@ class Photo:
                  lng:Optional[float]=None,
                  upload_time: Optional[datetime] = None,
                  image_url: Optional[str] = None,
+                 image_data:Optional[bytes] = None,
+                 content_type: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
@@ -136,6 +138,9 @@ class Photo:
 
     @classmethod
     def from_dict(cls, data):
+        # image_data = data.get("image_data")
+        # if isinstance(image_data,Binary):
+        #     image_data = image_data.binary
         return cls(
             _id=data.get("_id"),
             user_id=data["user_id"],
