@@ -15,7 +15,8 @@ import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 from bson.binary import Binary
-from fastapi.responses import JSONResponse
+from starlette.responses import StreamingResponse
+import io
 # from utils.logger import log_error
 
 router = APIRouter()
@@ -137,6 +138,29 @@ async def get_photo(photo_id: str):
         return Response(content=image_data, media_type=content_type, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Server error, get photo failed")
+
+
+@router.get("/download_photo/{photo_id}")
+async def download_photo(photo_id: str):
+    try:
+        collection = MongoDB.get_instance().get_collection('photos')
+        photo = await collection.find_one({"_id": ObjectId(photo_id)})
+        if not photo:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        image_data = photo.get("image_data")
+        content_type = photo.get("content_type", "application/octet-stream")
+        filename = photo.get("image_url", "downloaded_image.jpg").split("/")[-1]
+
+        return StreamingResponse(
+            io.BytesIO(image_data),
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        print("Download error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error during image download")
 
 
 @router.get("/review/batch_fetch")
@@ -393,18 +417,18 @@ async def get_user_photos(user_id: str):
 
 
 @router.get("/get_photo_list")
-async def get_photo_list(address: str):
+async def get_photo_list(address: str,request:Request):
     try:
-        photo_list= await db_photoEntities.get_all_photos_under_same_address(address)
+        photo_list= await db_photoEntities.get_all_photos_under_same_address(address,request)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 @router.get("/get_first_9_photo")
-async def get_first_9_photo(address: str):
+async def get_first_9_photo(address: str,request: Request):
     try:
-        photo_list= await db_photoEntities.get_first_nine_photo(address)
+        photo_list= await db_photoEntities.get_first_nine_photo(address,request)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())
@@ -412,18 +436,18 @@ async def get_first_9_photo(address: str):
 
 
 @router.get("/photoNumber")
-async def get_photo_number(address: str):
+async def get_photo_number(address: str,request:Request):
     try:
-       photo_list= await db_photoEntities.get_photo_list(address)
+       photo_list= await db_photoEntities.get_photo_list(address,request)
        return len(photo_list)
     except Exception as e:
         print(f"get_photo_number error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 @router.get("/get_first_upload_time")
-async def get_first_upload_time(address: str):
+async def get_first_upload_time(address: str,request:Request):
     try:
-        return await db_photoEntities.get_first_upload_time(address)
+        return await db_photoEntities.get_first_upload_time(address,request)
     except Exception as e:
         print(f"get_firsh_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")

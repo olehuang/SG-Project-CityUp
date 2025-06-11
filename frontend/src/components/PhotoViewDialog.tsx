@@ -61,6 +61,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 console.log(data);
 
                 const formattedPhotos: Photo[] = data.map((item: any) => ({
+                    id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
                     uploader: item.user_id,
@@ -83,7 +84,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 }
                 const updatedPhotos = formattedPhotos.map(p => ({
                     ...p,
-                    id: p.src,
+                    id: p.id,
                     uploader: userMap[p.uploader] ?? "Unknown",
                     uploadTime: new Intl.DateTimeFormat("de-DE",{
                             dateStyle: "medium",
@@ -167,12 +168,29 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
 
         for (const photo of selectedPhotos) {
-            const link = document.createElement("a");
-            link.href = photo.src;
-            link.download = photo.title || "photo.jpg"; //
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
+            try {
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/photos/download_photo/${photo.id}`,
+                    {
+                        responseType: 'blob',
+                    }
+                );
+
+                const blob = response.data;
+                const url = URL.createObjectURL(blob);
+
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = `${photo.title || 'photo'}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                URL.revokeObjectURL(url);
+            } catch (error: any) {
+                console.error("Download failed for", photo.id, error);
+                setError(`Download failed: ${photo.title}`);
+            }
         }
     };
 

@@ -3,7 +3,7 @@ import dotenv
 from db_entities import MongoDB, User
 from error_logging import log_error
 import traceback
-
+BASE_URL = "http://localhost:8000"
 
 
 """
