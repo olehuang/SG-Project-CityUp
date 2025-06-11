@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query
+from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query,Response
 from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
@@ -15,6 +15,7 @@ import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 from bson.binary import Binary
+from fastapi.responses import JSONResponse
 # from utils.logger import log_error
 
 router = APIRouter()
@@ -89,6 +90,8 @@ async def upload_photo(
                 lat=lat,
                 lng=lng,
                 image_url=image_url,
+                image_data=image_binary_data,
+                content_type=photo.content_type,
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending
             )
@@ -112,6 +115,17 @@ async def upload_photo(
         print("upload_photo error:", traceback.format_exc())
         # log_error("An exception occurred during the photo upload process\n" + traceback.format_exc(), e, user_id=user_id)
         raise HTTPException(status_code=500, detail="Server error, upload failed")
+
+@router.get("/get_single_photo/{photo_id}")
+async def get_photo(photo_id: str):
+    try:
+        photo_obj = await photo_collection.find_one({"photo_id": photo_id})
+        if photo_obj is None:
+            raise HTTPException(status_code=404, detail="Photo not found")
+
+        return Response(content=photo_obj.get("image_data"),media_type=photo_obj.get("content_type"))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Server error, get photo failed")
 
 
 @router.get("/review/batch_fetch")
@@ -513,4 +527,3 @@ async def get_user_photo_stats(user_id: str):
     except Exception as e:
         print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")
-

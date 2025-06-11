@@ -1,12 +1,14 @@
 from datetime import datetime
+from fastapi import File
 import dotenv
 
 import db_entities
 import routes.photo_routes
-from db_entities import MongoDB,Building,ReviewStatus,PhotoResponse
+from db_entities import MongoDB,Building,ReviewStatus,PhotoResponse,Photo
 from error_logging import log_error
 import traceback
 from pydantic import BaseModel
+from bson.binary import Binary
 from typing import Optional, List
 
 
@@ -73,11 +75,18 @@ async def get_first_nine_photo(address:str):
         raise
 
 
-def serialize_photo(photo: dict) -> dict:
-    return {
-        "src": photo.get("src", ""),
-        "title": photo.get("title", ""),
-        "uploader": photo.get("uploader", ""),
-        "uploadTime": photo.get("upload_time", ""),
-        # "_id": str(photo["_id"])  # 可选：如果你想保留 _id 传到前端
-    }
+
+
+
+# async def get_binary_to_image(photo_id:str):
+#     try:
+#         collection = MongoDB.get_instance().get_collection('photos')
+#         photo_doc = await collection.find_one({'photo_id': photo_id})
+#         original_binary = record(photo_doc.get('image_data'))
+#
+#     except Exception as e:
+#         log_error(f'get_photo_data: {e}',
+#                   stack_data=traceback.format_exc(),
+#                   time_stamp=datetime.now())
+#         raise
+

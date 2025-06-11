@@ -8,6 +8,7 @@ from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 # MongoDB初始化
 from pydantic import BaseModel
+from bson.binary import Binary
 
 class MongoDB:
     _instance = None
@@ -109,6 +110,8 @@ class Photo:
         self.lng = lng;
         self.upload_time = upload_time or datetime.now()
         self.image_url = image_url
+        self.image_data = image_data
+        self.content_type = content_type
         self.status = status
         self.feedback = feedback
         self.reviewer_id = reviewer_id
@@ -123,6 +126,8 @@ class Photo:
             "lng": self.lng,
             "upload_time": self.upload_time,
             "image_url": self.image_url,
+            "image_data": self.image_data,
+            "content_type":self.content_type,
             "status": self.status.value,
             "feedback": self.feedback,
             "reviewer_id": self.reviewer_id,
@@ -137,6 +142,8 @@ class Photo:
             building_addr=data["building_addr"],
             upload_time=data.get("upload_time"),
             image_url=data.get("image_url"),
+            image_data=data.get("image_data"),
+            content_type=data.get("content_type"),
             status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),
             feedback=data.get("feedback"),
             reviewer_id = data.get("reviewer_id"),
@@ -154,6 +161,7 @@ class PhotoResponse(BaseModel):
     # upload_time: str
     upload_time: datetime
     image_url: Optional[str]
+    #image_data: Photo=None
     status: str
     feedback: Optional[str]
     reviewer_id: Optional[str]
