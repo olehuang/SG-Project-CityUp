@@ -389,33 +389,6 @@ async def get_user_photos(user_id: str):
         print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
 
-# # history
-# @router.get("/user/{user_id}", response_model=List[PhotoResponse])
-# async def get_user_photos(user_id: str):
-#     try:
-#         cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
-#         photos = []
-#
-#         for doc in cursor:
-#             photos.append(PhotoResponse(
-#                 photo_id=str(doc["_id"]),
-#                 user_id=doc["user_id"],
-#                 building_id=doc["building_id"],
-#                 image_url=doc.get("image_url"),
-#                 upload_time=doc["upload_time"].isoformat(),
-#                 status=doc["status"],
-#                 feedback=doc.get("feedback")
-#             ))
-#
-#         return photos
-#
-#     except Exception as e:
-#         print("get_user_photos error:", traceback.format_exc())
-#         # log_error("Exception while retrieving user photo history\n" + traceback.format_exc(), e, user_id=user_id)
-#         raise HTTPException(status_code=500, detail="Server error, failed to retrieve photo records")
-# Backend: photos_routes.py
-
-
 @router.get("/get_photo_list")
 async def get_photo_list(address: str,request:Request):
     try:
@@ -505,16 +478,18 @@ async def get_upload_history(
         photos = []
         async for photo_doc in photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+            photo_id = str(photo_doc["_id"])
             del photo_doc["_id"]
 
             # 兼容旧数据
             if "building_id" in photo_doc and "building_addr" not in photo_doc:
                 photo_doc["building_addr"] = photo_doc["building_id"]
 
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_id}/data"
             # 拼接完整图片 URL
-            filename = photo_doc.get("filename")
-            if filename:
-                photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+            # filename = photo_doc.get("filename")
+            # if filename:
+            #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
 
             photos.append(PhotoResponse(**photo_doc))
 
