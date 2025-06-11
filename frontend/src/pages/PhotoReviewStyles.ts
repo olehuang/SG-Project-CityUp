@@ -127,7 +127,7 @@ export const photoReviewStyles = {
     },
 
     tableRow: (selectMode: boolean, selected: boolean) => ({
-        backgroundColor: selectMode && selected ? "#FFF8E1" : "#FFFEF7",
+        backgroundColor: selectMode && selected ? "#F3E5F5" : "#FFFEF7",
         height: "120px",
         "&:hover": {
             backgroundColor: "#F3E5F5",
