@@ -77,8 +77,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 {
                     responseType: 'blob',
                 }));
-            const blob = response.data;
-            const url = URL.createObjectURL(blob);
+            const url = URL.createObjectURL(response.data);
             const link = document.createElement('a');
             link.href = url;
             link.download = `${photo.title || 'download'}.jpg`;

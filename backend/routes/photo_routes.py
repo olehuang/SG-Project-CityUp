@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query,Response
+from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query,Response,Body
 from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
@@ -15,8 +15,11 @@ import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 from bson.binary import Binary
+#for photo download
 from starlette.responses import StreamingResponse
 import io
+from io import BytesIO
+import zipfile
 # from utils.logger import log_error
 
 router = APIRouter()
@@ -162,6 +165,29 @@ async def download_photo(photo_id: str):
         print("Download error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error during image download")
 
+@router.post("/download_zip")
+async def download_photos_zip(photo_ids: list[str] = Body(...)):
+    try:
+        zip_stream = BytesIO()
+        with zipfile.ZipFile(zip_stream, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for pid in photo_ids:
+                try:
+                    photo = await photo_collection.find_one({"_id": ObjectId(pid)})
+                    if photo and "image_data" in photo:
+                        image_bytes = photo["image_data"]
+                        filename = f"{photo.get('title', 'photo')}_{pid}.jpg"
+                        zip_file.writestr(filename, image_bytes)
+                except Exception as e:
+                    print(f"Skipping photo {pid} due to error: {e}")
+        zip_stream.seek(0)
+        return StreamingResponse(
+            zip_stream,
+            media_type="application/x-zip-compressed",
+            headers={"Content-Disposition": "attachment; filename=photos.zip"}
+        )
+    except Exception as e:
+        print("Error generating ZIP:", e)
+        raise HTTPException(status_code=500, detail="Failed to generate ZIP.")
 
 @router.get("/review/batch_fetch")
 async def fetch_photos_for_review(reviewer_id:str, request: Request):
