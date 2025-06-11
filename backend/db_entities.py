@@ -105,8 +105,8 @@ class Photo:
         self._id = _id or ObjectId()
         self.user_id = user_id
         self.building_addr = building_addr
-        self.lat = lat;
-        self.lng = lng;
+        self.lat = lat
+        self.lng = lng
         self.upload_time = upload_time or datetime.now()
         self.image_url = image_url
         self.status = status

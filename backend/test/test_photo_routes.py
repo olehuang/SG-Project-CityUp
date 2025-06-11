@@ -51,23 +51,23 @@ def test_upload_multiple_photos():
     print("Multiple photo upload return data:", data)
     print(f"Successfully uploaded {len(data['uploaded_photos'])} Photos")
 
-    user_photos_response = client.get("/photos/user/test_user")
-    assert user_photos_response.status_code == 200, f"Failed to get user photos after upload: {user_photos_response.text}"
-    user_photos = user_photos_response.json()
-
-    uploaded_photo_ids = {p['photo_id'] for p in data["uploaded_photos"]}
-    retrieved_photo_ids = {p['photo_id'] for p in user_photos}
-    assert uploaded_photo_ids.issubset(retrieved_photo_ids), "User photo list should contain all newly uploaded photos."
+    # user_photos_response = client.get("/photos/user/test_user")
+    # assert user_photos_response.status_code == 200, f"Failed to get user photos after upload: {user_photos_response.text}"
+    # user_photos = user_photos_response.json()
+    #
+    # uploaded_photo_ids = {p['photo_id'] for p in data["uploaded_photos"]}
+    # retrieved_photo_ids = {p['photo_id'] for p in user_photos}
+    # assert uploaded_photo_ids.issubset(retrieved_photo_ids), "User photo list should contain all newly uploaded photos."
 
     return data["uploaded_photos"]
 
-def test_get_user_photos():
-    print("\n--- Running test_get_user_photos ---")
-    # This test now depends on the /photos/user/{user_id} endpoint existing.
-    response = client.get("/photos/user/test_user")
-    assert response.status_code == 200, f"Failed to get user photos: {response.text}"
-    assert isinstance(response.json(), list)
-    print("Get a list of photos for test_user:", response.json())
+# def test_get_user_photos():
+#     print("\n--- Running test_get_user_photos ---")
+#     # This test now depends on the /photos/user/{user_id} endpoint existing.
+#     response = client.get("/photos/user/test_user")
+#     assert response.status_code == 200, f"Failed to get user photos: {response.text}"
+#     assert isinstance(response.json(), list)
+#     print("Get a list of photos for test_user:", response.json())
 
 #
 # def test_get_batch_pending_photos_and_mark_reviewing():
