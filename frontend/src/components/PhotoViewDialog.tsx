@@ -88,9 +88,9 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     id: p.id,
                     uploader: userMap[p.uploader] ?? "Unknown",
                     uploadTime: new Intl.DateTimeFormat("de-DE",{
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                            timeZone: "Europe/Berlin"}).format(new Date(p.uploadTime))
+                        dateStyle: "medium",
+                        timeStyle: "medium",
+                        timeZone: "Europe/Berlin"}).format(new Date(p.uploadTime))
                 }));
                 setPhotos(updatedPhotos);
             } catch (err: any) {
@@ -300,7 +300,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                             | Upload Time: ${
                                                 new Intl.DateTimeFormat("de-DE", {
                                                     dateStyle: "medium",
-                                                    timeStyle: "short",
+                                                    timeStyle: "medium",
                                                     timeZone: "Europe/Berlin"
                                                 }).format(new Date(photo.uploadTime))}`}
                                         actionIcon={

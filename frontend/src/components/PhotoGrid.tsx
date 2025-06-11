@@ -45,7 +45,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     uploader: item.user_id,
                     uploadTime: new Intl.DateTimeFormat("de-DE",{
                         dateStyle: "medium",
-                        timeStyle: "short",
+                        timeStyle: "medium",
                         timeZone: "Europe/Berlin"}).format(new Date(item.upload_time))
                 }));
                 setPhotos(formattedPhotos);

@@ -78,9 +78,10 @@ const BuildingInfo=()=>{
 
                             const rawtime = updateResp.data;
                             const formatTime = new Intl.DateTimeFormat("de-DE",{
+                                timeZone: "Europe/Berlin",
                                 dateStyle: "medium",
-                                timeStyle: "short",
-                                timeZone: "Europe/Berlin"}).format(new Date(rawtime));
+                                timeStyle: "medium",
+                                }).format(new Date(rawtime));
 
                             infoMap[address] = {
                                 updateTime: formatTime,
