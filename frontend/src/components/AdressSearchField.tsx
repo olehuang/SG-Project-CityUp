@@ -1,28 +1,54 @@
-import React, { useState } from "react";
-import {Autocomplete, Button, TextField} from "@mui/material";
+import React, { useState ,useEffect} from "react";
+import {Autocomplete, Button, TextField,Box} from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 
-const addressList = [
-    "Karolinenpl. 5, 64289 Darmstadt ",
-    "Luisenplatz, Luisenpl. 5, 64283 Darmstadt",
-    "Marktpl. 15, 64283 Darmstadt"
-];
 
 interface Props {
     onSearch: (query: string) => void;//return search result
     onSelect?: (selected: string) => void;//clearn search field
+    isNomatch: boolean;
+    setIsNomatch: (isNomatch: boolean) => void;
+    setSearchResult: (searchResult: string[]) => void;
+    allAddresses: string[];
+
 }
 
-const AdressSearchField: React.FC<Props> = ({onSearch,onSelect}) => {
+const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNomatch,setSearchResult,allAddresses}) => {
     const [inputValue, setInputValue] = useState("");
     const [selectedAddress, setSelectedAddress] = useState<string|null>("");
+    const [history, setHistory] = useState<string[]>([]);
+
+    const STORAGE_KEY = "address_search_history";
+    useEffect(() => {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+            try {
+                const parsed = JSON.parse(stored);
+                if (Array.isArray(parsed)) {
+                    setHistory(parsed);
+                }
+            } catch (e) {
+                console.warn("Failed to parse search history");
+            }
+        }
+    }, []);
+
+    const updateHistory = (newEntry: string) => {
+        const trimmed = newEntry.trim();
+        if (!trimmed) return;
+
+        const updated = [trimmed, ...history.filter(h => h !== trimmed)].slice(0, 10); // keep max 10
+        setHistory(updated);
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
+    };
 
     const handleSearch = () => {
         const trimmedInput = inputValue.trim();
         if (trimmedInput !== "") {
             onSearch(trimmedInput);
-            setInputValue(""); // 搜索完再清空
+            updateHistory(trimmedInput);
+            setInputValue("");
             setSelectedAddress(null);
         }
     };
@@ -31,14 +57,23 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect}) => {
         if (newValue) {
             setInputValue("");
             setSelectedAddress("");
-            onSelect?.(newValue); // tell the parent Component choose already
+            onSelect?.(newValue);// tell the parent Component choose already
+            onSearch?.(newValue);
         }
     };
+
+    const clearHistory = () => {
+        localStorage.removeItem(STORAGE_KEY);
+        setHistory([]);
+    };
+
+    const mergedOptions = Array.from(new Set([...history]));
     return (
+        <>
         <Autocomplete
             style={{ width: "100%" }}
             freeSolo
-            options={addressList}
+            options={mergedOptions}
             value={selectedAddress}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
@@ -85,6 +120,31 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect}) => {
                 />
             )}
         />
+            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"0.5% 1px 0 0.5%",}}>
+                {isNomatch && <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => {
+                    setSearchResult([...allAddresses])
+                    setIsNomatch(false)
+                }}> Back</Button>}
+                {history.length > 0 && (
+                    <Button
+                        sx={{marginRight:"auto"}}
+                        onClick={()=> {
+                            clearHistory()
+                            setIsNomatch(false)
+                            setSearchResult([...allAddresses])
+                        }}
+                        variant="outlined"
+                        color="secondary"
+                        size="small"
+                    >
+                        Clear History
+                    </Button>
+                )}
+            </Box>
+        </>
     );
 }
 

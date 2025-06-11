@@ -110,6 +110,9 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     if(error)return(<Alert variant="filled" severity="error">Error by Fetch Photo, Detail: {error}</Alert>)
 
+    if (!photos || !Array.isArray(photos)) {
+        return <Typography color="error">Error loading photos.</Typography>;
+    }
 
     return (
         <>

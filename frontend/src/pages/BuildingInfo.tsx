@@ -53,6 +53,7 @@ const BuildingInfo=()=>{
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
     const [open,setOpen]=useState(false);//Photo dialog
+    const [isNomatch,setIsNomatch]=useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
 
@@ -138,6 +139,7 @@ const BuildingInfo=()=>{
 
 
     const handleSearch = (query: string) => {
+
         const result = allAddresses.filter((addr) =>
             addr.toLowerCase().includes(query.toLowerCase())
         );
@@ -146,17 +148,34 @@ const BuildingInfo=()=>{
     };
 
 
-
     const handleSelect = (selected: string) => {
         //handleSearch(selected);
         setSelectedAddress(selected);
 
     };
+
+    useEffect(()=>{
+        if (searchResult.length>0) return;
+
+        if (searchResult.length===0){
+            setIsNomatch(true);
+        }
+    },[searchResult])
+
+
+
     return(
         <Box sx={pageBackgroundStyles.container} style={{justifyContent:"left",display:'contents',overflow: "hidden"}}>
             <Box  sx={BuildingInfoStyles.container}>
                 {/*Search box*/}
-                <AdressSearchField  onSearch={handleSearch} onSelect={handleSelect}/>
+                <AdressSearchField
+                    isNomatch={isNomatch}
+                    setIsNomatch={setIsNomatch}
+                    onSearch={handleSearch}
+                    onSelect={handleSelect}
+                    setSearchResult={setSearchResult}
+                    allAddresses={allAddresses}
+                />
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container" sx={BuildingInfoStyles.innerContainer}>
                     {/*Adresse Table */}
@@ -189,10 +208,11 @@ const BuildingInfo=()=>{
                                     ))
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={3}>No Match</TableCell>
+                                        <TableCell colSpan={3} >No Match</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
+
                         </Table>
                     </TableContainer>
                     {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
@@ -207,14 +227,19 @@ const BuildingInfo=()=>{
                                 <Typography >Photos Preview </Typography>
                                 <Button onClick={()=>setOpen(true)}>View all</Button>
                             </Box>
-                            <Box sx={{marginTop:"1%"}}>
-                                {selectedAddress ? (
+                            <Box sx={{marginTop: "1%"}}>
+                                {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (
                                     <PhotoGrid address={selectedAddress}/>
-                                ) : (
-                                    <Typography variant="body2" color="textSecondary">
-                                        Please select an address to view photos.
-                                    </Typography>
-                                )}
+                                ) :
+                                    isNomatch ? (
+                                        <Typography variant="body2" color="textSecondary">
+                                            Please enter a valid address to view photos.
+                                        </Typography>)
+                                    : (
+                                        <Typography variant="body2" color="textSecondary">
+                                            Please select an address to view photos.
+                                        </Typography>
+                                    )}
                             </Box>
                         </Box>
                     </Box>
