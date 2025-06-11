@@ -12,6 +12,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import PhotoOrderSelector from "./PhotoOrderSelector";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import PhotoCarousel from "./PhotoCarousel";
+import qs from "qs";
 
 
 
@@ -61,6 +62,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 console.log(data);
 
                 const formattedPhotos: Photo[] = data.map((item: any) => ({
+                    id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
                     uploader: item.user_id,
@@ -83,7 +85,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 }
                 const updatedPhotos = formattedPhotos.map(p => ({
                     ...p,
-                    id: p.src,
+                    id: p.id,
                     uploader: userMap[p.uploader] ?? "Unknown",
                     uploadTime: new Intl.DateTimeFormat("de-DE",{
                             dateStyle: "medium",
@@ -164,16 +166,30 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     // download selceted photo
     const handleDownloadSelected = async () => {
-        const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
+        //const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
+        const selectedPhotosIds=Array.from(selectedPhotoIds);
+            try {
+                const response = await axios.post(
+                    `http://127.0.0.1:8000/photos/download_zip`,selectedPhotosIds,
+                    {
+                        responseType: "blob"
+                    }
+                );
+                const blob = new Blob([response.data], { type: "application/zip" });
+                const url = URL.createObjectURL(response.data);
+                const link = document.createElement("a");
+                link.href = url;
+                link.download = "photos.zip";
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
 
-        for (const photo of selectedPhotos) {
-            const link = document.createElement("a");
-            link.href = photo.src;
-            link.download = photo.title || "photo.jpg"; //
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
+                URL.revokeObjectURL(url);
+            } catch (error: any) {
+                console.error("Download ZIP failed", error);
+                setError("Failed to download photos as ZIP.");
+            }
     };
 
 
@@ -195,6 +211,14 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         const prevIndex = (previewIndex-1+sortedPhotos.length)% sortedPhotos.length;
         setPreviewIndex(prevIndex);
         setPreviewPhoto(sortedPhotos[prevIndex]);
+    }
+    const handleAllSelect=()=>{
+        if(selectedPhotoIds.size===sortedPhotos.length){
+            setSelectedPhotoIds(new Set());
+        }else{
+            const allIds= new Set(sortedPhotos.map(p => p.id));
+            setSelectedPhotoIds(allIds);
+        }
     }
 
     return(
@@ -221,6 +245,10 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 </Button>
                             )}
                             {/*Select Button*/}
+                            {isSelecting && <Button
+                                variant="contained"
+                                color="info"
+                                onClick={handleAllSelect}>Select All</Button>}
                             <Button
                                 variant="contained"
                                 onClick={() => {

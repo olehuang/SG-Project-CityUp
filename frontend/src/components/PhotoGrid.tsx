@@ -9,12 +9,12 @@ interface PhotoGridProps {
     address: string;
 }
 interface Photo {
+    id: string;
     src: string;
     title: string;
     uploader: string;
     uploadTime: string;
 }
-
 
 const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [photos, setPhotos] = useState<Photo[]>([]);//backend return photo list
@@ -39,6 +39,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 console.log(data);
 
                 const formattedPhotos: Photo[] = data.map((item: any) => ({
+                    id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
                     uploader: item.user_id,
@@ -71,12 +72,18 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     const handleOfDownload=async (photo:Photo)=>{
         try{
-            const blob = await (await fetch(photo.src)).blob();
-            const url = URL.createObjectURL(blob);
-            Object.assign(document.createElement('a'), {
-                href: url,
-                download: `${photo.title || 'download'}.jpg`
-            }).click();
+            const response = await (await axios.get(
+                `http://localhost:8000/photos/download_photo/${photo.id}`,
+                {
+                    responseType: 'blob',
+                }));
+            const url = URL.createObjectURL(response.data);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `${photo.title || 'download'}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             URL.revokeObjectURL(url);
         }catch (e:any) {
             setError(e.message || "Unknown error");

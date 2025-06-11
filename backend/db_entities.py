@@ -3,11 +3,12 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from bson import ObjectId
+from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 # MongoDB初始化
 from pydantic import BaseModel
+from bson.binary import Binary
 
 class MongoDB:
     _instance = None
@@ -97,6 +98,8 @@ class Photo:
                  lng:Optional[float]=None,
                  upload_time: Optional[datetime] = None,
                  image_url: Optional[str] = None,
+                 image_data: Optional[bytes] = None,
+                 content_type: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
@@ -109,6 +112,8 @@ class Photo:
         self.lng = lng
         self.upload_time = upload_time or datetime.now()
         self.image_url = image_url
+        self.image_data = image_data
+        self.content_type = content_type
         self.status = status
         self.feedback = feedback
         self.reviewer_id = reviewer_id
@@ -123,6 +128,8 @@ class Photo:
             "lng": self.lng,
             "upload_time": self.upload_time,
             "image_url": self.image_url,
+            "image_data": Binary(self.image_data),
+            "content_type":self.content_type,
             "status": self.status.value,
             "feedback": self.feedback,
             "reviewer_id": self.reviewer_id,
@@ -131,12 +138,17 @@ class Photo:
 
     @classmethod
     def from_dict(cls, data):
+        image_data = data.get("image_data")
+        if isinstance(image_data, Binary):
+            image_data = bytes(image_data)
         return cls(
             _id=data.get("_id"),
             user_id=data["user_id"],
             building_addr=data["building_addr"],
             upload_time=data.get("upload_time"),
             image_url=data.get("image_url"),
+            image_data=data.get("image_data"),
+            content_type=data.get("content_type"),
             status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),
             feedback=data.get("feedback"),
             reviewer_id = data.get("reviewer_id"),
@@ -154,6 +166,7 @@ class PhotoResponse(BaseModel):
     # upload_time: str
     upload_time: datetime
     image_url: Optional[str]
+    #image_data: Photo=None
     status: str
     feedback: Optional[str]
     reviewer_id: Optional[str]

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query
+from fastapi import APIRouter, HTTPException, status, File, UploadFile, Form, Depends, Request, Query,Response,Body
 from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
@@ -15,11 +15,17 @@ import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 from bson.binary import Binary
+#for photo download
+from starlette.responses import StreamingResponse
+import io
+from io import BytesIO
+import zipfile
 # from utils.logger import log_error
 
 router = APIRouter()
 photo_collection = MongoDB.get_instance().get_collection("photos")
 users_collection = MongoDB.get_instance().get_collection("users")
+print(" photos_routes.py 被加载了！")
 
 
 # 上传目录
@@ -73,6 +79,7 @@ async def upload_photo(
             if not photo.content_type.startswith("image/"):
                 raise HTTPException(status_code=400,
                                     detail=f"The uploaded file '{photo.filename}' must be in image format")
+            image_binary_data = await photo.read()
             # 生成唯一文件名
             file_extension = os.path.splitext(photo.filename)[1]
             unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
@@ -88,13 +95,14 @@ async def upload_photo(
                 lat=lat,
                 lng=lng,
                 image_url=image_url,
+                image_data=image_binary_data,
+                content_type=photo.content_type,
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending
             )
             result = await photo_collection.insert_one(photo_obj.to_dict())
             print(f"Document inserted with ID: {result.inserted_id}")
             if not result.inserted_id:
-                # 如果数据库插入失败，删除已上传的文件
                 os.remove(file_path)
                 raise HTTPException(status_code=500, detail=f"Upload failed for photo '{photo.filename}'")
             uploaded_photos.append({
@@ -112,9 +120,77 @@ async def upload_photo(
         # log_error("An exception occurred during the photo upload process\n" + traceback.format_exc(), e, user_id=user_id)
         raise HTTPException(status_code=500, detail="Server error, upload failed")
 
+@router.get("/{photo_id}/data")
+async def get_photo(photo_id: str):
+    try:
+        object_id_to_find = ObjectId(photo_id)
+        print(f"DEBUG: Attempting to find document with ObjectId: {object_id_to_find}")
+        photo_obj = await photo_collection.find_one({"_id": ObjectId(photo_id)})
+        if photo_obj is None:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        image_data = photo_obj.get("image_data")
+        if isinstance(image_data, Binary):
+            image_data = bytes(image_data)
+        elif image_data is None:
+            raise HTTPException(status_code=404, detail="Image data not found")
+        content_type = photo_obj.get("content_type", "image/jpeg")
+        headers = {
+            "Cache-Control": "public, max-age=3600",
+            "Content-Type": content_type
+        }
+        return Response(content=image_data, media_type=content_type, headers=headers)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Server error, get photo failed")
+
+
+@router.get("/download_photo/{photo_id}")
+async def download_photo(photo_id: str):
+    try:
+        collection = MongoDB.get_instance().get_collection('photos')
+        photo = await collection.find_one({"_id": ObjectId(photo_id)})
+        if not photo:
+            raise HTTPException(status_code=404, detail="Photo not found")
+        image_data = photo.get("image_data")
+        content_type = photo.get("content_type", "application/octet-stream")
+        filename = photo.get("image_url", "downloaded_image.jpg").split("/")[-1]
+
+        return StreamingResponse(
+            io.BytesIO(image_data),
+            media_type=content_type,
+            headers={
+                "Content-Disposition": f"attachment; filename={filename}"
+            }
+        )
+    except Exception as e:
+        print("Download error:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error during image download")
+
+@router.post("/download_zip")
+async def download_photos_zip(photo_ids: list[str] = Body(...)):
+    try:
+        zip_stream = BytesIO()
+        with zipfile.ZipFile(zip_stream, "w", zipfile.ZIP_DEFLATED) as zip_file:
+            for pid in photo_ids:
+                try:
+                    photo = await photo_collection.find_one({"_id": ObjectId(pid)})
+                    if photo and "image_data" in photo:
+                        image_bytes = photo["image_data"]
+                        filename = f"{photo.get('title', 'photo')}_{pid}.jpg"
+                        zip_file.writestr(filename, image_bytes)
+                except Exception as e:
+                    print(f"Skipping photo {pid} due to error: {e}")
+        zip_stream.seek(0)
+        return StreamingResponse(
+            zip_stream,
+            media_type="application/x-zip-compressed",
+            headers={"Content-Disposition": "attachment; filename=photos.zip"}
+        )
+    except Exception as e:
+        print("Error generating ZIP:", e)
+        raise HTTPException(status_code=500, detail="Failed to generate ZIP.")
 
 @router.get("/review/batch_fetch")
-async def fetch_photos_for_review(reviewer_id:str):
+async def fetch_photos_for_review(reviewer_id:str, request: Request):
     try:
         timeout_threshold = datetime.now(timezone.utc) - timedelta(hours=1)
 
@@ -159,6 +235,7 @@ async def fetch_photos_for_review(reviewer_id:str):
         locked_photos = []
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
             del photo_doc["_id"]
 
             try:
@@ -171,7 +248,10 @@ async def fetch_photos_for_review(reviewer_id:str):
                 print(f"Failed to get username for user_id {photo_doc['user_id']}: {e}")
                 photo_doc["username"] = photo_doc["user_id"]
 
+            if "image_data" in photo_doc:
+                del photo_doc["image_data"]
             locked_photos.append(PhotoResponse(**photo_doc))
+
 
         if not locked_photos:
            raise HTTPException(status_code=404, detail="All available photos were taken by another reviewer, or none could be assigned.")
@@ -216,6 +296,8 @@ async def review_single_photo(request: PhotoReviewRequest):
 
         updated_photo_doc["photo_id"] = str(updated_photo_doc["_id"])
         del updated_photo_doc["_id"]
+        if "image_data" in updated_photo_doc:
+            del updated_photo_doc["image_data"]
 
         return PhotoResponse(**updated_photo_doc)
 
@@ -268,6 +350,8 @@ async def review_batch_photos(request: BatchReviewRequest):
         async for photo_doc in updated_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             del photo_doc["_id"]
+            if "image_data" in photo_doc:
+                del photo_doc["image_data"]
             updated_photos_list.append(PhotoResponse(**photo_doc))
 
         return updated_photos_list
@@ -305,19 +389,45 @@ async def release_all_reviewing_photos(request: ReleasePhotosRequest):
         raise HTTPException(status_code=500, detail="Server error while releasing photos.")
 
 
-@router.get("/get_photo_list")
-async def get_photo_list(address: str):
+@router.get("/user/{user_id}", response_model=List[PhotoResponse])
+async def get_user_photos(user_id: str):
+    """
+    Retrieves all photos uploaded by a specific user.
+    """
     try:
-        photo_list= await db_photoEntities.get_all_photos_under_same_address(address)
+        photos_cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
+        user_photos = []
+        async for photo_doc in photos_cursor:
+            photo_doc["photo_id"] = str(photo_doc["_id"])
+            del photo_doc["_id"]
+            if "building_id" in photo_doc and "building_addr" not in photo_doc:
+                photo_doc["building_addr"] = photo_doc["building_id"] # Use building_id as building_addr for old data
+
+            user_photos.append(PhotoResponse(**photo_doc))
+
+        if not user_photos:
+            raise HTTPException(status_code=404, detail=f"No photos found for user {user_id}")
+
+        return user_photos
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
+        raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
+
+@router.get("/get_photo_list")
+async def get_photo_list(address: str,request:Request):
+    try:
+        photo_list= await db_photoEntities.get_all_photos_under_same_address(address,request)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 @router.get("/get_first_9_photo")
-async def get_first_9_photo(address: str):
+async def get_first_9_photo(address: str,request: Request):
     try:
-        photo_list= await db_photoEntities.get_first_nine_photo(address)
+        photo_list= await db_photoEntities.get_first_nine_photo(address,request)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())
@@ -325,18 +435,18 @@ async def get_first_9_photo(address: str):
 
 
 @router.get("/photoNumber")
-async def get_photo_number(address: str):
+async def get_photo_number(address: str,request:Request):
     try:
-       photo_list= await db_photoEntities.get_photo_list(address)
+       photo_list= await db_photoEntities.get_photo_list(address,request)
        return len(photo_list)
     except Exception as e:
         print(f"get_photo_number error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 @router.get("/get_first_upload_time")
-async def get_first_upload_time(address: str):
+async def get_first_upload_time(address: str,request:Request):
     try:
-        return await db_photoEntities.get_first_upload_time(address)
+        return await db_photoEntities.get_first_upload_time(address,request)
     except Exception as e:
         print(f"get_firsh_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
@@ -394,16 +504,18 @@ async def get_upload_history(
         photos = []
         async for photo_doc in photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+            photo_id = str(photo_doc["_id"])
             del photo_doc["_id"]
 
             # 兼容旧数据
             if "building_id" in photo_doc and "building_addr" not in photo_doc:
                 photo_doc["building_addr"] = photo_doc["building_id"]
 
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_id}/data"
             # 拼接完整图片 URL
-            filename = photo_doc.get("filename")
-            if filename:
-                photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+            # filename = photo_doc.get("filename")
+            # if filename:
+            #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
 
             photos.append(PhotoResponse(**photo_doc))
 
@@ -459,27 +571,3 @@ async def get_user_photo_stats(user_id: str):
     except Exception as e:
         print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")
-
-
-# @router.get("/user/{user_id}", response_model=List[PhotoResponse])
-# async def get_user_photos(user_id: str):
-#     try:
-#         photos_cursor = photo_collection.find({"user_id": user_id}).sort("upload_time", -1)
-#         user_photos = []
-#         async for photo_doc in photos_cursor:
-#             photo_doc["photo_id"] = str(photo_doc["_id"])
-#             del photo_doc["_id"]
-#             if "building_id" in photo_doc and "building_addr" not in photo_doc:
-#                 photo_doc["building_addr"] = photo_doc["building_id"] # Use building_id as building_addr for old data
-#
-#             user_photos.append(PhotoResponse(**photo_doc))
-#
-#         if not user_photos:
-#             raise HTTPException(status_code=404, detail=f"No photos found for user {user_id}")
-#
-#         return user_photos
-#     except HTTPException:
-#         raise
-#     except Exception as e:
-#         print(f"get_user_photos error for user {user_id}:", traceback.format_exc())
-#         raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
