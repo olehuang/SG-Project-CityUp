@@ -3,7 +3,7 @@ from datetime import datetime
 from enum import Enum
 from typing import Optional
 
-from bson import ObjectId
+from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 # MongoDB初始化
