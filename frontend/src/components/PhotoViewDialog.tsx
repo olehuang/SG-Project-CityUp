@@ -167,29 +167,46 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     // download selceted photo
     const handleDownloadSelected = async () => {
         //const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
-        const selectedPhotosIds=Array.from(selectedPhotoIds);
-            try {
+        const selectedPhotosIds = Array.from(selectedPhotoIds);
+        let url = "";
+        let link = document.createElement("a");
+        try {
+            let blob: Blob;
+            let filename: string;
+            if (selectedPhotosIds.length === 1) {
+                const response = await (await axios.get(
+                    `http://localhost:8000/photos/download_photo/${selectedPhotosIds[0]}`,
+                    {
+                        responseType: 'blob',
+                    }));
+                blob = response.data
+                filename = `${'download'}.jpg`;
+                link = document.createElement('a');
+                link.href = url;
+
+            } else {
                 const response = await axios.post(
-                    `http://127.0.0.1:8000/photos/download_zip`,selectedPhotosIds,
+                    `http://127.0.0.1:8000/photos/download_zip`, selectedPhotosIds,
                     {
                         responseType: "blob"
                     }
                 );
-                const blob = new Blob([response.data], { type: "application/zip" });
-                const url = URL.createObjectURL(response.data);
-                const link = document.createElement("a");
-                link.href = url;
-                link.download = "photos.zip";
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-
-                URL.revokeObjectURL(url);
-            } catch (error: any) {
-                console.error("Download ZIP failed", error);
-                setError("Failed to download photos as ZIP.");
+                blob = new Blob([response.data], {type: "application/zip"});
+                filename = "photos.zip";
             }
+
+            url = URL.createObjectURL(blob);
+            link = document.createElement("a");
+            link.href = url;
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (error: any) {
+            console.error("Download ZIP failed", error);
+            setError("Failed to download photos as ZIP.");
+        }
     };
 
 
