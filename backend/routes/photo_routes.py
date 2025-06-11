@@ -75,6 +75,7 @@ async def upload_photo(
             if not photo.content_type.startswith("image/"):
                 raise HTTPException(status_code=400,
                                     detail=f"The uploaded file '{photo.filename}' must be in image format")
+            image_binary_data = await photo.read()
             # 生成唯一文件名
             file_extension = os.path.splitext(photo.filename)[1]
             unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
@@ -98,7 +99,6 @@ async def upload_photo(
             result = await photo_collection.insert_one(photo_obj.to_dict())
             print(f"Document inserted with ID: {result.inserted_id}")
             if not result.inserted_id:
-                # 如果数据库插入失败，删除已上传的文件
                 os.remove(file_path)
                 raise HTTPException(status_code=500, detail=f"Upload failed for photo '{photo.filename}'")
             uploaded_photos.append({
@@ -116,20 +116,31 @@ async def upload_photo(
         # log_error("An exception occurred during the photo upload process\n" + traceback.format_exc(), e, user_id=user_id)
         raise HTTPException(status_code=500, detail="Server error, upload failed")
 
-@router.get("/get_single_photo/{photo_id}")
+@router.get("/{photo_id}/data")
 async def get_photo(photo_id: str):
     try:
-        photo_obj = await photo_collection.find_one({"photo_id": photo_id})
+        object_id_to_find = ObjectId(photo_id)
+        print(f"DEBUG: Attempting to find document with ObjectId: {object_id_to_find}")
+        photo_obj = await photo_collection.find_one({"_id": ObjectId(photo_id)})
         if photo_obj is None:
             raise HTTPException(status_code=404, detail="Photo not found")
-
-        return Response(content=photo_obj.get("image_data"),media_type=photo_obj.get("content_type"))
+        image_data = photo_obj.get("image_data")
+        if isinstance(image_data, Binary):
+            image_data = bytes(image_data)
+        elif image_data is None:
+            raise HTTPException(status_code=404, detail="Image data not found")
+        content_type = photo_obj.get("content_type", "image/jpeg")
+        headers = {
+            "Cache-Control": "public, max-age=3600",
+            "Content-Type": content_type
+        }
+        return Response(content=image_data, media_type=content_type, headers=headers)
     except Exception as e:
         raise HTTPException(status_code=500, detail="Server error, get photo failed")
 
 
 @router.get("/review/batch_fetch")
-async def fetch_photos_for_review(reviewer_id:str):
+async def fetch_photos_for_review(reviewer_id:str, request: Request):
     try:
         timeout_threshold = datetime.now(timezone.utc) - timedelta(hours=1)
 
@@ -174,6 +185,7 @@ async def fetch_photos_for_review(reviewer_id:str):
         locked_photos = []
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
             del photo_doc["_id"]
 
             try:
@@ -186,7 +198,10 @@ async def fetch_photos_for_review(reviewer_id:str):
                 print(f"Failed to get username for user_id {photo_doc['user_id']}: {e}")
                 photo_doc["username"] = photo_doc["user_id"]
 
+            if "image_data" in photo_doc:
+                del photo_doc["image_data"]
             locked_photos.append(PhotoResponse(**photo_doc))
+
 
         if not locked_photos:
            raise HTTPException(status_code=404, detail="All available photos were taken by another reviewer, or none could be assigned.")
@@ -231,6 +246,8 @@ async def review_single_photo(request: PhotoReviewRequest):
 
         updated_photo_doc["photo_id"] = str(updated_photo_doc["_id"])
         del updated_photo_doc["_id"]
+        if "image_data" in updated_photo_doc:
+            del updated_photo_doc["image_data"]
 
         return PhotoResponse(**updated_photo_doc)
 
@@ -283,6 +300,8 @@ async def review_batch_photos(request: BatchReviewRequest):
         async for photo_doc in updated_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             del photo_doc["_id"]
+            if "image_data" in photo_doc:
+                del photo_doc["image_data"]
             updated_photos_list.append(PhotoResponse(**photo_doc))
 
         return updated_photos_list

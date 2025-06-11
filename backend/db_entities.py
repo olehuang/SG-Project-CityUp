@@ -98,6 +98,8 @@ class Photo:
                  lng:Optional[float]=None,
                  upload_time: Optional[datetime] = None,
                  image_url: Optional[str] = None,
+                 image_data: Optional[bytes] = None,
+                 content_type: Optional[str] = None,
                  status: ReviewStatus = ReviewStatus.Pending,
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
@@ -126,7 +128,7 @@ class Photo:
             "lng": self.lng,
             "upload_time": self.upload_time,
             "image_url": self.image_url,
-            "image_data": self.image_data,
+            "image_data": Binary(self.image_data),
             "content_type":self.content_type,
             "status": self.status.value,
             "feedback": self.feedback,
@@ -136,6 +138,9 @@ class Photo:
 
     @classmethod
     def from_dict(cls, data):
+        image_data = data.get("image_data")
+        if isinstance(image_data, Binary):
+            image_data = bytes(image_data)
         return cls(
             _id=data.get("_id"),
             user_id=data["user_id"],
