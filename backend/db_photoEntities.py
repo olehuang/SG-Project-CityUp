@@ -51,7 +51,7 @@ async def get_photo_list(address:str):
         for photo_doc in photo_list:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             photo_doc["upload_time"] = str(photo_doc["upload_time"])
-            del photo_doc["_id"]
+            #del photo_doc["_id"]
             result_photo_list.append(PhotoResponse(**photo_doc))
         return result_photo_list
     except Exception as e:

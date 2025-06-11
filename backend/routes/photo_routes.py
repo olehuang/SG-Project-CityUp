@@ -14,6 +14,7 @@ import math
 import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
+from bson.binary import Binary
 # from utils.logger import log_error
 
 router = APIRouter()
