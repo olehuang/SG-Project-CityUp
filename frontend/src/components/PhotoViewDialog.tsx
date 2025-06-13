@@ -246,8 +246,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     maxWidth={'lg'}
                     fullWidth
             >
-                <DialogTitle> Photos Under Adresse - {selectedAddress}</DialogTitle>
-                <Box sx={{padding: 2}}>
+                <DialogTitle sx={{backgroundColor: "#e3f2fd",}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
+                <Box sx={{padding: 2,backgroundColor: "#e3f2fd",}}>
                     <Box sx={{display: "flex", mb: 2, alignItems: "center"}}>
                         <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}

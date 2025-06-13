@@ -191,7 +191,7 @@ const BuildingPhotoGallery=()=>{
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container" sx={BuildingInfoStyles.innerContainer}>
                     {/*Adresse Table */}
-                    <TableContainer component={Paper} style={{}}>
+                    <TableContainer component={Paper} style={{backgroundColor: "#e3f2fd",}}>
                         <Table size="medium" aria-label="building table">
                             <TableHead >
                                 <TableRow >

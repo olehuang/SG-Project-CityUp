@@ -45,7 +45,8 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                 position: "relative",
                 display: "flex",
                 flexDirection: "row",
-                alignItems: "center"
+                alignItems: "center",
+                backgroundColor: "#e3f2fd",
             }}>
                 {/*<DialogTitle>{previewPhoto?.title}</DialogTitle>*/}
                 {/*link Arrow area*/}

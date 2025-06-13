@@ -24,6 +24,7 @@ const BuildingInfoStyles={
         height:"95%",
         width:"100%",
         // border:"1px solid red",
+        backgroundColor: "#e3f2fd",
         borderRadius:"5px",
         overflowY: "auto",
     },
@@ -36,6 +37,7 @@ const BuildingInfoStyles={
         height:"99%",
         width:"60%",
         //border:"1px solid black",
+       // backgroundColor: "#e3f2fd",
         borderRadius:"5px",
         overflowY: "auto",
     },
@@ -69,8 +71,9 @@ const BuildingInfoStyles={
         gap: "8px",// space between resualt
         padding:"0 0 0 0 ",
         height:"100%",
+        backgroundColor: "#e3f2fd",
         //border:"1px solid brown",
-        backgroundColor:"#ffffff",
+
         borderRadius:"5px",
         overflowY: "auto",
     },

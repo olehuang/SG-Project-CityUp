@@ -148,8 +148,9 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={'lg'}
+                    sx={{}}
             >
-                <DialogTitle >Photo Detail</DialogTitle>
+                <DialogTitle sx={{backgroundColor: "#e3f2fd",}}>Photo Detail</DialogTitle>
                 <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>
@@ -193,9 +194,11 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         gap: 2,             // space between photo
         minWidth:"95%",
         minHeight:"100%",
-        margin:"0 0 0 2%"
+        margin:"0 0 0 2%",
+
     },
     dialogContainer:{
+        backgroundColor: "#e3f2fd",
         padding:"0 0 1% 0 ",
         display: "flex",
         flexDirection: "row",
