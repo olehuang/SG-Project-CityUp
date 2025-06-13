@@ -125,8 +125,8 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                     variant="outlined"
                     size="small"
                     onClick={() => {
-                    setSearchResult([...allAddresses])
-                    setIsNomatch(false)
+                        setSearchResult([...allAddresses])
+                        setIsNomatch(false)
                         setHasSearched(false)
                 }}> Back</Button>}
                 {history.length > 0 && (
@@ -135,7 +135,6 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         onClick={()=> {
                             clearHistory()
                             setIsNomatch(false)
-                            setSearchResult([...allAddresses])
                         }}
                         variant="outlined"
                         color="secondary"
