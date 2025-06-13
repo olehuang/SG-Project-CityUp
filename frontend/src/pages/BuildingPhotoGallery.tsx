@@ -24,7 +24,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import {hover} from "@testing-library/user-event/dist/hover";
 import axios from "axios";
 import PhotoViewDialog from "../components/PhotoViewDialog";
-import BuildingInfoStyles from "./BuildingInfoStyles";
+import BuildingPhotoGalleryStyles from "./BuildingPhotoStyles";
 import {useNavigate} from "react-router-dom";
 import {photoReviewStyles} from "./PhotoReviewStyles";
 
@@ -177,7 +177,7 @@ const BuildingPhotoGallery=()=>{
             overflow: "hidden",
             position: 'relative'
         }}>
-            <Box  sx={BuildingInfoStyles.container}>
+            <Box  sx={BuildingPhotoGalleryStyles.container}>
                 {/*Search box*/}
                 <AdressSearchField
                     isNomatch={isNomatch}
@@ -189,11 +189,11 @@ const BuildingPhotoGallery=()=>{
 
                 />
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
-                <Box id="resizable-container" sx={BuildingInfoStyles.innerContainer}>
+                <Box id="resizable-container" sx={BuildingPhotoGalleryStyles.innerContainer}>
                     {/*Adresse Table */}
-                    <TableContainer component={Paper} style={{backgroundColor: "#e3f2fd",}}>
-                        <Table size="medium" aria-label="building table">
-                            <TableHead >
+                    <TableContainer component={Paper} style={{backgroundColor: "#e3eaed",}}>
+                        <Table  size="medium" aria-label="building table">
+                            <TableHead sx={{backgroundColor:"#abd1e6", position: "sticky", top: 0}}>
                                 <TableRow >
                                     <TableCell><strong>Address</strong></TableCell>
                                     <TableCell><strong>Last Update Time</strong></TableCell>
@@ -207,9 +207,9 @@ const BuildingPhotoGallery=()=>{
                                         <TableRow
                                             key={idx}
                                             hover
-                                            sx={{...BuildingInfoStyles.serachResault,
+                                            sx={{...BuildingPhotoGalleryStyles.serachResault,
                                                 ...(addr === selectedAddress && {
-                                                    backgroundColor: "#b2ebf2",  // click address highlight
+                                                    backgroundColor: "#e3eaed",  // click address highlight
                                                 }),}}
                                             onClick={() => handleSelect(addr)}
                                         >
@@ -228,18 +228,13 @@ const BuildingPhotoGallery=()=>{
                         </Table>
                     </TableContainer>
                     {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
-                    <Box onMouseDown={handleMouseDown} sx={BuildingInfoStyles.resizer} />
-                    <Box sx={{ ...BuildingInfoStyles.rightContainer, width: `${100 - leftWidth}%` }}>
+                    <Box onMouseDown={handleMouseDown} sx={BuildingPhotoGalleryStyles.resizer} />
+                    <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer, width: `${100 - leftWidth}%` }}>
                         <Box >
-                            <Box sx={{
-                                display:"flex",
-                                flexDirection:"row",
-                                justifyContent:"space-between",
-                                alignItems:"center",
-                                margin:"0 1% 0 1%",
-                            }}>
-                                <Typography >Photos Preview </Typography>
-                                <Button onClick={()=>setOpen(true)}>View all</Button>
+                            <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
+                                <Typography ><strong>Photos Preview</strong> </Typography>
+                                <Button variant={"outlined"}
+                                        onClick={()=>setOpen(true)}>View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (

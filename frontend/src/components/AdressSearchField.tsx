@@ -120,7 +120,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                 />
             )}
         />
-            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"1% 1px 0 1%",}}>
+            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"1% 0 0 1%",}}>
                 {(isNomatch ||hasSearched) && <Button
                     variant="outlined"
                     size="small"

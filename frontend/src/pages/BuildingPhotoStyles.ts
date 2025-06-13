@@ -1,4 +1,4 @@
-const BuildingInfoStyles={
+const BuildingPhotoStyles={
     container:{
         width: '95%',
         position: "absolute",
@@ -9,7 +9,7 @@ const BuildingInfoStyles={
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
-        backgroundColor: "#e3f2fd",
+        backgroundColor: "#e3eaed",
         display: "flex",
         flexDirection: "column",
     },
@@ -24,7 +24,7 @@ const BuildingInfoStyles={
         height:"95%",
         width:"100%",
         // border:"1px solid red",
-        backgroundColor: "#e3f2fd",
+        backgroundColor: "#e3eaed",
         borderRadius:"5px",
         overflowY: "auto",
     },
@@ -71,11 +71,21 @@ const BuildingInfoStyles={
         gap: "8px",// space between resualt
         padding:"0 0 0 0 ",
         height:"100%",
-        backgroundColor: "#e3f2fd",
+        backgroundColor: "#e3eaed",
         //border:"1px solid brown",
-
         borderRadius:"5px",
         overflowY: "auto",
+    },
+    rightContainerTitle:{
+        display:"flex",
+        flexDirection:"row",
+        justifyContent:"space-between",
+        alignItems:"center",
+        padding:"2% 3% 3% 3%",
+        margin:"0% 1% 4% 1%",
+        backgroundColor:"#abd1e6",
+        borderRadius:"8px",
+        position: "sticky", top: 0
     },
     resizer: {
         width: "6px",
@@ -87,4 +97,4 @@ const BuildingInfoStyles={
     }
 }
 
-export default BuildingInfoStyles
+export default BuildingPhotoStyles
