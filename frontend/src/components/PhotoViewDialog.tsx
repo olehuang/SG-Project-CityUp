@@ -122,7 +122,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
             }
             return order;
         }
-
+        //follow time/upload Name Desc(Z-A)/Asc(A-Z) Order Photos
         const orderPhoto = (order: string) => {
             return [...photos].sort((a, b) => {
                 const timeA = new Date(a.uploadTime).getTime();
@@ -164,7 +164,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         });
     };
 
-    // download selceted photo
+    // download selected photo,single Photo will be direct download, more will as Zip download
     const handleDownloadSelected = async () => {
         //const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
         const selectedPhotosIds = Array.from(selectedPhotoIds);
@@ -209,7 +209,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         }
     };
 
-
+    //come to prev Photo
     const handlePreview =(photo:Photo)=>{
         const index = sortedPhotos.findIndex(p => p.id === photo.id);
         setPreviewIndex(index);
@@ -229,6 +229,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         setPreviewIndex(prevIndex);
         setPreviewPhoto(sortedPhotos[prevIndex]);
     }
+    // set all photos select / delete all selected Photos
     const handleAllSelect=()=>{
         if(selectedPhotoIds.size===sortedPhotos.length){
             setSelectedPhotoIds(new Set());
@@ -247,8 +248,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
             >
                 <DialogTitle> Photos Under Adresse - {selectedAddress}</DialogTitle>
                 <Box sx={{padding: 2}}>
-                    <Box sx={{display: "flex", mb: 2, alignItems: "center"}}
-                    >
+                    <Box sx={{display: "flex", mb: 2, alignItems: "center"}}>
                         <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>

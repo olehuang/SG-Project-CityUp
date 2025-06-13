@@ -1,12 +1,11 @@
 const BuildingInfoStyles={
     container:{
+        width: '95%',
         position: "absolute",
-        top: `${60}px`,
-        left:0,
-        right:0,
-        margin:0,
+        left:"2%",
+        marginRight:"2%",
         paddingTop: "0.5%",
-        height:`calc(100vh - ${70}px)`,
+        height:"79%",//`calc(100vh - ${70}px)`,
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
@@ -15,8 +14,8 @@ const BuildingInfoStyles={
         flexDirection: "column",
     },
     innerContainer:{
-        top:"2%",
-        marginTop:"0.5%",
+        top:"5%",
+        margin:"1% 1% 1% 1%",
         paddingTop:"0%",
         justifyContent:"left",
         display:"flex",
@@ -35,6 +34,7 @@ const BuildingInfoStyles={
         flexDirection:"column",//  Direction of all result
         gap: "8px",// space between resualt
         height:"99%",
+        width:"60%",
         //border:"1px solid black",
         borderRadius:"5px",
         overflowY: "auto",
@@ -63,12 +63,14 @@ const BuildingInfoStyles={
     rightContainer:{
         paddingBottom:"0",
         display:"flex",
+        margin:"0 2% 0 0",
         flexDirection: "column",
-        flexWrap:"warp",
+        flexWrap:"wrap",
         gap: "8px",// space between resualt
         padding:"0 0 0 0 ",
-        height:"99%",
-        //border:"1px solid blue",
+        height:"100%",
+        //border:"1px solid brown",
+        backgroundColor:"#ffffff",
         borderRadius:"5px",
         overflowY: "auto",
     },

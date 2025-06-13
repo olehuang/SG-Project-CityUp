@@ -25,6 +25,8 @@ import {hover} from "@testing-library/user-event/dist/hover";
 import axios from "axios";
 import PhotoViewDialog from "../components/PhotoViewDialog";
 import BuildingInfoStyles from "./BuildingInfoStyles";
+import {useNavigate} from "react-router-dom";
+import {photoReviewStyles} from "./PhotoReviewStyles";
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
@@ -56,6 +58,8 @@ const BuildingInfo=()=>{
     const [isNomatch,setIsNomatch]=useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
+
+    const navigat=useNavigate();
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
@@ -166,7 +170,7 @@ const BuildingInfo=()=>{
 
 
     return(
-        <Box sx={pageBackgroundStyles.container} style={{justifyContent:"left",display:'contents',overflow: "hidden"}}>
+        <Box sx={{...pageBackgroundStyles.container,justifyContent:"content",display:'contents',overflow: "hidden",position: 'relative'}}>
             <Box  sx={BuildingInfoStyles.container}>
                 {/*Search box*/}
                 <AdressSearchField
@@ -176,6 +180,7 @@ const BuildingInfo=()=>{
                     onSelect={handleSelect}
                     setSearchResult={setSearchResult}
                     allAddresses={allAddresses}
+
                 />
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container" sx={BuildingInfoStyles.innerContainer}>
@@ -224,7 +229,9 @@ const BuildingInfo=()=>{
                                 display:"flex",
                                 flexDirection:"row",
                                 justifyContent:"space-between",
-                                alignItems:"center"}}>
+                                alignItems:"center",
+                                margin:"0 1% 0 1%",
+                            }}>
                                 <Typography >Photos Preview </Typography>
                                 <Button onClick={()=>setOpen(true)}>View all</Button>
                             </Box>
@@ -233,13 +240,18 @@ const BuildingInfo=()=>{
                                     <PhotoGrid address={selectedAddress}/>
                                 ) :
                                     isNomatch ? (
+                                        <Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
                                         <Typography variant="body2" color="textSecondary">
                                             Please enter a valid address to view photos.
-                                        </Typography>)
-                                    : (
+
+                                        </Typography>
+                                        </Box>
+                                        )
+                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
                                         <Typography variant="body2" color="textSecondary">
                                             Please select an address to view photos.
                                         </Typography>
+                                     </Box>
                                     )}
                             </Box>
                         </Box>
@@ -248,6 +260,11 @@ const BuildingInfo=()=>{
             </Box>
             {/*All photo Dialog */}
             <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
+            <Button
+                variant="outlined"
+                onClick={()=>{navigat("/dashboard");}}
+                sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}
+            >Exit</Button>
         </Box>
     )
 

@@ -12,12 +12,15 @@ interface Props {
     setSearchResult: (searchResult: string[]) => void;
     allAddresses: string[];
 
+
 }
 
 const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNomatch,setSearchResult,allAddresses}) => {
     const [inputValue, setInputValue] = useState("");
     const [selectedAddress, setSelectedAddress] = useState<string|null>("");
     const [history, setHistory] = useState<string[]>([]);
+
+    const [hasSearched, setHasSearched] = useState(false);
 
     const STORAGE_KEY = "address_search_history";
     useEffect(() => {
@@ -50,6 +53,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
             updateHistory(trimmedInput);
             setInputValue("");
             setSelectedAddress(null);
+            setHasSearched(true);
         }
     };
 
@@ -71,7 +75,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
     return (
         <>
         <Autocomplete
-            style={{ width: "100%" }}
+            style={{margin:"1% 1% 0 1%"}}
             freeSolo
             options={mergedOptions}
             value={selectedAddress}
@@ -79,14 +83,10 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
             onInputChange={(event, newInputValue) => {
                 setInputValue(newInputValue);
             }}
-            // onChange={(event, newValue:any) => {
-            //     setInputValue(newValue || "");
-            //     setSelectedAddress(newValue);
-            //     console.log("choose the address：", newValue);
-            // }}
             onChange={handleChange}
             renderInput={(params) => (
                 <TextField
+                    sx={{}}
                     {...params}
                     label="Input Adress"
                     variant="outlined"
@@ -120,13 +120,14 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                 />
             )}
         />
-            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"0.5% 1px 0 0.5%",}}>
-                {isNomatch && <Button
+            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"1% 1px 0 1%",}}>
+                {(isNomatch ||hasSearched) && <Button
                     variant="outlined"
                     size="small"
                     onClick={() => {
                     setSearchResult([...allAddresses])
                     setIsNomatch(false)
+                        setHasSearched(false)
                 }}> Back</Button>}
                 {history.length > 0 && (
                     <Button

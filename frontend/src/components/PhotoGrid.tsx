@@ -23,7 +23,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [open,setOpen]=useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-
+    //get first 9 photo form DB follow Uploadtime
     useEffect(() => {
         if(!address) return;
 
@@ -59,17 +59,17 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         fetchPhoto(address)
     }, [address]);
 
-
+    //open dialog to see Photo detail
     const handleOpen = (index: number) => {
         setSelectedPhotoIndex(index);
         setOpen(true);
     };
-
+    //close Dialog
     const handleClose = () => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
-
+    //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
         try{
             const response = await (await axios.get(
@@ -89,7 +89,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             setError(e.message || "Unknown error");
         }
     }
-
+    //show upload user name
     const getUsername=async (user_id:string)=>{
         try{
             const response= await axios.get(`http://127.0.0.1:8000/users/get_user_name`, {params: {user_id:user_id}});
@@ -101,7 +101,11 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     if (loading) {
         return (
-            <Box >
+            <Box sx={{
+                display: 'flex',            //  Flexbox
+                justifyContent: 'center',
+                alignItems: 'center'
+            }}>
                 <CircularProgress size="3rem"/>
                 <Typography>Loading photos...</Typography>
             </Box>
@@ -117,11 +121,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     return (
         <>
             <Box
-                sx={{
-                    display: "flex",
-                    flexWrap: "wrap",   // automatic change row
-                    gap: 2,             // space between photo
-                }}
+                sx={styles.photoGridroot}
             >
                 {photos.map((photo, index) => (
                     <Box
@@ -155,7 +155,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                         <DialogContent sx={styles.dialogContainer}>
                             <Box
                                 sx={styles.dialogFirstBox}
-                            > {/* 图片区域 */}
+                            > {/* 9 Photos  Area */}
                                 <Box
                                     component="img"
                                     src={photos[selectedPhotoIndex].src}
@@ -163,7 +163,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                     sx={styles.dialogPhotoArea}
                                 />
 
-                                {/* 信息区域 */}
+                                {/* Photo infomation Area */}
                                 <Box sx={styles.dialogInfoArea}><Box sx={{mb: 2, textAlign: "left"}}>
                                     <Typography variant="h6">{photos[selectedPhotoIndex].title}</Typography>
                                     <Typography variant="body1">Upload
@@ -187,6 +187,14 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     )
  }
  const styles={
+    photoGridroot:{
+        display: "flex",
+        flexWrap: "wrap",   // automatic change row
+        gap: 2,             // space between photo
+        minWidth:"95%",
+        minHeight:"100%",
+        margin:"0 0 0 2%"
+    },
     dialogContainer:{
         padding:"0 0 1% 0 ",
         display: "flex",
