@@ -94,7 +94,7 @@ const DashboardPage: React.FC = () => {
     const topItems = [
         { label: "Tutorial", desc: "Step-by-step guide" },
         { label: "Upload", desc: "Add your files here"  },
-        { label: "Building Information", desc: "Browse building details" },
+        { label: "Building Photo Gallery", desc: "Browse building photos" },
     ];
 
     //bottom Button in Daschboard page
@@ -111,7 +111,7 @@ const DashboardPage: React.FC = () => {
         switch (label) {
             case "Tutorial":return "tutorial";
             case "Upload":return "upload";
-            case "Building Information":return "buildingInformation";
+            case "Building Photo Gallery":return "buildingPhoto";
             case "Product Introduction": return "productIntroduction";
             case "Upload History":return "uploadHistory";
             case "Photo Review": return "photoReview";

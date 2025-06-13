@@ -20,7 +20,7 @@ import UploadHistory from "../pages/UploadHistory";
 import Upload from "../pages/Upload";
 import Tutorial from "../pages/Tutorial";
 import ProductIntroduction from "../pages/ProductIntroduction";
-import BuildingInfo from "../pages/BuildingInfo";
+import BuildingPhotoGallery from "../pages/BuildingPhotoGallery";
 import {useEffect, useState} from "react";
 import KeycloakClient from "./keycloak";
 
@@ -78,7 +78,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 <ListItemText primary="Tutorial" />
                             </ListItemButton>
                         </ListItem>
-                        <ListItemButton  component={Link} to="/dashboard/buildingInformation">
+                        <ListItemButton  component={Link} to="/dashboard/buildingPhoto">
                             <ListItemIcon>
                             </ListItemIcon>
                             <ListItemText primary="Building Information" />

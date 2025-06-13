@@ -27,8 +27,8 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 return 'Upload';
             case '/dashboard/tutorial':
                 return 'Tutorial';
-            case '/dashboard/buildingInformation':
-                return 'Building Information';
+            case '/dashboard/buildingPhoto':
+                return 'Building Photo Gallery';
             case '/dashboard/uploadHistory':
                 return 'Upload History';
             case '/dashboard/productIntroduction':

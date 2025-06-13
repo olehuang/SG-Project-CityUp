@@ -44,7 +44,7 @@ const mockResults = [
     "Magdalenenstraße 8, 64289 Darmstadt",
 ].sort((a,b)=>a.localeCompare(b));
 
-const BuildingInfo=()=>{
+const BuildingPhotoGallery=()=>{
     const now = new Date();
 
     const photos = new Array(9).fill(null);
@@ -170,7 +170,13 @@ const BuildingInfo=()=>{
 
 
     return(
-        <Box sx={{...pageBackgroundStyles.container,justifyContent:"content",display:'contents',overflow: "hidden",position: 'relative'}}>
+        <Box sx={{
+            ...pageBackgroundStyles.container,
+            justifyContent:"content",
+            display:'contents',
+            overflow: "hidden",
+            position: 'relative'
+        }}>
             <Box  sx={BuildingInfoStyles.container}>
                 {/*Search box*/}
                 <AdressSearchField
@@ -271,4 +277,4 @@ const BuildingInfo=()=>{
 }
 
 
-export default BuildingInfo;
+export default BuildingPhotoGallery;
