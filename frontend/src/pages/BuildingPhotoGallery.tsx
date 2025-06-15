@@ -49,7 +49,7 @@ const BuildingPhotoGallery=()=>{
 
     const photos = new Array(9).fill(null);
 
-    const [leftWidth, setLeftWidth] = useState(60);
+    const [leftWidth, setLeftWidth] = useState(70);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
     const [allAddresses, setAllAddresses] = useState<string[]>([]);
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
@@ -189,11 +189,18 @@ const BuildingPhotoGallery=()=>{
 
                 />
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
-                <Box id="resizable-container" sx={BuildingPhotoGalleryStyles.innerContainer}>
+                <Box id="resizable-container"
+                     sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
                     {/*Adresse Table */}
-                    <TableContainer component={Paper} style={{backgroundColor: "#e3eaed",}}>
+                    <Box sx={{...BuildingPhotoGalleryStyles.leftContainer,
+                        width: `calc(${leftWidth}% - 6px)`
+                    }}>
+                    <TableContainer component={Paper}
+                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1",
+                                    }}>
                         <Table  size="medium" aria-label="building table">
-                            <TableHead sx={{backgroundColor:"#abd1e6", position: "sticky", top: 0}}>
+                            <TableHead sx={{backgroundColor:"#F1EFEC",//"#abd1e6",
+                                position: "sticky", top: 0}}>
                                 <TableRow >
                                     <TableCell><strong>Address</strong></TableCell>
                                     <TableCell><strong>Last Update Time</strong></TableCell>
@@ -209,7 +216,7 @@ const BuildingPhotoGallery=()=>{
                                             hover
                                             sx={{...BuildingPhotoGalleryStyles.serachResault,
                                                 ...(addr === selectedAddress && {
-                                                    backgroundColor: "#e3eaed",  // click address highlight
+                                                    backgroundColor: "#bbdefb",//"#e3eaed",  // click address highlight
                                                 }),}}
                                             onClick={() => handleSelect(addr)}
                                         >
@@ -227,14 +234,20 @@ const BuildingPhotoGallery=()=>{
 
                         </Table>
                     </TableContainer>
+                    </Box>
                     {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
                     <Box onMouseDown={handleMouseDown} sx={BuildingPhotoGalleryStyles.resizer} />
-                    <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer, width: `${100 - leftWidth}%` }}>
+                    <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer,
+                        //width: `calc(${100 - leftWidth}% - 6px)`
+                        flex: 1
+                    }}>
                         <Box >
                             <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>
                                 <Button variant={"outlined"}
-                                        onClick={()=>setOpen(true)}>View all</Button>
+                                        onClick={()=>setOpen(true)}
+                                            sx={{visibility:selectedAddress? "visible":"hidden" }}>
+                                            View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (

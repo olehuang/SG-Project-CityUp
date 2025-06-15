@@ -150,7 +150,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     maxWidth={'lg'}
                     sx={{}}
             >
-                <DialogTitle sx={{backgroundColor: "#e3f2fd",}}>Photo Detail</DialogTitle>
+                <DialogTitle sx={{backgroundColor: "#FAF6E9",}}>Photo Detail</DialogTitle>
                 <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>
@@ -198,7 +198,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     },
     dialogContainer:{
-        backgroundColor: "#e3f2fd",
+        backgroundColor: "#FAF6E9",
         padding:"0 0 1% 0 ",
         display: "flex",
         flexDirection: "row",

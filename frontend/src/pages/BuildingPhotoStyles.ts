@@ -9,7 +9,7 @@ const BuildingPhotoStyles={
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
-        backgroundColor: "#e3eaed",
+        backgroundColor:"#FAF6E9",// "#cee6ec",
         display: "flex",
         flexDirection: "column",
     },
@@ -20,13 +20,12 @@ const BuildingPhotoStyles={
         justifyContent:"left",
         display:"flex",
         flexDirection: "row",//  Direction of all result
-        gap: "8px",// space between resualt
+        gap: "6px",// space between resualt
         height:"95%",
-        width:"100%",
         // border:"1px solid red",
-        backgroundColor: "#e3eaed",
+        backgroundColor: "#FAF6E9",
         borderRadius:"5px",
-        overflowY: "auto",
+        overflow: "hidden",
     },
     leftContainer:{
         paddingBottom:"0",
@@ -34,8 +33,8 @@ const BuildingPhotoStyles={
         display:"flex",
         flexDirection:"column",//  Direction of all result
         gap: "8px",// space between resualt
-        height:"99%",
         width:"60%",
+        height:"100%",
         //border:"1px solid black",
        // backgroundColor: "#e3f2fd",
         borderRadius:"5px",
@@ -53,25 +52,24 @@ const BuildingPhotoStyles={
         cursor: "pointer",
         transition: "all 0.2s ease-in-out",
         "&:hover":{
-            backgroundColor: "#e0f7fa",
+            backgroundColor: "#bbdefb",//"#e0f7fa",
             borderColor: "#128d9e",
         },
         "&:active": {
             transform: "scale(0.98)",
-            backgroundColor: "#b2ebf2",
+            backgroundColor: "#bbdefb",//"#b2ebf2",
         },
     },
 
     rightContainer:{
         paddingBottom:"0",
         display:"flex",
-        margin:"0 2% 0 0",
         flexDirection: "column",
         flexWrap:"wrap",
         gap: "8px",// space between resualt
-        padding:"0 0 0 0 ",
+
         height:"100%",
-        backgroundColor: "#e3eaed",
+        backgroundColor: "#FAF6E9",
         //border:"1px solid brown",
         borderRadius:"5px",
         overflowY: "auto",
@@ -82,8 +80,8 @@ const BuildingPhotoStyles={
         justifyContent:"space-between",
         alignItems:"center",
         padding:"2% 3% 3% 3%",
-        margin:"0% 1% 4% 1%",
-        backgroundColor:"#abd1e6",
+        margin:"0% 2% 4% 1%",
+        backgroundColor:"#F1EFEC",
         borderRadius:"8px",
         position: "sticky", top: 0
     },
@@ -92,7 +90,7 @@ const BuildingPhotoStyles={
         cursor: "col-resize",
         backgroundColor: "#ddd",
         "&:hover": {
-            backgroundColor: "#bbb",
+            backgroundColor: "#b0bec5",
         },
     }
 }
