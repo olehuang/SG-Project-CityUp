@@ -199,8 +199,6 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                         }));
                     blob = response.data
                     filename = `${'download'}.jpg`;
-                    link = document.createElement('a');
-                    link.href = url;
 
                 } else {
                     const response = await axios.post(
