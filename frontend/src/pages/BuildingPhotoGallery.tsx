@@ -2,7 +2,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton  from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import {Box, Typography, Container, Button,Dialog, DialogTitle,} from "@mui/material";
+import {Box, Typography, Container, Button,Dialog, DialogTitle,LinearProgress} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -30,6 +30,8 @@ import {photoReviewStyles} from "./PhotoReviewStyles";
 import {useAuthHook} from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
 
+import CircularProgress from '@mui/material/CircularProgress';
+
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
     "Karolinenpl. 5, 64283 Darmstadt",
@@ -45,6 +47,12 @@ const mockResults = [
     "Landgraf-Georg-Straße, 64283 Darmstadt",
     "Magdalenenstraße 8, 64289 Darmstadt",
 ].sort((a,b)=>a.localeCompare(b));
+
+type BuildingInfo = {
+    address: string;
+    photoNr: number;
+    updateTime: string;
+};
 
 const BuildingPhotoGallery=()=>{
 
@@ -64,55 +72,80 @@ const BuildingPhotoGallery=()=>{
 
     const navigat=useNavigate()
 
-
+    const [isLoading,setIsLoading] = useState(false);
+    const [progress, setProgress] = useState<number>(0);
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
+        setIsLoading(true);
+        setProgress(0);
+
+
         const fetchAllData=async ()=>{
             try {
-                const response = await axios.get(url+"/buildings/get_all_build_addr");
-                const addrList =response.data.sort((a: string, b: string) => a.localeCompare(b));
-                console.log("addr_list:",addrList)
+
+                const response =await axios.get(url+"/buildings/get_addr_with_status");
+                const raw_list: BuildingInfo[] = response.data.map((item: any) => ({
+                    address: item.building_addr,
+                    photoNr: item.photo_count,
+                    updateTime: item.last_update_time,
+                }));
+
+
+                raw_list.sort((a: BuildingInfo, b: BuildingInfo) => a.address.localeCompare(b.address));
+
+                const addrList = raw_list.map(item=>item.address);
                 setAllAddresses(addrList);
                 setSearchResult([...addrList]);
+                const total = addrList.length;
 
-                const infoMap: Record<string, { updateTime: string, photoNr: number }> = {};
-                await Promise.all(
-                    addrList.map(async (address:string) => {
-                        try {
-                            const [updateResp, countResp] = await Promise.all([
-                                axios.get(url + "/photos/get_first_upload_time", { params: { address } }),
-                                axios.get(url + "/photos/photoNumber", { params: { address } }),
-                            ]);
+                const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
+                // raw_list.forEach((item,idx)=>{
+                //     console.log("infoMat item:",item);
+                //     const formattedTime = new Intl.DateTimeFormat("de-DE",{
+                //         timeZone:"Europe/Berlin",
+                //         dateStyle:"medium",
+                //         timeStyle:"medium",
+                //     }).format(new Date(item.updateTime))
+                //
+                //     infoMap[item.address]={
+                //         updateTime:formattedTime,
+                //         photoNr:item.photoNr
+                //     }
+                //     setProgress(Math.round(((idx + 1) / total) * 100));
+                //      new Promise((resolve) => setTimeout(resolve, 20));
+                // })
 
-                            const rawtime = updateResp.data;
-                            const formatTime = new Intl.DateTimeFormat("de-DE",{
-                                timeZone: "Europe/Berlin",
-                                dateStyle: "medium",
-                                timeStyle: "medium",
-                                }).format(new Date(rawtime));
+                for (let idx = 0; idx < raw_list.length; idx++) {
+                    const item = raw_list[idx];
+                    const formattedTime = new Intl.DateTimeFormat("de-DE", {
+                        timeZone: "Europe/Berlin",
+                        dateStyle: "medium",
+                        timeStyle: "medium",
+                    }).format(new Date(item.updateTime));
 
-                            infoMap[address] = {
-                                updateTime: formatTime,
-                                photoNr: countResp.data,
-                            };
-                        } catch (err: any) {
-                            console.warn(`Failed to fetch info for ${address}:`, err.message);
-                            infoMap[address] = {
-                                updateTime: "Error",
-                                photoNr: -1,
-                            };
-                        }
-                    })
-                );
+                    infoMap[item.address] = {
+                        updateTime: formattedTime,
+                        photoNr: item.photoNr,
+                    };
+
+                    //setProgress(Math.round(((idx + 1) / total) * 100));
+
+                }
+
                 setPhotoInfoMap(infoMap);
+
             }catch (e:any) {
                 console.log(e.message || "Unknown error")
                 setAllAddresses(mockResults);
                 setSearchResult(mockResults);
+
+            }finally {
+                setIsLoading(false);
             }
         }
         fetchAllData();
+
     }, []);
 
 
@@ -193,6 +226,12 @@ const BuildingPhotoGallery=()=>{
                     allAddresses={allAddresses}
 
                 />
+                {isLoading && (
+                    <Box sx={{ width: '100%' }}>
+                        <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
+                        <Typography>Loading...</Typography>
+                    </Box>
+                )}
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container"
                      sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
