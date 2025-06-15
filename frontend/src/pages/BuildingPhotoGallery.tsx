@@ -100,38 +100,21 @@ const BuildingPhotoGallery=()=>{
                 const total = addrList.length;
 
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
-                // raw_list.forEach((item,idx)=>{
-                //     console.log("infoMat item:",item);
-                //     const formattedTime = new Intl.DateTimeFormat("de-DE",{
-                //         timeZone:"Europe/Berlin",
-                //         dateStyle:"medium",
-                //         timeStyle:"medium",
-                //     }).format(new Date(item.updateTime))
-                //
-                //     infoMap[item.address]={
-                //         updateTime:formattedTime,
-                //         photoNr:item.photoNr
-                //     }
-                //     setProgress(Math.round(((idx + 1) / total) * 100));
-                //      new Promise((resolve) => setTimeout(resolve, 20));
-                // })
+                raw_list.forEach((item,idx)=>{
+                    console.log("infoMat item:",item);
+                    const formattedTime = new Intl.DateTimeFormat("de-DE",{
+                        timeZone:"Europe/Berlin",
+                        dateStyle:"medium",
+                        timeStyle:"medium",
+                    }).format(new Date(item.updateTime))
 
-                for (let idx = 0; idx < raw_list.length; idx++) {
-                    const item = raw_list[idx];
-                    const formattedTime = new Intl.DateTimeFormat("de-DE", {
-                        timeZone: "Europe/Berlin",
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                    }).format(new Date(item.updateTime));
+                    infoMap[item.address]={
+                        updateTime:formattedTime,
+                        photoNr:item.photoNr
+                    }
 
-                    infoMap[item.address] = {
-                        updateTime: formattedTime,
-                        photoNr: item.photoNr,
-                    };
+                })
 
-                    //setProgress(Math.round(((idx + 1) / total) * 100));
-
-                }
 
                 setPhotoInfoMap(infoMap);
 
@@ -229,7 +212,7 @@ const BuildingPhotoGallery=()=>{
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
                         <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
-                        <Typography>Loading...</Typography>
+                        <Typography sx={{}}>Loading...</Typography>
                     </Box>
                 )}
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
