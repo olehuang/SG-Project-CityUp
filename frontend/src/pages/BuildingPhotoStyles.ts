@@ -12,6 +12,7 @@ const BuildingPhotoStyles={
         backgroundColor:"#FAF6E9",// "#cee6ec",
         display: "flex",
         flexDirection: "column",
+        boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
     },
     innerContainer:{
         top:"5%",
@@ -26,6 +27,7 @@ const BuildingPhotoStyles={
         backgroundColor: "#FAF6E9",
         borderRadius:"5px",
         overflow: "hidden",
+        boxShadow: "0px 10px 12px rgba(0, 0, 0, 0.1)",
     },
     leftContainer:{
         paddingBottom:"0",
