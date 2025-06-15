@@ -451,6 +451,7 @@ async def get_first_upload_time(address: str,request:Request):
         print(f"get_firsh_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
+
 # 新增：上传历史记录接口
 @router.get("/history", response_model=UploadHistoryResponse)
 async def get_upload_history(
