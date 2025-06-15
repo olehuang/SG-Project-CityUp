@@ -27,6 +27,8 @@ import PhotoViewDialog from "../components/PhotoViewDialog";
 import BuildingPhotoGalleryStyles from "./BuildingPhotoStyles";
 import {useNavigate} from "react-router-dom";
 import {photoReviewStyles} from "./PhotoReviewStyles";
+import {useAuthHook} from "../components/AuthProvider";
+import KeycloakClient from "../components/keycloak";
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
@@ -45,6 +47,7 @@ const mockResults = [
 ].sort((a,b)=>a.localeCompare(b));
 
 const BuildingPhotoGallery=()=>{
+
     const now = new Date();
 
     const photos = new Array(9).fill(null);
@@ -59,7 +62,9 @@ const BuildingPhotoGallery=()=>{
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
 
-    const navigat=useNavigate();
+    const navigat=useNavigate()
+
+
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {

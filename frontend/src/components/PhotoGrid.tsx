@@ -4,6 +4,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
 import axios from "axios";
+import {useAuthHook} from "./AuthProvider";
+import KeycloakClient from "./keycloak";
 
 interface PhotoGridProps {
     address: string;
@@ -22,6 +24,20 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [error, setError] = useState<string | null>(null); // error
     const [open,setOpen]=useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+
+    const { token } = useAuthHook();
+    const [roles, setRoles] = useState<string[]>([]);
+    // Take user from KeycloakClient and if token exist take into roles
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const userInfo = await KeycloakClient.extractUserInfo(token);
+            setRoles(userInfo?.roles || []);
+            console.log(userInfo?.roles);
+        };
+        if (token !== null && token !== undefined) {
+            fetchRoles();
+        }
+    }, [token]);
 
     //get first 9 photo form DB follow Uploadtime
     useEffect(() => {
@@ -71,22 +87,24 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     };
     //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
-        try{
-            const response = await (await axios.get(
-                `http://localhost:8000/photos/download_photo/${photo.id}`,
-                {
-                    responseType: 'blob',
-                }));
-            const url = URL.createObjectURL(response.data);
-            const link = document.createElement('a');
-            link.href = url;
-            link.download = `${photo.title || 'download'}.jpg`;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            URL.revokeObjectURL(url);
-        }catch (e:any) {
-            setError(e.message || "Unknown error");
+        if(roles.includes("admin")){
+            try {
+                const response = await (await axios.get(
+                    `http://localhost:8000/photos/download_photo/${photo.id}`,
+                    {
+                        responseType: 'blob',
+                    }));
+                const url = URL.createObjectURL(response.data);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = `${photo.title || 'download'}.jpg`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } catch (e: any) {
+                setError(e.message || "Unknown error");
+            }
         }
     }
     //show upload user name
@@ -173,8 +191,11 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         User: {getUsername(photos[selectedPhotoIndex].uploader)}</Typography>
                                 </Box>
                                     <Button variant="contained"
-                                            sx={{alignSelf: "flex-start"}}
+                                            sx={{
+                                                alignSelf: "flex-start",
+                                                visibility: roles.includes("admin")? "visible":"hidden",}}
                                             onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
+
                                     >
                                         Download
                                     </Button>
