@@ -2,7 +2,7 @@ import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton  from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import {Box, Typography, Container, Button,Dialog, DialogTitle,LinearProgress} from "@mui/material";
+import {Box, Typography, Container, Button,Dialog, DialogTitle,LinearProgress,Alert} from "@mui/material";
 import TextField from "@mui/material/TextField";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
@@ -75,6 +75,9 @@ const BuildingPhotoGallery=()=>{
     const [isLoading,setIsLoading] = useState(false);
     const [progress, setProgress] = useState<number>(0);
 
+    const [error,setError] = useState<string>("")
+    const [isError,setIsError] = useState<false>(false)
+
     const url="http://127.0.0.1:8000"
     useEffect(() => {
         setIsLoading(true);
@@ -120,6 +123,7 @@ const BuildingPhotoGallery=()=>{
 
             }catch (e:any) {
                 console.log(e.message || "Unknown error")
+                setError(e.message || "Unknown error")
                 setAllAddresses(mockResults);
                 setSearchResult(mockResults);
 
@@ -215,6 +219,7 @@ const BuildingPhotoGallery=()=>{
                         <Typography sx={{}}>Loading...</Typography>
                     </Box>
                 )}
+                {error && <Alert severity="error">{error}</Alert>}
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container"
                      sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
