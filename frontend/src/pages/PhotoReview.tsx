@@ -45,7 +45,7 @@ const PhotoReview = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>("");
     const [success, setSuccess] = useState<string>("");
-    // 大图预览
+
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState<string>("");
     const [previewPhotoInfo, setPreviewPhotoInfo] = useState<PhotoItem | null>(null);
@@ -124,7 +124,7 @@ const PhotoReview = () => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
-            // 从列表中移除已审核的照片
+            // Remove reviewed photos from list
             setPhotos((prev) => prev.filter((photo) => photo.photo_id !== photo_id));
             setSuccess(`Photo review${result === "success" ? "approved" : "rejected"}, and removed from the list`);
         } catch (err) {
@@ -179,7 +179,7 @@ const PhotoReview = () => {
         }
     };
 
-    // 页面卸载时释放照片
+    // Release photos when page unloads
     useEffect(() => {
         return () => {
             if (user_id) {
@@ -205,7 +205,7 @@ const PhotoReview = () => {
     const toggleSelectMode = () => {
         setSelectMode((prev) => !prev);
         if (selectMode) {
-            // 退出选择模式时清除所有选择
+            // Clear all selections when exiting selection mode
             setPhotos((prev) => prev.map((p) => ({ ...p, selected: false })));
             setSelectAll(false);
         }
@@ -220,7 +220,7 @@ const PhotoReview = () => {
             )
         );
 
-        // 检查是否所有照片都被选中
+        //Check if all photos are selected
         const updatedPhotos = photos.map((p) =>
             p.photo_id === photo_id ? { ...p, selected: !p.selected } : p
         );
@@ -228,7 +228,7 @@ const PhotoReview = () => {
         setSelectAll(allSelected);
     };
 
-    // 清除消息
+    // Clear Message
     useEffect(() => {
         if (error || success) {
             const timer = setTimeout(() => {
@@ -274,7 +274,7 @@ const PhotoReview = () => {
                     </Button>
                 </Box>
 
-                {/* 照片列表 */}
+                {/* Photo list */}
                 <TableContainer
                     component={Paper}
                     sx={photoReviewStyles.tableContainer}
@@ -409,7 +409,7 @@ const PhotoReview = () => {
                     </Table>
                 </TableContainer>
 
-                {/* 统计信息 */}
+                {/* Statistical information */}
                 <Box sx={photoReviewStyles.statsContainer}>
                     <Typography
                         variant="body2"
@@ -455,7 +455,7 @@ const PhotoReview = () => {
                 </Box>
             </Box>
 
-            {/* 大图预览对话框 */}
+            {/* Large Image Preview Dialog Box */}
             <Dialog
                 open={previewOpen}
                 onClose={handleClosePreview}
