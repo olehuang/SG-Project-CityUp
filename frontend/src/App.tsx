@@ -18,6 +18,7 @@ import UploadHistory from "./pages/UploadHistory";
 import ProductIntroduction from "./pages/ProductIntroduction";
 import PhotoReview from "./pages/PhotoReview";
 import axios from "axios";
+import RankingPage from "./pages/RankingPage";
 
 
 function App() {
@@ -36,6 +37,7 @@ function App() {
                             <Route element={<UploadHistory/>} path="/dashboard/uploadHistory" />{/*Upload History*/}
                             <Route element={<ProductIntroduction/>} path="/dashboard/productIntroduction" />{/*Product Introduction*/}
                             <Route element={<PhotoReview/>} path="/dashboard/photoReview" />{/*Product Introduction*/}
+                            <Route element={<RankingPage/>} path="/dashboard/ranking" />{/*Product Introduction*/}
                         </Route>{/*DashboardLayout*/}
                     </Route>{/*ProtectedRouter*/}
                 </Route>{/*KeycloakInit*/}

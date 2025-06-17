@@ -35,6 +35,8 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 return 'Product Introduction';
             case '/dashboard/photoReview':
                 return 'Photo Review';
+            case '/dashboard/ranking':
+                return 'Rankings';
             default:
                 return 'Loading...';
         }
