@@ -5,6 +5,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
+import Button from '@mui/material/Button';
 import {useNavigate,useLocation,Link} from "react-router-dom";
 
 interface TopBarProps {
@@ -79,8 +80,27 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         {getPageTitle()}
                     </Typography>
                 </Box>
+                <Button
+                    onClick={()=>{navigate("/dashboard")}}
+                    sx={{...styles.extiButton,
+                        visibility:location.pathname ===("/dashboard")?"hidden":"visible"
+                    }}
+                    variant="outlined"
+                >
+                    Exit</Button>
             </Toolbar>
         </AppBar>
     );
+}
+const styles = {
+    extiButton: {
+        justifyContent: "space-between",
+        borderRadius: 10,
+        borderColor: "white",
+        margin:"auto 5% auto auto",
+        color:"white",
+        fontWeight: "bold",
+
+    }
 }
 export default TopBar;

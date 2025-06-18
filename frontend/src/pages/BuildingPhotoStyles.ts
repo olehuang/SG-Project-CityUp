@@ -37,8 +37,7 @@ const BuildingPhotoStyles={
         gap: "8px",// space between resualt
         width:"60%",
         height:"100%",
-        //border:"1px solid black",
-       // backgroundColor: "#e3f2fd",
+
         borderRadius:"5px",
         overflowY: "auto",
     },

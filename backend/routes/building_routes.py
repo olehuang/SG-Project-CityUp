@@ -79,3 +79,5 @@ async def get_addr_with_status():
                   stack_data=traceback.format_exc(),
                   time_stamp=datetime.now())
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
