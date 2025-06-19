@@ -194,10 +194,36 @@ const Tutorial = () => {
                         </Typography>
                         <Typography variant="body1" sx={styles.body}>
                             {highlightText(
-                                "In this section, you will learn how to upload and edit the photos you take as well as enter the address the photos are relative to.",
+                                "In this section, you will learn how to upload and edit the photos you take, as well as enter the address the photos correspond to. Follow these steps to ensure a smooth upload process:",
                                 searchTerm
                             )}
                         </Typography>
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📍
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>1. Set your location</strong> – {highlightText("Enable map access or manually enter an address to position your location.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📷
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>2. Upload photos</strong> – {highlightText("Click 'Shooting and Upload' to upload one image. If you have multiple photos, click 'Album Upload' (up to 5 photos at a time).", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    ✅
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>3. Finalize upload</strong> – {highlightText("Once your photos are selected, click 'Submit' to complete the process.", searchTerm)}
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
                 );
             case "Upload History":
@@ -208,12 +234,47 @@ const Tutorial = () => {
                         </Typography>
                         <Typography variant="body1" sx={styles.body}>
                             {highlightText(
-                                "In this section, you'll learn to view your photo upload history and confirm that your photos have been approved.",
+                                "In this section, you'll learn how to search, filter, and navigate your photo upload history.",
                                 searchTerm
                             )}
                         </Typography>
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    🔍
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>1. Search and filter photos</strong> – {highlightText("Use the address search to find uploaded photos, or apply the status filter to view photos based on their current state.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📷
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>2. View details</strong> – {highlightText("Click 'View Details' to access full information about a photo, including upload status.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📁
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>3. Navigate pagination</strong> – {highlightText("This page supports pagination. Photos are sorted from newest to oldest, with the most recently uploaded photos displayed at the top.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    🔙
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>4. Exit and return</strong> – {highlightText("To leave this section, use the sidebar menu on the left or click 'Return to Main Menu'.", searchTerm)}
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
                 );
+
             case "Building Information":
                 return (
                     <Box sx={styles.tutorialModelBox}>
@@ -222,10 +283,36 @@ const Tutorial = () => {
                         </Typography>
                         <Typography variant="body1" sx={styles.body}>
                             {highlightText(
-                                "In this section, you will learn how to find relevant building information based on addresses.",
+                                "In this section, you will learn how to search for building-related photo uploads and download images easily.",
                                 searchTerm
                             )}
                         </Typography>
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    🔍
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>1. Search by address</strong> – {highlightText("Enter an address in the search bar to view the latest upload times and the number of photos related to that location.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📷
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>2. Download photos</strong> – {highlightText("Click on a photo from the right panel and then select the 'Download' button to save it.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📁
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>3. Manage multiple downloads</strong> – {highlightText("Multiple photos will be downloaded as a ZIP file, while single images will be saved in their original format.", searchTerm)}
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
                 );
             case "Photo Review":
@@ -240,8 +327,35 @@ const Tutorial = () => {
                                 searchTerm
                             )}
                         </Typography>
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📥
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>1. Fetch user-uploaded photos</strong> – {highlightText("Click 'Fetch Photos' to load the images submitted by users for review.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    ✅
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>2. Approve or reject photos</strong> – {highlightText("Use the selection buttons to approve a single photo or multiple photos at once.", searchTerm)}
+                                </Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    🔄
+                                </Typography>
+                                <Typography variant="body1">
+                                    <strong>3. Understand status labels</strong> – {highlightText("Pending means the photo is awaiting review. Accept means the photo meets requirements and has the correct address information. If the photo does not meet upload guidelines or does not match the address details, click 'Reject'.", searchTerm)}
+                                </Typography>
+                            </Box>
+                        </Box>
                     </Box>
                 ) : null;
+
             case "User Management":
                 return roles.includes("admin") ? (
                     <Box sx={styles.tutorialModelBox}>
