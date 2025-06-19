@@ -67,7 +67,8 @@ async def get_addr_with_status():
         combin=[]
         for addr in add_list:
             status =status_map.get(addr,{"photo_count":0,"last_update_time":None})
-
+            if status["photo_count"] == 0: continue;
+            print("status:",status)
             combin.append({
                 "building_addr":addr,
                 "photo_count":status["photo_count"],
@@ -79,3 +80,5 @@ async def get_addr_with_status():
                   stack_data=traceback.format_exc(),
                   time_stamp=datetime.now())
         return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+

@@ -38,11 +38,12 @@ class MongoDB:
 
 # User information table
 class User:
-    def __init__(self, user_id: str, username: str, email: str, role: str):
+    def __init__(self, user_id: str, username: str, email: str, role: str,point=0):
         self.user_id = user_id
         self.username = username
         self.email = email
         self.role = "user"
+        self.point = point
 
     def to_dict(self):
         return {
@@ -50,6 +51,7 @@ class User:
             "username": self.username,
             "email": self.email,
             "role": self.role,
+            "point": self.point
         }
 
     @classmethod
@@ -59,6 +61,7 @@ class User:
             username=data["username"],
             email=data["email"],
             role=data["role"],
+            point=data["point"]
         )
 
 

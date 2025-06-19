@@ -116,6 +116,81 @@ async def update_user_role(user_id:str, role="user"):
                   time_stamp=datetime.now().isoformat())
         raise
 
+async def initial_user_point():
+    try:
+        users=MongoDB.get_instance().get_collection("users")
+        result = await users.update_many({},{"$set":{"point": 0}})
+        return {"message": "User point updated successfully"}
+    except Exception as e:
+        log_error("Error from initial_user_point : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+async def update_user_point(user_id:str,point:int):
+    """
+    :Motivation: need a function to update user point
+    :param user_id: which user need to update
+    :param point: how many points to update
+    :return:
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id":user_id}
+        user=await users.find_one(query)
+        if user is None:
+            return {"message": "User does not exist"}
+        user_point=user.get('point')+point
+        neu_valiue={"$set": {"point": user_point}}
+        result = await users.update_one(query, neu_valiue)
+        return {"message": "User point updated successfully"}
+    except Exception as e:
+        log_error("Error from update_user_point : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+async def get_users_in_Order():
+    """
+    :Motivation: need a function to get all users in order follow point just first 100
+    :return: list of all users in order
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        result = await users.find().sort("point", 1).limit(100)
+        return result
+    except Exception as e:
+        log_error("Error from get_users_in_Order : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+
+async def get_userRanking(user_id:str):
+    """
+    :motivation: need a function to get user ranking
+    :param user_id: which user want to get ranking
+    :return: position
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id":user_id}
+        user = await users.find_one(query)
+        better_rank_count = await users.count_documents({"point": {"$gt": user.get('point')}})
+        rank =better_rank_count + 1
+        if rank >=1:return {"rank": rank}
+        else: return {"rank": -1}
+    except Exception as e:
+        log_error("Error from get_userRanking : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+
+
 
 if __name__ == '__main__':
     dotenv.load_dotenv()
