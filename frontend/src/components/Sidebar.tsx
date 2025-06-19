@@ -81,7 +81,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                         <ListItemButton  component={Link} to="/dashboard/buildingPhoto">
                             <ListItemIcon>
                             </ListItemIcon>
-                            <ListItemText primary="Building Information" />
+                            <ListItemText primary="Building Photo Gallery" />
                         </ListItemButton>
                         <ListItemButton component={Link} to="/dashboard/uploadHistory" >
                             <ListItemIcon>
@@ -99,6 +99,11 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                                 </ListItemIcon>
                                 <ListItemText primary="Photo Review " />
                             </ListItemButton>}
+                        <ListItemButton  component={Link} to="/dashboard/ranking">
+                            <ListItemIcon>
+                            </ListItemIcon>
+                            <ListItemText primary="Rankings" />
+                        </ListItemButton>
 
                     </List>
                 </Box>
