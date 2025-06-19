@@ -102,14 +102,26 @@ const BuildingPhotoGallery=()=>{
                 setSearchResult([...addrList]);
                 const total = addrList.length;
 
+
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
                 raw_list.forEach((item,idx)=>{
                     console.log("infoMat item:",item);
-                    const formattedTime = new Intl.DateTimeFormat("de-DE",{
-                        timeZone:"Europe/Berlin",
-                        dateStyle:"medium",
-                        timeStyle:"medium",
-                    }).format(new Date(item.updateTime))
+                    let formattedTime = "N/A";
+                    if (item.updateTime && item.updateTime.trim()) {
+                        try {
+                            const timeStr = item.updateTime + (
+                                item.updateTime.includes('Z') || item.updateTime.includes('+') ? '' : 'Z'
+                            );
+                            formattedTime = new Intl.DateTimeFormat("de-DE",{
+                                timeZone:"Europe/Berlin",
+                                dateStyle:"medium",
+                                timeStyle:"medium",
+                            }).format(new Date(timeStr));
+                        } catch (error) {
+                            console.error(error, "updateTime:", item.updateTime);
+                            formattedTime = "Invalid Date";
+                        }
+                    }
 
                     infoMap[item.address]={
                         updateTime:formattedTime,

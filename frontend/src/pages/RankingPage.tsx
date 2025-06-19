@@ -132,7 +132,6 @@ const RankingPage =()=>{
                 <Table stickyHeader sx={{width:'100%',}}>
                     <TableHead >
                         <TableRow sx={{ backgroundColor: "#F1EFEC",//"#abd1e6",
-                            //flex: 1, display: "flex", justifyContent: "flex-end"
                         }}>
                             <TableCell sx={styles.headerCell(25)}>Ranking</TableCell>
                             <TableCell sx={styles.headerCell(30)}>Username</TableCell>
@@ -143,8 +142,8 @@ const RankingPage =()=>{
                     <TableBody >
                         {loading ? (
                         <TableRow >
-                            <TableCell sx={{display: "flex", flexDirection: "column", justifyContent: "center",}}>
-                                <Box sx={{margin:"auto",textAlign: "center",}}>
+                            <TableCell sx={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
+                                <Box sx={{margin:"auto",textAlign: "center"}}>
                                     <CircularProgress color={"primary"}></CircularProgress>
                                     <Typography variant="h6" sx={{ fontWeight: "bold"}}>
                                         Loading...

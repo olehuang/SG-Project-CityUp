@@ -2,7 +2,7 @@ from datetime import datetime
 import dotenv
 
 import db_entities
-from db_entities import MongoDB,Building
+from db_entities import MongoDB,Building,ReviewStatus
 from error_logging import log_error
 import traceback
 
@@ -82,6 +82,7 @@ async def update_addr_from_photo():
             address = photo.get("building_addr")
             if not address or address in existing_addresses:
                 continue
+            if photo.get("status") != ReviewStatus.Approved.value:continue
             geo_coords = {"lat": photo.get("lat"), "lng": photo.get("lng")}
             building = Building(address=address, geo_coords=geo_coords)
             await save_building(building)

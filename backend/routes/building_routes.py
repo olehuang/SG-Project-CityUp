@@ -67,7 +67,8 @@ async def get_addr_with_status():
         combin=[]
         for addr in add_list:
             status =status_map.get(addr,{"photo_count":0,"last_update_time":None})
-
+            if status["photo_count"] == 0: continue;
+            print("status:",status)
             combin.append({
                 "building_addr":addr,
                 "photo_count":status["photo_count"],
