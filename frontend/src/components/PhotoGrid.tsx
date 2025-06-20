@@ -59,10 +59,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     src: item.image_url,
                     title: item.title,
                     uploader: item.user_id,
-                    uploadTime: new Intl.DateTimeFormat("de-DE",{
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                        timeZone: "Europe/Berlin"}).format(new Date(item.upload_time))
+                    uploadTime: formatTime(item.upload_time),
                 }));
                 setPhotos(formattedPhotos);
             }catch (err: any) {
@@ -74,6 +71,29 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         }
         fetchPhoto(address)
     }, [address]);
+
+    // change Time format to EU format
+    const formatTime =  (time:any)=>{
+        let formattedTime = "N/A";
+        if (time && time.trim()) {
+            try {
+                const timeStr = time+ (
+                    time.includes('Z') || time.includes('+') ? '' : 'Z'
+                );
+                formattedTime = new Intl.DateTimeFormat("de-DE",{
+                    timeZone:"Europe/Berlin",
+                    dateStyle:"medium",
+                    timeStyle:"medium",
+                }).format(new Date(timeStr));
+            } catch (error) {
+                console.error(error, "updateTime:", time);
+                formattedTime = "Invalid Date";
+            }finally {
+                return formattedTime;
+            }
+        }
+
+    }
 
     //open dialog to see Photo detail
     const handleOpen = (index: number) => {
@@ -242,7 +262,9 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          maxHeight: 500,
          objectFit: "contain",
          borderRadius: 2,
-         border: "1px solid black",
+         //border: "1px solid black",
+         boxShadow:"0px 4px 12px rgba(0,0,0,0.1)"
+
      },
      dialogInfoArea:{
          width: "100%",

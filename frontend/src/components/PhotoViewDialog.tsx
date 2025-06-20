@@ -104,10 +104,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     ...p,
                     id: p.id,
                     uploader: userMap[p.uploader] ?? "Unknown",
-                    uploadTime: new Intl.DateTimeFormat("de-DE",{
-                        dateStyle: "medium",
-                        timeStyle: "medium",
-                        timeZone: "Europe/Berlin"}).format(new Date(p.uploadTime))
+                    uploadTime: formatTime(p.uploadTime)?? "Unknow"
                 }));
                 setPhotos(updatedPhotos);
             } catch (err: any) {
@@ -256,6 +253,29 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         }
     }
 
+    // change Time format to EU format
+    const formatTime =  (time:any)=>{
+        let formattedTime = "N/A";
+        if (time && time.trim()) {
+            try {
+                const timeStr = time+ (
+                    time.includes('Z') || time.includes('+') ? '' : 'Z'
+                );
+                formattedTime = new Intl.DateTimeFormat("de-DE",{
+                    timeZone:"Europe/Berlin",
+                    dateStyle:"medium",
+                    timeStyle:"medium",
+                }).format(new Date(timeStr));
+            } catch (error) {
+                console.error(error, "updateTime:", time);
+                formattedTime = "Invalid Date";
+            }finally {
+                return formattedTime;
+            }
+        }
+
+    }
+
     return(
         <>
             <Dialog open={open}
@@ -263,10 +283,10 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     maxWidth={'lg'}
                     fullWidth
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
+                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
                 <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
-                    <Box sx={{display: "flex", mb: 2, alignItems: "center"}}>
-                        <Typography variant="h5">Photos Preview</Typography>
+                    <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
+                        <Typography variant="h5" sx={{}}>Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
                             {isSelecting && selectedPhotoIds.size > 0 && (
@@ -309,14 +329,14 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12}>
+                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:0}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
                                     src={photo.src}
                                     alt={photo.title}
                                     loading="lazy"
-                                    style={{borderRadius: 8,cursor: 'pointer'}}
+                                    style={{borderRadius: 8,cursor: 'pointer',boxShadow:"0px 4px 12px rgba(0,0,0,0.2)"}}
                                     onClick={() => handlePreview(photo)}
                                 />
                                 <Box
@@ -330,21 +350,17 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 >
                                     <ImageListItemBar
                                         //title={photo.title}
+                                        sx={{borderRadius:"5px"}}
                                         subtitle={
                                             `Upload User: ${photo.uploader} 
-                                            | Upload Time: ${
-                                                new Intl.DateTimeFormat("de-DE", {
-                                                    dateStyle: "medium",
-                                                    timeStyle: "medium",
-                                                    timeZone: "Europe/Berlin"
-                                                }).format(new Date(photo.uploadTime))}`}
+                                            | Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
                                             isSelecting && (
                                                 <Checkbox
                                                     checked={selectedPhotoIds.has(photo.id)}
                                                     onClick={(e) => e.stopPropagation()} // stop bubble,click checkbox will not  toggleSelect
                                                     onChange={() => toggleSelect(photo.id)}
-                                                    sx={{ color: 'white' }}
+                                                    sx={{ color: 'white',cursor: 'pointer'}}
                                                 />
                                             )
                                         }

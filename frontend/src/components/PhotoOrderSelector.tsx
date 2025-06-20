@@ -18,7 +18,7 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
         setSelectOrder(event.target.value as string);
     }
     return(
-        <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <FormControl sx={{  minWidth: 120}}>
             <InputLabel id="demo-simple-select-helper-label">Order</InputLabel>
             <Select
                 labelId="demo-simple-select-helper-label"
@@ -26,6 +26,7 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
                 value={selectOrder}
                 label="Order"
                 onChange={handleChange}
+                sx={{padding:"0 1% 0 2%"}}
             >
                 <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
                 <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>

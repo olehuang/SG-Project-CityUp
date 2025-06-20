@@ -106,25 +106,10 @@ const BuildingPhotoGallery=()=>{
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
                 raw_list.forEach((item,idx)=>{
                     console.log("infoMat item:",item);
-                    let formattedTime = "N/A";
-                    if (item.updateTime && item.updateTime.trim()) {
-                        try {
-                            const timeStr = item.updateTime + (
-                                item.updateTime.includes('Z') || item.updateTime.includes('+') ? '' : 'Z'
-                            );
-                            formattedTime = new Intl.DateTimeFormat("de-DE",{
-                                timeZone:"Europe/Berlin",
-                                dateStyle:"medium",
-                                timeStyle:"medium",
-                            }).format(new Date(timeStr));
-                        } catch (error) {
-                            console.error(error, "updateTime:", item.updateTime);
-                            formattedTime = "Invalid Date";
-                        }
-                    }
+
 
                     infoMap[item.address]={
-                        updateTime:formattedTime,
+                        updateTime:formatTime(item.updateTime)||"unknow",
                         photoNr:item.photoNr
                     }
 
@@ -147,6 +132,28 @@ const BuildingPhotoGallery=()=>{
 
     }, []);
 
+    // change Time format to EU format
+    const formatTime =  (time:any)=>{
+        let formattedTime = "N/A";
+        if (time && time.trim()) {
+            try {
+                const timeStr = time+ (
+                    time.includes('Z') || time.includes('+') ? '' : 'Z'
+                );
+                formattedTime = new Intl.DateTimeFormat("de-DE",{
+                    timeZone:"Europe/Berlin",
+                    dateStyle:"medium",
+                    timeStyle:"medium",
+                }).format(new Date(timeStr));
+            } catch (error) {
+                console.error(error, "updateTime:", time);
+                formattedTime = "Invalid Date";
+            }finally {
+                return formattedTime;
+            }
+        }
+
+    }
 
     const handleDialogOpen = (index: number) => {
         setOpen(true);
@@ -193,6 +200,7 @@ const BuildingPhotoGallery=()=>{
     const handleSelect = (selected: string) => {
         //handleSearch(selected);
         setSelectedAddress(selected);
+        console.log("select:",selected)
 
     };
 
