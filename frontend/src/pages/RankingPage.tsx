@@ -22,7 +22,7 @@ type User={
     user_id:string,
     username:string,
     point:string,
-    rank:string,
+    rank:number,
 }
 
 type UserRanking={
@@ -38,7 +38,7 @@ const RankingPage =()=>{
         user_id: " - ",
         username:" - ",
         point:" 0 ",
-        rank: " -1 ",
+        rank: -1 ,
     }
     const {user_id}=useAuthHook();
     const [userRanking,setUserRanking]=useState<UserRanking>();//all users as a Array
@@ -114,7 +114,7 @@ const RankingPage =()=>{
                 <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>User
                     Name: {user.username }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Ranking: {user.rank!==" -1 "? user.rank: "not in Ranking " }</Typography>
+                    Ranking: {user.rank!== -1 ? user.rank: "not in Ranking " }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
                     Point: { user.point}</Typography>
                 <Button sx={{marginLeft: "auto"}}
@@ -164,7 +164,7 @@ const RankingPage =()=>{
                             >
                                 <TableCell >
                                     {(() => {
-                                    const rank = (page - 1) * limit + index + 1;
+                                    const rank = rowUser.rank;
                                     if (rank <= 3) {
                                         const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
                                         return <WorkspacePremiumRoundedIcon sx={{ color }} />;
