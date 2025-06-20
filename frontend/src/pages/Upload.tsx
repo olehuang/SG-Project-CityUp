@@ -270,48 +270,57 @@ const Upload: React.FC = () => {
         setIsSubmitting(false);
     };
 
-
     return (
         <div
             style={{
-                height: "100%",         // 让内容充满剩余空间
-                width: "100%",
-                overflowY: "auto",      // 出现竖向滚动条
-                background: "#FFF8E1",
+                width: "100vw",
+                height: "100vh",
+                minHeight: "100vh",
+                background: "#FFF8E1", // 页面主色
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "flex-start",
+                justifyContent: "stretch",
+                boxSizing: "border-box",
+                overflowX: "auto",  // 横向滚动
+                overflowY: "auto", //竖向滚动
+                position: "relative",
             }}
         >
-
+            {/* 左侧 2/3：地址输入和地图 */}
             <div
                 style={{
-                    maxWidth: 680,
-                    width: "95%",
-                    margin: "0 auto",
-                    padding: "3vw 0.5vw",
+                    flex: 2,
+                    minWidth: 340,
+                    maxWidth: "68vw",
+                    padding: "44px 38px 44px 6vw", // 左边padding更宽一些
                     boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
                 }}
             >
                 <h1
                     style={{
                         fontSize: "2rem",
                         fontWeight: 700,
-                        margin: "18px 0"
+                        margin: "0 0 22px 0"
                     }}
                 >
                     Upload Building Photos
                 </h1>
                 {/* 地址输入和搜索 */}
-                <div style={{ marginBottom: 14 }}>
+                <div style={{ marginBottom: 16 }}>
                     <label htmlFor="address"
-                        style={{
-                            display: "block",
-                            fontWeight: 500,
-                            fontSize: "1.15rem",
-                            marginBottom: 4,
-                        }}
-                    >
+                           style={{
+                               display: "block",
+                               fontWeight: 400,
+                               fontSize: "0.8rem",
+                               marginBottom: 4,
+                           }}>
                         Please enter the address of the building to be registered (Darmstadt only)
                     </label>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
                         <input
                             id="address"
                             type="text"
@@ -320,12 +329,12 @@ const Upload: React.FC = () => {
                             placeholder="Type the address or click on the map to select."
                             style={{
                                 width: "100%",
-                                fontSize: "1rem",
+                                fontSize: "0.8rem",
                                 padding: "0.6em 0.8em",
                                 border: "1px solid #aaa",
                                 borderRadius: 5,
                                 boxSizing: "border-box",
-                                maxWidth: "420px",
+                                maxWidth: "520px",
                                 minWidth: "0px"
                             }}
                             onKeyDown={(e) => {
@@ -345,22 +354,23 @@ const Upload: React.FC = () => {
                                 flexShrink: 0,
                             }}
                         >
-                             Search
+                            Search
                         </button>
                     </div>
                 </div>
-                {/* map */}
+                {/* 地图 */}
                 <div
                     style={{
                         width: "100%",
-                        height: "35vw",
-                        maxHeight: 350,
-                        minHeight: 220,
+                        height: "38vw",
+                        maxHeight: 520,
+                        minHeight: 340,
                         borderRadius: 16,
                         overflow: "hidden",
-                        marginBottom: 14,
+                        marginBottom: 8,
                         border: "1px solid #eee",
                         background: "#e0e0e0",
+                        transition: "height .2s"
                     }}
                 >
                     {latlng ? (
@@ -401,8 +411,25 @@ const Upload: React.FC = () => {
                         </div>
                     )}
                 </div>
-                {/* Upload area 上传区 */}
-                <div style={{ marginBottom: 12,display: "flex", flexWrap: "wrap", gap: 10 }}>
+            </div>
+
+            {/* 右侧 1/3：上传区 */}
+            <div
+                style={{
+                    flex: 1,
+                    minWidth: 260,
+                    maxWidth: "32vw",
+                    padding: "44px 6vw 44px 38px", // 右侧padding更宽一些
+                    borderLeft: "0.5px solid #e6dfcc",
+                    boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    background: "transparent",
+                    marginTop: "160px"
+                }}
+            >
+                {/* 拍照/相册上传 */}
+                <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
                     <button
                         onClick={handleTakePhoto}
                         style={{
@@ -414,7 +441,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="camera">📷</span> Shooting and upload
+                        <span role="img" aria-label="camera">📷</span> Camera
                     </button>
                     <button
                         onClick={handleSelectFromGallery}
@@ -427,7 +454,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="gallery">🖼️</span> Album upload
+                        <span role="img" aria-label="gallery">🖼️</span> Album
                     </button>
                     <input
                         type="file"
@@ -439,15 +466,15 @@ const Upload: React.FC = () => {
                     />
                 </div>
                 {/* 照片缩略图 */}
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10,overflowX: "auto",}}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12, overflowX: "auto", }}>
                     {photos.map((photo) => (
                         <div key={photo.id} style={{ position: "relative" }}>
                             <img
                                 src={photo.previewUrl}
                                 alt="thumbnail image"
                                 style={{
-                                    width: 80,
-                                    height: 80,
+                                    width: 78,
+                                    height: 78,
                                     objectFit: "cover",
                                     borderRadius: 8,
                                     border: "1px solid #ddd",
@@ -478,25 +505,26 @@ const Upload: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                {/* 照片要求说明 */}
+                {/* 拍摄要求说明 */}
                 <div
                     style={{
-                        fontSize: "1rem",
+                        fontSize: "0.98rem",
                         background: "#fffde7",
                         borderRadius: 8,
-                        padding: "10px 16px",
-                        marginBottom: 20,
+                        padding: "9px 13px",
+                        marginBottom: 16,
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box"
                     }}
                 >
                     <b>Photo shooting requirements：</b>
                     <ul style={{ paddingLeft: 22, margin: 0 }}>
-                        <li>Exclude personally identifiable information (PII) including human subjects and vehicle identifiers</li>
-                        <li>Maintain clear visibility of the entire structure without vegetation/object obstruction</li>
-                        <li>Utilize optimal daylight conditions to mitigate shadow interference</li>
-                        <li>Align camera sensors parallel to architectural planes to prevent perspective distortion</li>
-                        <li>Document all building facades through comprehensive multi-angle coverage</li>
+                        <li>NO! Face and Licence Plate</li>
+                        <li>NO! Obstructions</li>
+                        <li>NO! Shadows on the building</li>
+                        <li>NO! Distortion, ensuring parallelism!</li>
+                        <li>Make sure pictures are clear</li>
+                        <li>Photographing the building as a whole</li>
                     </ul>
                 </div>
                 {/* 错误和提示 */}
@@ -522,12 +550,13 @@ const Upload: React.FC = () => {
                         width: "100%",
                         background: isSubmitting ? "#aaa" : "#4da151",
                         color: "#fff",
-                        fontSize: "1.1rem",
+                        fontSize: "1.08rem",
                         fontWeight: 700,
                         border: "none",
                         borderRadius: 8,
                         padding: "13px 0",
                         cursor: isSubmitting ? "not-allowed" : "pointer",
+                        marginTop: "auto" // 保证按钮固定在底部
                     }}
                 >
                     {isSubmitting ? "submitting..." : "Submit"}
@@ -535,6 +564,273 @@ const Upload: React.FC = () => {
             </div>
         </div>
     );
-};
+
+
+
+//     return (
+//         <div
+//             style={{
+//                 height: "100%",         // 让内容充满剩余空间
+//                 width: "100%",
+//                 overflowY: "auto",      // 出现竖向滚动条
+//                 background: "#FFF8E1",
+//             }}
+//         >
+//
+//             <div
+//                 style={{
+//                     maxWidth: 680,
+//                     width: "95%",
+//                     margin: "0 auto",
+//                     padding: "3vw 0.5vw",
+//                     boxSizing: "border-box",
+//                 }}
+//             >
+//                 <h1
+//                     style={{
+//                         fontSize: "2rem",
+//                         fontWeight: 700,
+//                         margin: "18px 0"
+//                     }}
+//                 >
+//                     Upload Building Photos
+//                 </h1>
+//                 {/* 地址输入和搜索 */}
+//                 <div style={{ marginBottom: 14 }}>
+//                     <label htmlFor="address"
+//                         style={{
+//                             display: "block",
+//                             fontWeight: 500,
+//                             fontSize: "1.15rem",
+//                             marginBottom: 4,
+//                         }}
+//                     >
+//                         Please enter the address of the building to be registered (Darmstadt only)
+//                     </label>
+//                     <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+//                         <input
+//                             id="address"
+//                             type="text"
+//                             value={address}
+//                             onChange={(e) => setAddress(e.target.value)}
+//                             placeholder="Type the address or click on the map to select."
+//                             style={{
+//                                 width: "100%",
+//                                 fontSize: "1rem",
+//                                 padding: "0.6em 0.8em",
+//                                 border: "1px solid #aaa",
+//                                 borderRadius: 5,
+//                                 boxSizing: "border-box",
+//                                 maxWidth: "420px",
+//                                 minWidth: "0px"
+//                             }}
+//                             onKeyDown={(e) => {
+//                                 if (e.key === "Enter") handleAddressSearch();
+//                             }}
+//                         />
+//                         <button
+//                             onClick={handleAddressSearch}
+//                             style={{
+//                                 background: "#60a6fd",
+//                                 color: "#fff",
+//                                 border: "none",
+//                                 borderRadius: 5,
+//                                 padding: "0.5em 1.3em",
+//                                 fontSize: "1rem",
+//                                 cursor: "pointer",
+//                                 flexShrink: 0,
+//                             }}
+//                         >
+//                              Search
+//                         </button>
+//                     </div>
+//                 </div>
+//                 {/* map */}
+//                 <div
+//                     style={{
+//                         width: "100%",
+//                         height: "35vw",
+//                         maxHeight: 350,
+//                         minHeight: 220,
+//                         borderRadius: 16,
+//                         overflow: "hidden",
+//                         marginBottom: 14,
+//                         border: "1px solid #eee",
+//                         background: "#e0e0e0",
+//                     }}
+//                 >
+//                     {latlng ? (
+//                         <MapContainer
+//                             center={latlng}
+//                             zoom={18}
+//                             style={{ width: "100%", height: "100%" }}
+//                             scrollWheelZoom={true}
+//                         >
+//                             <TileLayer
+//                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+//                                 attribution="&copy; OpenStreetMap contributors"
+//                             />
+//                             <Marker
+//                                 position={latlng}
+//                                 icon={markerIcon}
+//                                 draggable={true}
+//                                 eventHandlers={{
+//                                     dragend: handleMarkerDragEnd,
+//                                 }}
+//                             ></Marker>
+//                             <SetMapRef />
+//                             <LocationPicker />
+//                         </MapContainer>
+//                     ) : (
+//                         <div
+//                             style={{
+//                                 width: "100%",
+//                                 height: "100%",
+//                                 display: "flex",
+//                                 alignItems: "center",
+//                                 justifyContent: "center",
+//                                 color: "#888",
+//                                 fontSize: 20,
+//                             }}
+//                         >
+//                             {locating ? "Locating..." : "Map loading failed."}
+//                         </div>
+//                     )}
+//                 </div>
+//                 {/* Upload area 上传区 */}
+//                 <div style={{ marginBottom: 12,display: "flex", flexWrap: "wrap", gap: 10 }}>
+//                     <button
+//                         onClick={handleTakePhoto}
+//                         style={{
+//                             fontSize: 16,
+//                             padding: "6px 12px",
+//                             borderRadius: 7,
+//                             border: "1px solid #888",
+//                             background: "#fffde7",
+//                             cursor: "pointer",
+//                         }}
+//                     >
+//                         <span role="img" aria-label="camera">📷</span> Shooting and upload
+//                     </button>
+//                     <button
+//                         onClick={handleSelectFromGallery}
+//                         style={{
+//                             fontSize: 16,
+//                             padding: "6px 12px",
+//                             borderRadius: 7,
+//                             border: "1px solid #888",
+//                             background: "#fffde7",
+//                             cursor: "pointer",
+//                         }}
+//                     >
+//                         <span role="img" aria-label="gallery">🖼️</span> Album upload
+//                     </button>
+//                     <input
+//                         type="file"
+//                         ref={fileInputRef}
+//                         accept="image/*"
+//                         multiple
+//                         style={{ display: "none" }}
+//                         onChange={handleFileChange}
+//                     />
+//                 </div>
+//                 {/* 照片缩略图 */}
+//                 <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10,overflowX: "auto",}}>
+//                     {photos.map((photo) => (
+//                         <div key={photo.id} style={{ position: "relative" }}>
+//                             <img
+//                                 src={photo.previewUrl}
+//                                 alt="thumbnail image"
+//                                 style={{
+//                                     width: 80,
+//                                     height: 80,
+//                                     objectFit: "cover",
+//                                     borderRadius: 8,
+//                                     border: "1px solid #ddd",
+//                                     display: "block"
+//                                 }}
+//                             />
+//                             <button
+//                                 onClick={() => removePhoto(photo.id)}
+//                                 style={{
+//                                     position: "absolute",
+//                                     top: 1,
+//                                     right: 1,
+//                                     width: 22,
+//                                     height: 22,
+//                                     borderRadius: "50%",
+//                                     border: "none",
+//                                     background: "#ee9292",
+//                                     color: "#fff",
+//                                     fontSize: 14,
+//                                     cursor: "pointer",
+//                                     lineHeight: "20px",
+//                                     zIndex: 2,
+//                                 }}
+//                                 title="delete photo"
+//                             >
+//                                 ×
+//                             </button>
+//                         </div>
+//                     ))}
+//                 </div>
+//                 {/* 照片要求说明 */}
+//                 <div
+//                     style={{
+//                         fontSize: "1rem",
+//                         background: "#fffde7",
+//                         borderRadius: 8,
+//                         padding: "10px 16px",
+//                         marginBottom: 20,
+//                         border: "1px solid #f5e79e",
+//                         boxSizing: "border-box"
+//                     }}
+//                 >
+//                     <b>Photo shooting requirements：</b>
+//                     <ul style={{ paddingLeft: 22, margin: 0 }}>
+//                         <li>Exclude personally identifiable information (PII) including human subjects and vehicle identifiers</li>
+//                         <li>Maintain clear visibility of the entire structure without vegetation/object obstruction</li>
+//                         <li>Utilize optimal daylight conditions to mitigate shadow interference</li>
+//                         <li>Align camera sensors parallel to architectural planes to prevent perspective distortion</li>
+//                         <li>Document all building facades through comprehensive multi-angle coverage</li>
+//                     </ul>
+//                 </div>
+//                 {/* 错误和提示 */}
+//                 {error && (
+//                     <div
+//                         style={{
+//                             background: error.includes("successful") ? "#e1f7d5" : "#ffd6d6",
+//                             color: error.includes("successful") ? "#237a00" : "#b71c1c",
+//                             padding: "8px 16px",
+//                             marginBottom: 10,
+//                             borderRadius: 6,
+//                             fontWeight: 500,
+//                         }}
+//                     >
+//                         {error}
+//                     </div>
+//                 )}
+//                 {/* 提交 */}
+//                 <button
+//                     onClick={handleSubmit}
+//                     disabled={isSubmitting}
+//                     style={{
+//                         width: "100%",
+//                         background: isSubmitting ? "#aaa" : "#4da151",
+//                         color: "#fff",
+//                         fontSize: "1.1rem",
+//                         fontWeight: 700,
+//                         border: "none",
+//                         borderRadius: 8,
+//                         padding: "13px 0",
+//                         cursor: isSubmitting ? "not-allowed" : "pointer",
+//                     }}
+//                 >
+//                     {isSubmitting ? "submitting..." : "Submit"}
+//                 </button>
+//             </div>
+//         </div>
+//     );
+ };
 
 export default Upload;
