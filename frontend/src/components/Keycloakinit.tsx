@@ -7,7 +7,8 @@ import {routes} from "@keycloak/keycloak-account-ui/lib/routes";
 
 import axios from "axios";
 
-
+/**initial Keycloak client, set user_id, auth status
+ * **/
 const KeycloakInit = () => {
 
     const {auth,setAuth,user_id,setUserID,authLoading,setAuthLoading,setToken}=useAuthHook();
@@ -29,6 +30,10 @@ const KeycloakInit = () => {
     }, [user_id,auth]);
 
 
+    /**
+     * callback function use to take Keycloak token,and reference user token into token from useAuthHook()
+     * @param tokens: keyclaok give back user token
+     * */
     const onKeycloakTokens = (tokens:any) => {
         const {token} = tokens || {};
         try{
@@ -51,6 +56,11 @@ const KeycloakInit = () => {
         }
     };
 
+    /** if normal user as admin change or from admin to normal user,
+     *  that will automatic change,which role in DBMS storage
+     *  @param user_id: which user loaded
+     *  @param role: which role in keycloak set
+     * */
     const uploadRole =async (user_id:any,role="user")=>{
          const url=`http://127.0.0.1:8000/users/update_user`;
          const payload={user_id, role}
@@ -74,6 +84,10 @@ const KeycloakInit = () => {
          }
     }
 
+    /**
+     * check user information in DBMS, if no save that in DBMS
+     * @param user_id: which user
+     * */
     const checkUser=async (user_id:any)=>{
         const url=`http://127.0.0.1:8000/users/check_user`;
         try{
@@ -88,6 +102,10 @@ const KeycloakInit = () => {
         }
     }
 
+    /**
+     * check user role consistency in Keycloak and in DBMS
+     * @param user_id: which user
+     * */
     const checkRole=async (user_id:any)=>{
         const url=`http://127.0.0.1:8000/users/check_role`;
         try{
@@ -105,6 +123,10 @@ const KeycloakInit = () => {
             console.error("Something wrong with checking role ：", error);
         }
     }
+    /**
+     * send user information to backend and save in DBMS
+     * @param user_id: which user
+     * */
     const saveUser=async (userInfo:any)=>{
         const url=`http://127.0.0.1:8000/users/save_user`;
         const payload={

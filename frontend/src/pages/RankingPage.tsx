@@ -17,14 +17,18 @@ import CircularProgress from "@mui/material/CircularProgress";
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import Pagination from '@mui/material/Pagination';
 
-
+/**
+ * a class form user, because user ranking in DBMS storage
+ * */
 type User={
     user_id:string,
     username:string,
     point:string,
     rank:number,
 }
-
+/**
+ *take backend in frontend storage
+ * */
 type UserRanking={
     total:number,
     page:number,
@@ -32,9 +36,13 @@ type UserRanking={
     total_page:number,
     users:User[],
 }
-
+/**
+ * Ranking page is to show Point System and how,which user in ranking
+ * */
 const RankingPage =()=>{
 
+    /**default infomation
+     * */
     const defautUser:User={
         user_id: " - ",
         username:" - ",
@@ -66,7 +74,11 @@ const RankingPage =()=>{
         get_user(user_id);
     }, []);
 
-
+    /**
+     * get all user ranking from DBMS and set all users in UserRanking
+     * @param page: actuelle page, default= 1
+     * @param limit: how many user in a page to show
+     * */
     const get_users=async (page=1,limit=10) => {
         try{
             const response = await axios.get<UserRanking>(url+"/users/get_all_user_after_order",
@@ -87,6 +99,10 @@ const RankingPage =()=>{
         }
     }
 
+    /**
+     * get self user infomation, ranking and put it into local
+     * @param user_id: use to take user infomation from DBMS
+     * */
     const get_user=async (user_id:string) => {
         try {
             const response = await axios.get(url+`/users/get_user`,{params:{user_id:user_id}});

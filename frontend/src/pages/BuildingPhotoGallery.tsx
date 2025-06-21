@@ -48,12 +48,19 @@ const mockResults = [
     "Magdalenenstraße 8, 64289 Darmstadt",
 ].sort((a,b)=>a.localeCompare(b));
 
+/**
+ * type Dataform from DBMS
+ * */
 type BuildingInfo = {
     address: string;
     photoNr: number;
     updateTime: string;
 };
 
+/**
+ *  show user which photo under which address has in DBMS storage.
+ *  user can first 9 photo preview (order follow time )and can see all photo in View ALL
+ * */
 const BuildingPhotoGallery=()=>{
 
     const now = new Date();
@@ -83,7 +90,9 @@ const BuildingPhotoGallery=()=>{
         setIsLoading(true);
         setProgress(0);
 
-
+        /**
+         * fetch Address data from DBMS
+         * */
         const fetchAllData=async ()=>{
             try {
 
@@ -94,27 +103,28 @@ const BuildingPhotoGallery=()=>{
                     updateTime: item.last_update_time,
                 }));
 
-
+                //address follow Dictionary order
                 raw_list.sort((a: BuildingInfo, b: BuildingInfo) => a.address.localeCompare(b.address));
 
+                //take a address list
                 const addrList = raw_list.map(item=>item.address);
                 setAllAddresses(addrList);
                 setSearchResult([...addrList]);
                 const total = addrList.length;
 
 
+
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
                 raw_list.forEach((item,idx)=>{
                     console.log("infoMat item:",item);
 
-
+                    // Time format to change
                     infoMap[item.address]={
                         updateTime:formatTime(item.updateTime)||"unknow",
                         photoNr:item.photoNr
                     }
 
                 })
-
 
                 setPhotoInfoMap(infoMap);
 
@@ -326,11 +336,11 @@ const BuildingPhotoGallery=()=>{
             </Box>
             {/*All photo Dialog */}
             <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
-            <Button
-                variant="outlined"
-                onClick={()=>{navigat("/dashboard");}}
-                sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}
-            >Exit</Button>
+            {/*<Button*/}
+            {/*    variant="outlined"*/}
+            {/*    onClick={()=>{navigat("/dashboard");}}*/}
+            {/*    sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}*/}
+            {/*>Exit</Button>*/}
         </Box>
     )
 

@@ -4,14 +4,14 @@ import React, {useEffect, createContext, useContext, useState,useRef, ReactNode}
 
 // Defining Context Data Structures
 interface AuthContextProps {
-    auth: boolean;                     // Is the current user logged in
-    setAuth: (value: boolean) => void; // Methods for updating authentication status
-    user_id: string;                    //storage keycloak user id
-    setUserID: (value: string) => void; // setting keycloak user id to user_id
-    authLoading: boolean;
-    setAuthLoading: (value: boolean) => void;
-    token:string;               //token
-    setToken:(value:any) => void;
+    auth: boolean;                            // Is the current user logged in
+    setAuth: (value: boolean) => void;        // Methods for updating authentication status
+    user_id: string;                          //storage keycloak user id
+    setUserID: (value: string) => void;       // setting keycloak user id to user_id
+    authLoading: boolean;                     // user in loading  status
+    setAuthLoading: (value: boolean) => void; // setting loading status
+    token: string;                            //token
+    setToken: (value: any) => void;
 }
 
 // setting default value

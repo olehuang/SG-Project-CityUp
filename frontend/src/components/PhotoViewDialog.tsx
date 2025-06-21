@@ -329,14 +329,18 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:0}}>
+                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
                                     src={photo.src}
                                     alt={photo.title}
                                     loading="lazy"
-                                    style={{borderRadius: 8,cursor: 'pointer',boxShadow:"0px 4px 12px rgba(0,0,0,0.2)"}}
+                                    style={{
+                                        borderRadius: 8,
+                                        cursor: 'pointer',
+                                        boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
+                                    }}
                                     onClick={() => handlePreview(photo)}
                                 />
                                 <Box
