@@ -40,12 +40,5 @@ app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(photo_routes.router, prefix="/photos", tags=["Photos"])
 app.include_router(building_routes.router, prefix="/buildings", tags=["Buildings"])
 
-print(" app 路由列表:")
-for r in app.routes:
-    if isinstance(r, APIRoute):
-        print(f"Path: {r.path}, Methods: {r.methods}, Name: {r.name}")
-    else:
-        print(f"Path: {getattr(r, 'path', 'N/A')}, Type: {type(r).__name__} (no methods)")
-
 if __name__ == '__main__':
     uvicorn.run(app, host="127.0.0.1", port=8000)

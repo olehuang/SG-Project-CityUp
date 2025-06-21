@@ -27,6 +27,96 @@ const iconMap: Record<string, React.ReactNode> = {
     "Photo Review": <RateReview fontSize="large" />,
 };
 
+const DashboardPage: React.FC = () => {
+    const [selected, setSelected] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const { token } = useAuthHook();
+    const [roles, setRoles] = useState<string[]>([]);
+
+    useEffect(() => {
+        const fetchRoles = async () => {
+            const userInfo= await KeycloakClient.extractUserInfo(token);
+            setRoles(userInfo?.roles||[]);
+            console.log(userInfo?.roles);
+        }
+        if (token!==null && token!==undefined) {
+            fetchRoles();
+        }
+    },[token]);
+
+    const topItems = [
+        { label: "Tutorial", desc: "Step-by-step guide" },
+        { label: "Upload", desc: "Add your photos here" },
+        { label: "Building Photo Gallery", desc: "Browse building photos" },
+    ];
+
+    const bottomItems = [
+        { label: "Product Introduction", desc: "Overview of the project" },
+        { label: "Upload History", desc: "See your past uploads" },
+        { label: "Photo Review", desc: "Review uploaded photos" },
+    ].filter((item) => item.label !== "Photo Review" || roles.includes("admin"));
+
+    const labelMap = (label: string) => {
+        switch (label) {
+            case "Tutorial": return "tutorial";
+            case "Upload": return "upload";
+            case "Building Photo Gallery": return "buildingPhoto";
+            case "Product Introduction": return "productIntroduction";
+            case "Upload History": return "uploadHistory";
+            case "Photo Review": return "photoReview";
+            case "Ranking": return "ranking";
+            default: return "";
+        }
+    };
+
+    const handleClick = (label: string) => {
+        navigate("/dashboard/" + labelMap(label));
+        setSelected((prev) => (prev === label ? null : label));
+    };
+
+    return (
+        <Box sx={styles.mainContainer}>
+            <Box sx={styles.contentContainer}>
+                <Box sx={styles.buttonGrid}>
+                    {[...topItems, ...bottomItems].map(({ label, desc }) => (
+                        <Box
+                            key={label}
+                            sx={styles.buttonContainer}
+                        >
+                            <Button
+                                onClick={() => handleClick(label)}
+                                variant="contained"
+                                sx={{
+                                    ...styles.buttonBase,
+                                    ...(selected === label ? styles.buttonSelected : {}),
+                                }}
+                            >
+                                {iconMap[label]}
+                                <Typography sx={styles.buttonTitle}>{label}</Typography>
+                                <Typography sx={styles.buttonDesc}>{desc}</Typography>
+                            </Button>
+                        </Box>
+                    ))}
+                </Box>
+                <Box sx={styles.rankingButtonContainer}>
+                    <Button
+                        onClick={() => handleClick("Ranking")}
+                        variant="contained"
+                        sx={styles.rankingButton}
+                    >
+                        <Checklist sx={styles.rankingButtonIcon} />
+                        <Box>
+                            <Typography sx={styles.rankingButtonTitle}>Rankings</Typography>
+                            <Typography sx={styles.rankingButtonDesc}>
+                                View user upload contribution ranking
+                            </Typography>
+                        </Box>
+                    </Button>
+                </Box>
+            </Box>
+        </Box>
+    );
+};
 const styles = {
     mainContainer: {
         ...pageBackgroundStyles.container,
@@ -131,97 +221,6 @@ const styles = {
         fontSize: 16,
         color: "#6D4C41",
     },
-};
-
-const DashboardPage: React.FC = () => {
-    const [selected, setSelected] = useState<string | null>(null);
-    const navigate = useNavigate();
-    const { token } = useAuthHook();
-    const [roles, setRoles] = useState<string[]>([]);
-
-    useEffect(() => {
-        const fetchRoles = async () => {
-            const userInfo= await KeycloakClient.extractUserInfo(token);
-            setRoles(userInfo?.roles||[]);
-            console.log(userInfo?.roles);
-        }
-        if (token!==null && token!==undefined) {
-            fetchRoles();
-        }
-    },[token]);
-
-    const topItems = [
-        { label: "Tutorial", desc: "Step-by-step guide" },
-        { label: "Upload", desc: "Add your photos here" },
-        { label: "Building Photo Gallery", desc: "Browse building photos" },
-    ];
-
-    const bottomItems = [
-        { label: "Product Introduction", desc: "Overview of the project" },
-        { label: "Upload History", desc: "See your past uploads" },
-        { label: "Photo Review", desc: "Review uploaded photos" },
-    ].filter((item) => item.label !== "Photo Review" || roles.includes("admin"));
-
-    const labelMap = (label: string) => {
-        switch (label) {
-            case "Tutorial": return "tutorial";
-            case "Upload": return "upload";
-            case "Building Photo Gallery": return "buildingPhoto";
-            case "Product Introduction": return "productIntroduction";
-            case "Upload History": return "uploadHistory";
-            case "Photo Review": return "photoReview";
-            case "Ranking": return "ranking";
-            default: return "";
-        }
-    };
-
-    const handleClick = (label: string) => {
-        navigate("/dashboard/" + labelMap(label));
-        setSelected((prev) => (prev === label ? null : label));
-    };
-
-    return (
-        <Box sx={styles.mainContainer}>
-            <Box sx={styles.contentContainer}>
-                <Box sx={styles.buttonGrid}>
-                    {[...topItems, ...bottomItems].map(({ label, desc }) => (
-                        <Box
-                            key={label}
-                            sx={styles.buttonContainer}
-                        >
-                            <Button
-                                onClick={() => handleClick(label)}
-                                variant="contained"
-                                sx={{
-                                    ...styles.buttonBase,
-                                    ...(selected === label ? styles.buttonSelected : {}),
-                                }}
-                            >
-                                {iconMap[label]}
-                                <Typography sx={styles.buttonTitle}>{label}</Typography>
-                                <Typography sx={styles.buttonDesc}>{desc}</Typography>
-                            </Button>
-                        </Box>
-                    ))}
-                </Box>
-                <Box sx={styles.rankingButtonContainer}>
-                    <Button
-                        onClick={() => handleClick("Ranking")}
-                        variant="contained"
-                        sx={styles.rankingButton}
-                    >
-                        <Checklist sx={styles.rankingButtonIcon} />
-                        <Box>
-                            <Typography sx={styles.rankingButtonTitle}>Rankings</Typography>
-                            <Typography sx={styles.rankingButtonDesc}>
-                                View user upload contribution ranking
-                            </Typography>
-                        </Box>
-                    </Button>
-                </Box>
-            </Box>
-        </Box>
-    );
 };
 
 export default DashboardPage;

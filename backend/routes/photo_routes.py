@@ -25,8 +25,6 @@ import zipfile
 router = APIRouter()
 photo_collection = MongoDB.get_instance().get_collection("photos")
 users_collection = MongoDB.get_instance().get_collection("users")
-print(" photos_routes.py 被加载了！")
-
 
 # 上传目录
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads/photos")
