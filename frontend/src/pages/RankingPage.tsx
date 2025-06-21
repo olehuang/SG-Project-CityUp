@@ -22,7 +22,7 @@ type User={
     user_id:string,
     username:string,
     point:string,
-    rank:string,
+    rank:number,
 }
 
 type UserRanking={
@@ -32,13 +32,14 @@ type UserRanking={
     total_page:number,
     users:User[],
 }
+
 const RankingPage =()=>{
 
     const defautUser:User={
         user_id: " - ",
         username:" - ",
         point:" 0 ",
-        rank: " -1 ",
+        rank: -1 ,
     }
     const {user_id}=useAuthHook();
     const [userRanking,setUserRanking]=useState<UserRanking>();//all users as a Array
@@ -46,8 +47,8 @@ const RankingPage =()=>{
     const [page,setPage] = useState(1);    // page Nr
     const [limit,setLimit] = useState(10);  // each page show limit User
     const [total,setTotal]=useState<number>(100); //total
-    const totalPages = userRanking?.total_page || 1;
-    const[loading,setLoading]=useState<boolean>(false);
+    const totalPages = userRanking?.total_page || 1; // how many pages will show, default 1
+    const [loading,setLoading]=useState<boolean>(false); //
     const [ranking,setRanking]=useState<number>();
     const [getRankingError,setGetRankingError]=useState<string>("");
     const [privateUserError,setPrivateUserError]=useState<string>("");
@@ -64,6 +65,7 @@ const RankingPage =()=>{
         setLoading(true);
         get_user(user_id);
     }, []);
+
 
     const get_users=async (page=1,limit=10) => {
         try{
@@ -114,7 +116,7 @@ const RankingPage =()=>{
                 <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>User
                     Name: {user.username }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Ranking: {user.rank!==" -1 "? user.rank: "not in Ranking " }</Typography>
+                    Ranking: {user.rank!== -1 ? user.rank: "not in Ranking " }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
                     Point: { user.point}</Typography>
                 <Button sx={{marginLeft: "auto"}}
@@ -164,7 +166,7 @@ const RankingPage =()=>{
                             >
                                 <TableCell >
                                     {(() => {
-                                    const rank = (page - 1) * limit + index + 1;
+                                    const rank = rowUser.rank;
                                     if (rank <= 3) {
                                         const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
                                         return <WorkspacePremiumRoundedIcon sx={{ color }} />;

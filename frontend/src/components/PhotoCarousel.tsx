@@ -39,6 +39,29 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                                            toggleSelect}) => {
 
     if(!photo) return null;
+    // change Time format to EU format
+    const formatTime =  (time:any)=>{
+        let formattedTime = "N/A";
+        if (time && time.trim()) {
+            try {
+                const timeStr = time+ (
+                    time.includes('Z') || time.includes('+') ? '' : 'Z'
+                );
+                formattedTime = new Intl.DateTimeFormat("de-DE",{
+                    timeZone:"Europe/Berlin",
+                    dateStyle:"medium",
+                    timeStyle:"medium",
+                }).format(new Date(timeStr));
+            } catch (error) {
+                console.error(error, "updateTime:", time);
+                formattedTime = "Invalid Date";
+            }finally {
+                return formattedTime;
+            }
+        }
+
+    }
+
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
             <Box sx={{
@@ -75,7 +98,8 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             style={{
                                 maxWidth: "90%",
                                 maxHeight: "80vh",
-                                borderRadius: 8
+                                borderRadius: 8,
+                                boxShadow:"0px 4px 12px rgba(0,0,0,0.2)"
                             }}
                         />
                     </Box>
@@ -84,10 +108,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             Upload User:  {photo?.uploader}
                         </Typography>
                         <Typography variant="body2" sx={{}}>
-                            Uploadtime : {new Intl.DateTimeFormat("de-DE",{
-                            dateStyle: "medium",
-                            timeStyle: "short",
-                            timeZone: "Europe/Berlin"}).format(new Date(photo?.uploadTime))}
+                            Uploadtime : {photo?.uploadTime}
                         </Typography>
                         {isSelecting && photo && (
                             <FormControlLabel

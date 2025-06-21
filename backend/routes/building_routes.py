@@ -31,6 +31,11 @@ async def get_photo_status_by_address():
 
         pipeline = [
             {
+                "$match":{
+                    "status":ReviewStatus.Approved.value
+                }
+            },
+            {
                 "$group": {
                     "_id": "$building_addr",
                     "photo_count": {"$sum": 1},
@@ -68,6 +73,7 @@ async def get_addr_with_status():
         for addr in add_list:
             status =status_map.get(addr,{"photo_count":0,"last_update_time":None})
             if status["photo_count"] == 0: continue;
+
             print("status:",status)
             combin.append({
                 "building_addr":addr,
