@@ -47,7 +47,7 @@ const RankingPage =()=>{
     const [page,setPage] = useState(1);    // page Nr
     const [limit,setLimit] = useState(10);  // each page show limit User
     const [total,setTotal]=useState<number>(100); //total
-    const totalPages = userRanking?.total_page || 1; // how many pages
+    const totalPages = userRanking?.total_page || 1; // how many pages will show, default 1
     const [loading,setLoading]=useState<boolean>(false); //
     const [ranking,setRanking]=useState<number>();
     const [getRankingError,setGetRankingError]=useState<string>("");
