@@ -21,11 +21,14 @@ import {
     Dialog,
     DialogTitle,
     DialogContent,
-    DialogContentText,
     DialogActions,
     Alert,
+    InputAdornment,
+    IconButton,
 } from "@mui/material";
+import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 10;
 
@@ -37,6 +40,7 @@ const statusColorMap: Record<string, "default" | "success" | "error" | "warning"
     approved: "success", // success color green
     rejected: "error", // error color red
 };
+
 
 interface UploadItem {
     photo_id: string;
@@ -70,14 +74,26 @@ const UploadHistory: React.FC = () => {
     const [statusFilter, setStatusFilter] = useState("all"); // Filter status (defaults to "all")
     const [page, setPage] = useState(1); // current page number (default page 1 of 1)
     const [error, setError] = useState<string | null>(null); // error message
-
     const [detailOpen, setDetailOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<UploadItem | null>(null);
+    const navigate = useNavigate();
+    // 【新增】搜索结果状态和原始数据缓存
+    const [originalUploads, setOriginalUploads] = useState<UploadItem[]>([]);
+    const [searchResults, setSearchResults] = useState<UploadItem[]>([]);
+    const [isSearchActive, setIsSearchActive] = useState(false);
 
-    // Debounce search term
+    // Debounce search term - 【修改】增加自动搜索触发
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
+            // 【新增】当搜索词变化时自动执行搜索
+            if (searchTerm.trim()) {
+                handleSearch();
+            } else {
+                // 【新增】清空搜索时恢复原始数据
+                setIsSearchActive(false);
+                setSearchResults([]);
+            }
         }, 500); // 500ms delay
 
         return () => clearTimeout(timer);
@@ -96,7 +112,8 @@ const UploadHistory: React.FC = () => {
                 limit: PAGE_SIZE.toString(),
             });
 
-            if (debouncedSearchTerm.trim()) {
+            // 【修改】仅在非搜索状态下才添加服务端搜索参数
+            if (!isSearchActive && debouncedSearchTerm.trim()) {
                 params.append("search", debouncedSearchTerm.trim());
             }
 
@@ -120,17 +137,22 @@ const UploadHistory: React.FC = () => {
             // 适配新的API响应格式
             if (result.photos && Array.isArray(result.photos)) {
                 setUploads(result.photos);
+                // 【新增】缓存原始数据用于客户端搜索
+                setOriginalUploads(result.photos);
                 setTotal(result.total_count|| 0);
             } else {
                 // 兼容旧的API响应格式
-                setUploads(Array.isArray(result) ? result : []);
-                setTotal(Array.isArray(result) ? result.length : 0);
+                const uploadsData = Array.isArray(result) ? result : [];
+                setUploads(uploadsData);
+                setOriginalUploads(uploadsData);
+                setTotal(uploadsData.length);
             }
 
         } catch (err) {
             console.error("Failed to fetch upload history:", err);
             setError("Failed to load upload history. Please try again.");
             setUploads([]);
+            setOriginalUploads([]);
             setTotal(0);
         } finally {
             setLoading(false);
@@ -139,8 +161,62 @@ const UploadHistory: React.FC = () => {
 
     useEffect(() => {
         fetchUploads();
-    }, [user_id, page, debouncedSearchTerm, statusFilter]);
+    }, [user_id, page, statusFilter]); // 【修改】移除debouncedSearchTerm依赖，改为手动搜索
 
+    // 【新增】客户端搜索功能
+    const handleSearch = () => {
+        if (!searchTerm.trim()) {
+            setSearchResults([]);
+            setIsSearchActive(false);
+            return;
+        }
+
+        const searchLower = searchTerm.toLowerCase();
+        const results = originalUploads.filter(item => {
+            // 搜索建筑地址
+            const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
+            // 搜索状态
+            const statusMatch = item.status.toLowerCase().includes(searchLower);
+            // 搜索photo_id
+            const photoIdMatch = item.photo_id.toLowerCase().includes(searchLower);
+            // 搜索反馈内容
+            const feedbackMatch = item.feedback?.toLowerCase().includes(searchLower);
+
+            return addressMatch || statusMatch || photoIdMatch || feedbackMatch;
+        });
+
+        setSearchResults(results);
+        setIsSearchActive(true);
+
+        console.log(`Search for "${searchTerm}" found ${results.length} results`);
+    };
+
+    // 【新增】高亮显示搜索文本
+    const highlightText = (text: string, searchTerm: string) => {
+        if (!searchTerm.trim() || !isSearchActive) return text;
+
+        const regex = new RegExp(`(${searchTerm})`, 'gi');
+        const parts = text.split(regex);
+
+        return parts.map((part, index) => {
+            if (regex.test(part)) {
+                return (
+                    <span
+                        key={index}
+                        style={{
+                            backgroundColor: '#ffeb3b',
+                            padding: '0 2px',
+                            borderRadius: '2px',
+                            fontWeight: 'bold'
+                        }}
+                    >
+                        {part}
+                    </span>
+                );
+            }
+            return part;
+        });
+    };
 
     //When the user clicks the View button, a Dialog pops up showing the upload details.
     //SelectedItem Stores the currently selected upload record.
@@ -154,15 +230,27 @@ const UploadHistory: React.FC = () => {
         setSelectedItem(null);
     };
 
-    //Handling changes to the search input box
+    //Handling changes to the search input box - 【修改】移除自动重置页面逻辑
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        setPage(1); // 重置到第一页
+        // 【修改】移除自动重置页面，改为在搜索时处理
     };
+
+    // 【新增】清除搜索功能
+    const handleClearSearch = () => {
+        setSearchTerm("");
+        setSearchResults([]);
+        setIsSearchActive(false);
+    };
+
     //Handling changes in status filtering
     const handleStatusFilterChange = (e: any) => {
         setStatusFilter(e.target.value);
         setPage(1); // 重置到第一页
+        // 【新增】状态筛选时，如果有搜索则重新搜索
+        if (isSearchActive && searchTerm.trim()) {
+            setTimeout(() => handleSearch(), 100);
+        }
     };
 
     const handlePageChange = (_: React.ChangeEvent<unknown>, value: number) => {
@@ -181,6 +269,32 @@ const UploadHistory: React.FC = () => {
         return status.charAt(0).toUpperCase() + status.slice(1);
     };
 
+    // 【新增】获取当前显示的数据 - 根据是否在搜索状态决定显示哪些数据
+    const getCurrentDisplayData = () => {
+        if (isSearchActive) {
+            // 如果在搜索状态，还需要根据状态筛选搜索结果
+            if (statusFilter === "all") {
+                return searchResults;
+            } else {
+                return searchResults.filter(item => item.status === statusFilter);
+            }
+        } else {
+            return uploads;
+        }
+    };
+
+    // 【新增】获取当前显示数据的总数
+    const getCurrentTotal = () => {
+        if (isSearchActive) {
+            return getCurrentDisplayData().length;
+        } else {
+            return total;
+        }
+    };
+
+    const currentDisplayData = getCurrentDisplayData();
+    const currentTotal = getCurrentTotal();
+
     return (
         <Box
             sx={{
@@ -191,26 +305,94 @@ const UploadHistory: React.FC = () => {
                 flexDirection: 'column'
             }}
         >
-            <Typography variant="h5" gutterBottom>
-                Upload History
-            </Typography>
-
+            <Button
+                variant="outlined"
+                onClick={() => navigate("/dashboard")}
+                size="small"
+                sx={{
+                    position: "fixed", // 让按钮固定在屏幕右下角
+                    bottom: 20, // 距离底部 20px
+                    right: 20, // 距离右侧 20px
+                    borderRadius: 10,
+                    textTransform: "none",
+                    fontWeight: "bold",
+                    fontSize: 13,
+                    borderColor: "#5D4037",
+                    color: "#5D4037",
+                    px: 3,
+                    py: 1.2,
+                    mb: 2,
+                    alignSelf: "flex-start",
+                    "&:hover": {
+                        borderColor: "#4E342E",
+                        backgroundColor: "#FFF8E1",
+                    }
+                }}
+            >
+                ← Back to Dashboard
+            </Button>
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
                 </Alert>
             )}
-            {/* Let users search for uploaded records by building address. */}
+
+            {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
             <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0 }}>
                 <TextField
-                    label="Search by building address"
+                    label="Search by building address, status, or photo ID"
                     variant="outlined"
                     size="small"
                     fullWidth
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    placeholder="Enter building address to search..."
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                            handleSearch();
+                        }
+                    }}
+                    placeholder="Enter search term..."
+                    InputProps={{
+                        startAdornment: (
+                            <InputAdornment position="start">
+                                <SearchIcon color="action" />
+                            </InputAdornment>
+                        ),
+                        endAdornment: (
+                            <InputAdornment position="end">
+                                {searchTerm && (
+                                    <>
+                                        <IconButton
+                                            size="small"
+                                            onClick={handleClearSearch}
+                                            edge="end"
+                                            sx={{ mr: 0.5 }}
+                                        >
+                                            <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                                Clear
+                                            </Typography>
+                                        </IconButton>
+                                        <IconButton
+                                            size="small"
+                                            onClick={handleSearch}
+                                            edge="end"
+                                        >
+                                            <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
+                                                Search
+                                            </Typography>
+                                        </IconButton>
+                                    </>
+                                )}
+                            </InputAdornment>
+                        )
+                    }}
+                    sx={{
+                        '& .MuiOutlinedInput-root': {
+                            borderRadius: '8px',
+                        }
+                    }}
                 />
+
                 {/* Status filter drop-down menu */}
                 <FormControl size="small" sx={{ minWidth: 160 }}>
                     <InputLabel>Status</InputLabel>
@@ -228,13 +410,27 @@ const UploadHistory: React.FC = () => {
                 </FormControl>
             </Box>
 
+            {/* 【新增】搜索结果提示 */}
+            {isSearchActive && (
+                <Box sx={{ mb: 2 }}>
+                    <Alert severity="info" sx={{ py: 1 }}>
+                        Found {currentDisplayData.length} result{currentDisplayData.length !== 1 ? 's' : ''} for "{searchTerm}"
+                        {/* {statusFilter !== "all" && ` with status "${getStatusDisplayName(statusFilter)}"`}*/}
+                        {statusFilter !== "all" && (
+                            <> with status "<strong>{getStatusDisplayName(statusFilter)}</strong>"</>
+                        )}
+
+                    </Alert>
+                </Box>
+            )}
+
             {loading ? (
                 <Box display="flex" justifyContent="center" mt={4}>
                     <CircularProgress />
                 </Box>
             ) : (
                 <>
-                    {/* 表格数据 */}
+                    {/* 表格数据 - 【修改】使用当前显示数据 */}
                     <TableContainer
                         component={Paper}
                         sx={{
@@ -249,12 +445,12 @@ const UploadHistory: React.FC = () => {
                                     <TableCell>Image</TableCell>
                                     <TableCell>Building Address</TableCell>
                                     <TableCell>Status</TableCell>
-                                    <TableCell>Uploaded At</TableCell>
+                                    <TableCell align="center">Uploaded At</TableCell>
                                     <TableCell>Action</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {uploads.map((item) => (
+                                {currentDisplayData.map((item) => (
                                     <TableRow key={item.photo_id}>
                                         <TableCell>
                                             {item.image_url ? (
@@ -262,8 +458,8 @@ const UploadHistory: React.FC = () => {
                                                     src={item.image_url}
                                                     alt="upload"
                                                     style={{
-                                                        width: 100,
-                                                        height: 60,
+                                                        width: 150,
+                                                        height: 100,
                                                         objectFit: "cover",
                                                         borderRadius: 4,
                                                         border: "1px solid #ddd"
@@ -275,8 +471,8 @@ const UploadHistory: React.FC = () => {
                                             ) : (
                                                 <Box
                                                     sx={{
-                                                        width: 100,
-                                                        height: 60,
+                                                        width: 150,
+                                                        height: 100,
                                                         backgroundColor: "#f5f5f5",
                                                         display: "flex",
                                                         alignItems: "center",
@@ -290,11 +486,14 @@ const UploadHistory: React.FC = () => {
                                             )}
                                         </TableCell>
                                         <TableCell>
-                                            {item.building_addr || "N/A"}
+                                            {/* 【新增】高亮显示搜索结果 */}
+                                            {item.building_addr ?
+                                                highlightText(item.building_addr, searchTerm) : "N/A"
+                                            }
                                         </TableCell>
                                         <TableCell>
                                             <Chip
-                                                label={getStatusDisplayName(item.status)}
+                                                label={highlightText(getStatusDisplayName(item.status), searchTerm)}
                                                 color={statusColorMap[item.status] || "default"}
                                                 size="small"
                                             />
@@ -313,11 +512,14 @@ const UploadHistory: React.FC = () => {
                                         </TableCell>
                                     </TableRow>
                                 ))}
-                                {uploads.length === 0 && !loading && (
+                                {currentDisplayData.length === 0 && !loading && (
                                     <TableRow>
                                         <TableCell colSpan={5} align="center">
                                             <Typography variant="body2" color="textSecondary">
-                                                No records found.
+                                                {isSearchActive ?
+                                                    `No records found matching "<strong>{searchTerm}</strong>".` :
+                                                    "No records found."
+                                                }
                                             </Typography>
                                         </TableCell>
                                     </TableRow>
@@ -326,22 +528,34 @@ const UploadHistory: React.FC = () => {
                         </Table>
                     </TableContainer>
 
-                    {total > PAGE_SIZE && (
+                    {/* 【修改】分页 - 根据搜索状态调整分页逻辑 */}
+                    {!isSearchActive && currentTotal > PAGE_SIZE && (
                         <Box mt={2} display="flex" justifyContent="center">
                             <Pagination
-                                count={Math.ceil(total / PAGE_SIZE)}
+                                count={Math.ceil(currentTotal / PAGE_SIZE)}
                                 page={page}
                                 onChange={handlePageChange}
                                 color="primary"
                                 showFirstButton
                                 showLastButton
+                                size="small"
+                                sx={{ mt: 2 }}
                             />
+                        </Box>
+                    )}
+
+                    {/* 【新增】搜索模式下的简单分页提示 */}
+                    {isSearchActive && currentDisplayData.length > 0 && (
+                        <Box mt={2} display="flex" justifyContent="center">
+                            <Typography variant="body2" color="textSecondary">
+                                Showing all {currentDisplayData.length} search results
+                            </Typography>
                         </Box>
                     )}
                 </>
             )}
 
-            {/* 详情弹窗 */}
+            {/* 详情弹窗 - 【修改】增加搜索高亮 */}
             <Dialog
                 open={detailOpen}
                 onClose={handleDetailClose}
@@ -360,15 +574,17 @@ const UploadHistory: React.FC = () => {
                         <Box>
                             <Box mb={2}>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Photo ID:</strong> {selectedItem.photo_id}
+                                    <strong>Photo ID:</strong> {highlightText(selectedItem.photo_id, searchTerm)}
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Building Address:</strong> {selectedItem.building_addr || "N/A"}
+                                    <strong>Building Address:</strong> {selectedItem.building_addr ?
+                                    highlightText(selectedItem.building_addr, searchTerm) : "N/A"
+                                }
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
                                     <strong>Status:</strong> {" "}
                                     <Chip
-                                        label={getStatusDisplayName(selectedItem.status)}
+                                        label={highlightText(getStatusDisplayName(selectedItem.status), searchTerm)}
                                         color={statusColorMap[selectedItem.status] || "default"}
                                         size="small"
                                     />
@@ -383,7 +599,7 @@ const UploadHistory: React.FC = () => {
                                 )}
                                 {selectedItem.feedback && (
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Feedback:</strong> {selectedItem.feedback}
+                                        <strong>Feedback:</strong> {highlightText(selectedItem.feedback, searchTerm)}
                                     </Typography>
                                 )}
                                 {selectedItem.review_time && (
@@ -403,7 +619,7 @@ const UploadHistory: React.FC = () => {
                                         alt="detail"
                                         style={{
                                             width: "100%",
-                                            maxHeight: 400,
+                                            maxHeight: 500,
                                             objectFit: "contain",
                                             borderRadius: 8,
                                             border: "1px solid #ddd"
@@ -421,6 +637,7 @@ const UploadHistory: React.FC = () => {
                     <Button onClick={handleDetailClose} variant="contained">
                         Close
                     </Button>
+
                 </DialogActions>
             </Dialog>
         </Box>
