@@ -32,6 +32,7 @@ type UserRanking={
     total_page:number,
     users:User[],
 }
+
 const RankingPage =()=>{
 
     const defautUser:User={
@@ -46,8 +47,8 @@ const RankingPage =()=>{
     const [page,setPage] = useState(1);    // page Nr
     const [limit,setLimit] = useState(10);  // each page show limit User
     const [total,setTotal]=useState<number>(100); //total
-    const totalPages = userRanking?.total_page || 1;
-    const[loading,setLoading]=useState<boolean>(false);
+    const totalPages = userRanking?.total_page || 1; // how many pages
+    const [loading,setLoading]=useState<boolean>(false); //
     const [ranking,setRanking]=useState<number>();
     const [getRankingError,setGetRankingError]=useState<string>("");
     const [privateUserError,setPrivateUserError]=useState<string>("");
@@ -64,6 +65,7 @@ const RankingPage =()=>{
         setLoading(true);
         get_user(user_id);
     }, []);
+
 
     const get_users=async (page=1,limit=10) => {
         try{
