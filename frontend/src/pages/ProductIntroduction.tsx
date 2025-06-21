@@ -3,6 +3,12 @@ import { Link } from "react-router-dom";
 import pageBackgroundStyles from "./pageBackgroundStyles";
 import React from "react";
 
+/**
+ * 产品介绍组件（ProductIntroduction）
+ * 用于展示CityUp项目简介、用户参与流程及操作入口，适配多端显示。
+ *
+ * Component for showing CityUp project introduction, participation steps, and main entry buttons. Responsive layout.
+ */
 const ProductIntroduction=()=>{
     return(
         <Box sx={pageBackgroundStyles.container}>
