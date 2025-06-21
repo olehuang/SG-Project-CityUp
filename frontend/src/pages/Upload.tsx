@@ -1,10 +1,8 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect,useLayoutEffect, useRef } from "react";
 import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
-
-
 
 // 默认达姆施塔特市中心 Default Darmstadt city centre
 const DEFAULT_CENTER: [number, number] = [49.8728, 8.6512];
@@ -15,7 +13,6 @@ interface UploadPhoto {
     file: File;
     previewUrl: string;
 }
-
 // 光标样式
 const markerIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
@@ -23,7 +20,18 @@ const markerIcon = L.icon({
     iconAnchor: [12, 41],
 });
 
+/**
+ * 建筑照片上传组件（Upload_Page）
+ * 实现地址定位、地图选点、照片选择/预览及上传，辅助3D城市模型优化。
+ *
+ * Component for uploading building photos: supports map/location selection, photo preview and upload for 3D city modeling.
+ */
 const Upload: React.FC = () => {
+    //分割线的组件
+    const [mapRect, setMapRect] = useState({ top: 0, height: 0 });
+    const mapDivRef = useRef<HTMLDivElement | null>(null);
+
+    //用户id，经纬度，地址，相片，处理错误，地址获取权限以及上传操作
     const { user_id, auth } = useAuthHook();
     const [latlng, setLatlng] = useState<[number, number] | null>(null);
     const [address, setAddress] = useState<string>("");
@@ -32,11 +40,11 @@ const Upload: React.FC = () => {
     const [locating, setLocating] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    //地图组件
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
 
-    // 1. 页面加载，自动定位
-    //TODO 1：需要先请求地址权限再自动定位当前位置
+    // 1. 页面加载，请求定位，自动定位
     useEffect(() => {
         setLocating(true);
         if (navigator.geolocation) {
@@ -55,7 +63,6 @@ const Upload: React.FC = () => {
             setLocating(false);
         }
     }, []);
-
     // 2. 反向地理编码：marker移动后刷新地址Reverse geocoding (coordinates to address)
     const reverseGeocode = async (lat: number, lng: number) => {
         try {
@@ -64,7 +71,7 @@ const Upload: React.FC = () => {
             );
             const data = await res.json();
             const addr = data.address || {};
-
+            //处理地址
             const locationString = [
                 addr.city,
                 addr.town,
@@ -79,7 +86,7 @@ const Upload: React.FC = () => {
                 .filter(Boolean)
                 .join(", ")
                 .toLowerCase();
-
+            //地址不在达姆时处理
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
@@ -103,9 +110,6 @@ const Upload: React.FC = () => {
         }
 
     };
-
-
-
     // 地图点击事件 + 光标marker拖拽 Process user map clicks, update markers and addresses.
     function LocationPicker() {
         useMapEvents({
@@ -117,8 +121,7 @@ const Upload: React.FC = () => {
         });
         return null;
     }
-
-    // 让 mapRef 获取当前map对象，用于搜索定位
+    // mapRef获取当前map对象，用于搜索定位
     function SetMapRef() {
         const map = useMap();
         useEffect(() => {
@@ -126,7 +129,6 @@ const Upload: React.FC = () => {
         }, [map]);
         return null;
     }
-
     // 3. 地址输入并且搜索和光标行动 Address Input and Search
     const handleAddressSearch = async () => {
         if (!address) {
@@ -155,9 +157,7 @@ const Upload: React.FC = () => {
             setError("The address search failed. Please try again later");
         }
     };
-
-    // 4. marker拖拽行动
-    /* 用户拖动 marker 后，自动反查新位置地址并校验范围。
+    /* 4. marker拖拽行动用户拖动 marker 后，自动反查新位置地址并校验范围。
      After the user drags the marker, the new location address is automatically
      back-checked and the range is verified.
      */
@@ -168,7 +168,6 @@ const Upload: React.FC = () => {
         reverseGeocode(pos.lat, pos.lng);
         setError(null);
     };
-
     // 拍照上传 Take a photo and upload it
     const handleTakePhoto = () => {
         if (fileInputRef.current) {
@@ -213,7 +212,6 @@ const Upload: React.FC = () => {
             setPhotos([...photos, ...newPhotos]);
 
     };
-
     // 删除略缩图中选取了的照片
     const removePhoto = (id: string) => {
         setPhotos(photos.filter((p) => p.id !== id));
@@ -222,7 +220,6 @@ const Upload: React.FC = () => {
     // 提交照片本身以及其信息到后端
     const handleSubmit = async () => {
         setError(null);
-
         if (!auth || !user_id) {
             setError("You must be logged in to upload photos.");
             return;
@@ -252,7 +249,6 @@ const Upload: React.FC = () => {
                 formData.append("photos", photo.file, photo.file.name);
             });
 
-
             const res = await fetch("http://localhost:8000/photos/", {
                 method: "POST",
                 body: formData,
@@ -270,48 +266,77 @@ const Upload: React.FC = () => {
         setIsSubmitting(false);
     };
 
+    // 监控地图高度，驱动分隔线同步
+    useLayoutEffect(() => {
+        const updateMapRect = () => {
+            if (mapDivRef.current && mapDivRef.current.parentElement) {
+                const rect = mapDivRef.current.getBoundingClientRect();
+                const parentRect = mapDivRef.current.parentElement.getBoundingClientRect();
+                setMapRect({
+                    top: rect.top - parentRect.top,
+                    height: rect.height
+                });
+            }
+        };
+        // 首次渲染和latlng变化时更新一次
+        updateMapRect();
+        // 添加窗口尺寸变化时的监听
+        window.addEventListener('resize', updateMapRect);
+        // 组件卸载时移除监听
+        return () => window.removeEventListener('resize', updateMapRect);
+    }, [latlng]);
 
     return (
         <div
             style={{
-                height: "100%",         // 让内容充满剩余空间
-                width: "100%",
-                overflowY: "auto",      // 出现竖向滚动条
+                width: "100vw",
+                height: "100vh",
+                minHeight: "100vh",
                 background: "#FFF8E1",
+                display: "flex",
+                flexDirection: "row",
+                alignItems: "flex-start",
+                justifyContent: "stretch",
+                boxSizing: "border-box",
+                overflowX: "auto",
+                overflowY: "auto",
+                position: "relative",
             }}
         >
-
+            {/* 左侧 2/3：地址输入和地图 */}
             <div
                 style={{
-                    maxWidth: 680,
-                    width: "95%",
-                    margin: "0 auto",
-                    padding: "3vw 0.5vw",
+                    flex: 2,
+                    minWidth: 340,
+                    maxWidth: "68vw",
+                    padding: "44px 38px 44px 6vw",
                     boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "flex-start",
                 }}
             >
                 <h1
                     style={{
                         fontSize: "2rem",
                         fontWeight: 700,
-                        margin: "18px 0"
+                        margin: "0 0 22px 0"
                     }}
                 >
                     Upload Building Photos
                 </h1>
                 {/* 地址输入和搜索 */}
-                <div style={{ marginBottom: 14 }}>
+                <div style={{ marginBottom: 16 }}>
                     <label htmlFor="address"
-                        style={{
-                            display: "block",
-                            fontWeight: 500,
-                            fontSize: "1.15rem",
-                            marginBottom: 4,
-                        }}
-                    >
+                           style={{
+                               display: "block",
+                               fontWeight: 400,
+                               fontSize: "0.8rem",
+                               marginBottom: 4,
+                           }}>
                         Please enter the address of the building to be registered (Darmstadt only)
                     </label>
-                    <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                    <div style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
                         <input
                             id="address"
                             type="text"
@@ -320,12 +345,12 @@ const Upload: React.FC = () => {
                             placeholder="Type the address or click on the map to select."
                             style={{
                                 width: "100%",
-                                fontSize: "1rem",
+                                fontSize: "0.8rem",
                                 padding: "0.6em 0.8em",
                                 border: "1px solid #aaa",
                                 borderRadius: 5,
                                 boxSizing: "border-box",
-                                maxWidth: "420px",
+                                maxWidth: "520px",
                                 minWidth: "0px"
                             }}
                             onKeyDown={(e) => {
@@ -345,22 +370,24 @@ const Upload: React.FC = () => {
                                 flexShrink: 0,
                             }}
                         >
-                             Search
+                            Search
                         </button>
                     </div>
                 </div>
-                {/* map */}
+                {/* 地图 */}
                 <div
+                    ref={mapDivRef}
                     style={{
                         width: "100%",
-                        height: "35vw",
-                        maxHeight: 350,
-                        minHeight: 220,
+                        height: "38vw",
+                        maxHeight: 520,
+                        minHeight: 340,
                         borderRadius: 16,
                         overflow: "hidden",
-                        marginBottom: 14,
+                        marginBottom: 8,
                         border: "1px solid #eee",
                         background: "#e0e0e0",
+                        transition: "height .2s"
                     }}
                 >
                     {latlng ? (
@@ -370,6 +397,7 @@ const Upload: React.FC = () => {
                             style={{ width: "100%", height: "100%" }}
                             scrollWheelZoom={true}
                         >
+                            {/* 换来源的话改url，但这里仅是符合Leaflet的情况。属性改成来源*/}
                             <TileLayer
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution="&copy; OpenStreetMap contributors"
@@ -401,8 +429,39 @@ const Upload: React.FC = () => {
                         </div>
                     )}
                 </div>
-                {/* Upload area 上传区 */}
-                <div style={{ marginBottom: 12,display: "flex", flexWrap: "wrap", gap: 10 }}>
+            </div>
+            {/* 悬浮分割线 */}
+            <div
+                style={{
+                    position: "absolute",
+                    left: "66.7%",  // 正好在2:1栏之间
+                    top: mapRect.top + "px",     // 和地图上沿对齐
+                    height: mapRect.height + "px",// 和地图等高
+                    width: "2px",
+                    background: "#e6dfcc",
+                    borderRadius: 2,
+                    zIndex: 10,
+                    pointerEvents: "none",
+                    boxShadow: "0 2px 10px rgba(200,180,140,0.07)",
+                    transition: "top .2s, height .2s",
+                }}
+            />
+            {/* 右侧 1/3：上传区 */}
+            <div
+                style={{
+                    flex: 1,
+                    minWidth: 260,
+                    maxWidth: "32vw",
+                    padding: "44px 6vw 44px 38px",
+                    boxSizing: "border-box",
+                    display: "flex",
+                    flexDirection: "column",
+                    background: "transparent",
+                    marginTop: "160px" // 调整上下对齐调这里
+                }}
+            >
+                {/* 拍照/相册上传 */}
+                <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
                     <button
                         onClick={handleTakePhoto}
                         style={{
@@ -414,7 +473,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="camera">📷</span> Shooting and upload
+                        <span role="img" aria-label="camera">📷</span> Camera
                     </button>
                     <button
                         onClick={handleSelectFromGallery}
@@ -427,7 +486,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="gallery">🖼️</span> Album upload
+                        <span role="img" aria-label="gallery">🖼️</span> Album
                     </button>
                     <input
                         type="file"
@@ -439,15 +498,15 @@ const Upload: React.FC = () => {
                     />
                 </div>
                 {/* 照片缩略图 */}
-                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 10,overflowX: "auto",}}>
+                <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 12, overflowX: "auto", }}>
                     {photos.map((photo) => (
                         <div key={photo.id} style={{ position: "relative" }}>
                             <img
                                 src={photo.previewUrl}
                                 alt="thumbnail image"
                                 style={{
-                                    width: 80,
-                                    height: 80,
+                                    width: 78,
+                                    height: 78,
                                     objectFit: "cover",
                                     borderRadius: 8,
                                     border: "1px solid #ddd",
@@ -478,25 +537,26 @@ const Upload: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                {/* 照片要求说明 */}
+                {/* 拍摄要求说明 */}
                 <div
                     style={{
-                        fontSize: "1rem",
+                        fontSize: "0.98rem",
                         background: "#fffde7",
                         borderRadius: 8,
-                        padding: "10px 16px",
-                        marginBottom: 20,
+                        padding: "9px 13px",
+                        marginBottom: 16,
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box"
                     }}
                 >
                     <b>Photo shooting requirements：</b>
                     <ul style={{ paddingLeft: 22, margin: 0 }}>
-                        <li>Exclude personally identifiable information (PII) including human subjects and vehicle identifiers</li>
-                        <li>Maintain clear visibility of the entire structure without vegetation/object obstruction</li>
-                        <li>Utilize optimal daylight conditions to mitigate shadow interference</li>
-                        <li>Align camera sensors parallel to architectural planes to prevent perspective distortion</li>
-                        <li>Document all building facades through comprehensive multi-angle coverage</li>
+                        <li>NO! Face and Licence Plate</li>
+                        <li>NO! Obstructions</li>
+                        <li>NO! Shadows on the building</li>
+                        <li>NO! Distortion, ensuring parallelism!</li>
+                        <li>Make sure pictures are clear</li>
+                        <li>Photographing the building as a whole</li>
                     </ul>
                 </div>
                 {/* 错误和提示 */}
@@ -522,12 +582,13 @@ const Upload: React.FC = () => {
                         width: "100%",
                         background: isSubmitting ? "#aaa" : "#4da151",
                         color: "#fff",
-                        fontSize: "1.1rem",
+                        fontSize: "1.08rem",
                         fontWeight: 700,
                         border: "none",
                         borderRadius: 8,
                         padding: "13px 0",
                         cursor: isSubmitting ? "not-allowed" : "pointer",
+                        marginTop: "auto"
                     }}
                 >
                     {isSubmitting ? "submitting..." : "Submit"}
@@ -535,6 +596,4 @@ const Upload: React.FC = () => {
             </div>
         </div>
     );
-};
-
-export default Upload;
+};export default Upload;
