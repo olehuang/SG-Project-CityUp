@@ -24,6 +24,7 @@ import BuildingPhotoGallery from "../pages/BuildingPhotoGallery";
 import {useEffect, useState} from "react";
 import KeycloakClient from "./keycloak";
 import {Checklist, History, Info, MenuBook, PhotoLibrary, RateReview} from "@mui/icons-material";
+import LogoutIcon from '@mui/icons-material/Logout';
 
 interface SidebarProps {
     open: boolean;
