@@ -8,7 +8,9 @@ import ListSubheader from '@mui/material/ListSubheader';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import KeycloakClient from "./keycloak";
-
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 
 
 const Profile = ({ token }: { token: string })=>{
@@ -49,7 +51,7 @@ const Profile = ({ token }: { token: string })=>{
             aria-labelledby="nested-list-subheader"
         >
             <ListItemButton onClick={handleClick} >
-                <ListItemIcon>
+                <ListItemIcon><AccountBoxIcon/>
                 </ListItemIcon>
                 <ListItemText primary="Profile" />
                 {openProfile ? <ExpandLess /> : <ExpandMore />}
@@ -57,13 +59,13 @@ const Profile = ({ token }: { token: string })=>{
             <Collapse in={openProfile} >
                 <List component="div" disablePadding>
                     <ListItemButton sx={{ pl: 4 }} onClick={handleToProfile} >
-                        <ListItemIcon>
+                        <ListItemIcon><AccountCircleIcon/>
                         </ListItemIcon>
                         <ListItemText primary="User Information" />
                     </ListItemButton>
                     {roles.includes('admin') &&
                         <ListItemButton sx={{ pl: 4 }} onClick={hanldAdminPanel}>
-                        <ListItemIcon>
+                        <ListItemIcon><SupervisorAccountIcon/>
                         </ListItemIcon>
                         <ListItemText primary="Admin Panel" />
                     </ListItemButton>}

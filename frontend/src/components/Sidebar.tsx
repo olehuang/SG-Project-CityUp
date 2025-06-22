@@ -23,6 +23,7 @@ import ProductIntroduction from "../pages/ProductIntroduction";
 import BuildingPhotoGallery from "../pages/BuildingPhotoGallery";
 import {useEffect, useState} from "react";
 import KeycloakClient from "./keycloak";
+import {Checklist, History, Info, MenuBook, PhotoLibrary, RateReview} from "@mui/icons-material";
 
 interface SidebarProps {
     open: boolean;
@@ -54,17 +55,18 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
             <Box sx={{ width: 250 }} role="presentation" >{/*onClose={onClose}*/}
                 <Box>
                     <List>
-                        <ListItem key={'dashboard'} disablePadding >
-                            <ListItemButton component={Link} to={"/dashboard"}>
-                                <ListItemIcon>
-                                </ListItemIcon>
-                                <ListItemText primary='dashboard' />
-                            </ListItemButton>
-                        </ListItem>
+                        {/*<ListItem key={'dashboard'} disablePadding >*/}
+                        {/*    <ListItemButton component={Link} to={"/dashboard"}>*/}
+                        {/*        <ListItemIcon>*/}
+                        {/*        </ListItemIcon>*/}
+                        {/*        <ListItemText primary='dashboard' />*/}
+                        {/*    </ListItemButton>*/}
+                        {/*</ListItem>*/}
+                        <Profile token={token}/>
                     </List>
                     <Divider />
                     <List>
-                        <Profile token={token}/>
+
                         {/* Upload 页面入口 */}
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
@@ -74,33 +76,34 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/tutorial">
-                                <ListItemIcon></ListItemIcon>
+                                <ListItemIcon><MenuBook  /></ListItemIcon>
                                 <ListItemText primary="Tutorial" />
                             </ListItemButton>
                         </ListItem>
+
                         <ListItemButton  component={Link} to="/dashboard/buildingPhoto">
-                            <ListItemIcon>
+                            <ListItemIcon><PhotoLibrary />
                             </ListItemIcon>
                             <ListItemText primary="Building Photo Gallery" />
                         </ListItemButton>
                         <ListItemButton component={Link} to="/dashboard/uploadHistory" >
-                            <ListItemIcon>
+                            <ListItemIcon><History  />
                             </ListItemIcon>
                             <ListItemText primary="History" />
                         </ListItemButton>
                         <ListItemButton  component={Link} to="/dashboard/productIntroduction">
-                            <ListItemIcon>
+                            <ListItemIcon><Info/>
                             </ListItemIcon>
                             <ListItemText primary="Product Introduction" />
                         </ListItemButton>
                         {roles.includes('admin') &&
                             <ListItemButton component={Link} to="/dashboard/photoReview">
-                                <ListItemIcon>
+                                <ListItemIcon><RateReview  />
                                 </ListItemIcon>
                                 <ListItemText primary="Photo Review " />
                             </ListItemButton>}
                         <ListItemButton  component={Link} to="/dashboard/ranking">
-                            <ListItemIcon>
+                            <ListItemIcon><Checklist />
                             </ListItemIcon>
                             <ListItemText primary="Rankings" />
                         </ListItemButton>
