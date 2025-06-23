@@ -157,7 +157,7 @@ const RankingPage =()=>{
                 <Button sx={{marginLeft: "auto"}}
                         size="large"
                         variant={"outlined"}
-                        onClick={toMyPosition}
+
                 > My Position
                 </Button>
                 <Button sx={{margin: "0 2% 0 0.5%"}}
