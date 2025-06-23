@@ -63,9 +63,6 @@ type BuildingInfo = {
  * */
 const BuildingPhotoGallery=()=>{
 
-    const now = new Date();
-
-    const photos = new Array(9).fill(null);
 
     const [leftWidth, setLeftWidth] = useState(70);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -87,6 +84,7 @@ const BuildingPhotoGallery=()=>{
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
+
         setIsLoading(true);
         setProgress(0);
 
@@ -97,30 +95,23 @@ const BuildingPhotoGallery=()=>{
             try {
 
                 const response =await axios.get(url+"/buildings/get_addr_with_status");
+
                 const raw_list: BuildingInfo[] = response.data.map((item: any) => ({
                     address: item.building_addr,
                     photoNr: item.photo_count,
-                    updateTime: item.last_update_time,
+                    updateTime: formatTime(item.last_update_time),
                 }));
-
-                //address follow Dictionary order
-                raw_list.sort((a: BuildingInfo, b: BuildingInfo) => a.address.localeCompare(b.address));
 
                 //take a address list
                 const addrList = raw_list.map(item=>item.address);
                 setAllAddresses(addrList);
                 setSearchResult([...addrList]);
-                const total = addrList.length;
-
-
 
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
                 raw_list.forEach((item,idx)=>{
-                    console.log("infoMat item:",item);
-
                     // Time format to change
                     infoMap[item.address]={
-                        updateTime:formatTime(item.updateTime)||"unknow",
+                        updateTime:item.updateTime,
                         photoNr:item.photoNr
                     }
 
