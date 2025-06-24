@@ -3,6 +3,7 @@ from fastapi import File
 import dotenv
 
 import db_entities
+import db_userEntities
 import routes.photo_routes
 from db_entities import MongoDB,Building,ReviewStatus,PhotoResponse,Photo
 from error_logging import log_error
@@ -53,6 +54,8 @@ async def get_photo_list(address:str,request:Request):
                             .to_list(length=None))
         result_photo_list = []
         for photo_doc in photo_list:
+            user =await db_userEntities.get_user(photo_doc["user_id"])
+            photo_doc["username"] = str( user.get("username"))
             photo_doc["photo_id"] = str(photo_doc["_id"])
             photo_doc["upload_time"] = str(photo_doc["upload_time"])
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"

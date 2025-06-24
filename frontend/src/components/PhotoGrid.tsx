@@ -14,6 +14,7 @@ interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
 }
@@ -24,6 +25,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [error, setError] = useState<string | null>(null); // error
     const [open,setOpen]=useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
+
 
     const { token } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
@@ -58,7 +60,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
-                    uploader: item.user_id,
+                    uploader_id:item.user_id,
+                    uploader: item.username,
                     uploadTime: formatTime(item.upload_time),
                 }));
                 setPhotos(formattedPhotos);
@@ -105,6 +108,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
+
     //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
         if(roles.includes("admin")){
@@ -125,15 +129,6 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             } catch (e: any) {
                 setError(e.message || "Unknown error");
             }
-        }
-    }
-    //show upload user name
-    const getUsername=async (user_id:string)=>{
-        try{
-            const response= await axios.get(`http://127.0.0.1:8000/users/get_user_name`, {params: {user_id:user_id}});
-            return response.data;
-        }catch (e:any) {
-            setError(e.message || "Unknown error");
         }
     }
 
@@ -208,7 +203,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                     <Typography variant="body1">Upload
                                         Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
                                     <Typography variant="body1">Upload
-                                        User: {getUsername(photos[selectedPhotoIndex].uploader)}</Typography>
+                                        User: {photos[selectedPhotoIndex].uploader}</Typography>
                                 </Box>
                                     <Button variant="contained"
                                             sx={{

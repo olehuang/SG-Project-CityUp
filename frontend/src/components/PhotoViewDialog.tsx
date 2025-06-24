@@ -28,6 +28,7 @@ interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
 }
@@ -82,31 +83,12 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
-                    uploader: item.user_id,
-                    uploadTime: item.upload_time
+                    uploader_id:item.user_id,
+                    uploader: item.username,
+                    uploadTime: formatTime(item.upload_time)
                 }));
 
-                const userIds: string[] = Array.from(new Set(data.map((p: any) => p.user_id)));
-                const userMap: Record<string, string> = {};
-
-                for (const userId of userIds) {
-                    try {
-                        const res = await axios.get("http://127.0.0.1:8000/users/get_user_name", {
-                            params: {user_id: userId},
-                        });
-                        userMap[userId] = res.data;
-                    } catch (e) {
-                        console.error(`Failed to fetch username for ${userId}`, e);
-                        userMap[userId] = "Unknown";
-                    }
-                }
-                const updatedPhotos = formattedPhotos.map(p => ({
-                    ...p,
-                    id: p.id,
-                    uploader: userMap[p.uploader] ?? "Unknown",
-                    uploadTime: formatTime(p.uploadTime)?? "Unknow"
-                }));
-                setPhotos(updatedPhotos);
+                setPhotos(formattedPhotos);
             } catch (err: any) {
                 setError(err.message || "Unknown error");
             } finally {

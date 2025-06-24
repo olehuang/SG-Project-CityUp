@@ -13,6 +13,7 @@ interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
 }
@@ -28,6 +29,7 @@ interface PhotoPreviewDialogProps {
     toggleSelect: (photoId: string) => void;
 }
 
+
 const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                                            open,
                                                            photo,
@@ -39,28 +41,6 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                                            toggleSelect}) => {
 
     if(!photo) return null;
-    // change Time format to EU format
-    const formatTime =  (time:any)=>{
-        let formattedTime = "N/A";
-        if (time && time.trim()) {
-            try {
-                const timeStr = time+ (
-                    time.includes('Z') || time.includes('+') ? '' : 'Z'
-                );
-                formattedTime = new Intl.DateTimeFormat("de-DE",{
-                    timeZone:"Europe/Berlin",
-                    dateStyle:"medium",
-                    timeStyle:"medium",
-                }).format(new Date(timeStr));
-            } catch (error) {
-                console.error(error, "updateTime:", time);
-                formattedTime = "Invalid Date";
-            }finally {
-                return formattedTime;
-            }
-        }
-
-    }
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -106,6 +86,9 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     <Box>
                         <Typography variant="body2" sx={{}}>
                             Upload User:  {photo?.uploader}
+                        </Typography>
+                        <Typography variant="body2" sx={{}}>
+                            Upload User id:  {photo?.uploader_id}
                         </Typography>
                         <Typography variant="body2" sx={{}}>
                             Uploadtime : {photo?.uploadTime}
