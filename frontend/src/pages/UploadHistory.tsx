@@ -258,10 +258,26 @@ const UploadHistory: React.FC = () => {
 
     const formatDate = (dateString: string) => {
         try {
-            return new Date(dateString).toLocaleString();
+            const timeStr =
+                dateString.includes("Z") || dateString.includes("+")
+                    ? dateString
+                    : dateString + "Z";
+
+            return new Intl.DateTimeFormat("de-DE", {
+                timeZone: "Europe/Berlin",
+                dateStyle: "medium",
+                timeStyle: "short",
+                hour12: false,
+            }).format(new Date(timeStr));
         } catch {
             return "Invalid date";
         }
+
+        //try {
+          //  return new Date(dateString).toLocaleString();
+        //} catch {
+          //  return "Invalid date";
+        //}
     };
     //Status Display Formatting
     const getStatusDisplayName = (status: string) => {
