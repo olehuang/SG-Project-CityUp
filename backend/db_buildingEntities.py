@@ -54,7 +54,7 @@ brief: give back all Building address from DB
 async def take_all_building_address():
     try:
         buildings=MongoDB.get_instance().get_collection("buildings")
-        building_list= await buildings.find({}, {"address": 1, "_id": 0}).to_list(length=None)
+        building_list= await buildings.find({}, {"address": 1, "_id": 0}).sort("address",1).to_list(length=None)
         buildings_address_list = [b["address"] for b in building_list if "address" in b]
         return buildings_address_list
     except Exception as e:

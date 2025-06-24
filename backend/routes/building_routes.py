@@ -26,9 +26,14 @@ async def get_all_build_addr():
 
 
 async def get_photo_status_by_address():
+    """
+    :return: a list with all photo status(addr, photoNr,last_Upload_time)
+    """
     try:
         photo = MongoDB.get_instance().get_collection("photos");
 
+        # Use pipeline to concatenate the address,
+        # number of pictures, and last upload time into a table
         pipeline = [
             {
                 "$match":{
@@ -46,7 +51,9 @@ async def get_photo_status_by_address():
         ]
         result_cursor = await photo.aggregate(pipeline)
         result=[]
+        # Convenient results, skipping elements with zero number of photos
         async for doc in result_cursor:
+            if doc["photo_count"] ==0:continue
             result.append({
                 "building_addr": str(doc["_id"]),
                 "photo_count": doc["photo_count"],
@@ -63,24 +70,7 @@ async def get_photo_status_by_address():
 @router.get("/get_addr_with_status")
 async def get_addr_with_status():
     try:
-        await db_buildingEntities.update_addr_from_photo()
-        add_list = await db_buildingEntities.take_all_building_address()
-
-        status = await get_photo_status_by_address()
-        status_map = {s["building_addr"]: s for s in status}
-
-        combin=[]
-        for addr in add_list:
-            status =status_map.get(addr,{"photo_count":0,"last_update_time":None})
-            if status["photo_count"] == 0: continue;
-
-            print("status:",status)
-            combin.append({
-                "building_addr":addr,
-                "photo_count":status["photo_count"],
-                "last_update_time":status["last_update_time"]
-            })
-        return combin
+         return await get_photo_status_by_address()
     except Exception as e:
         log_error("get_addr_with_status error:",traceback.format_exc(),
                   stack_data=traceback.format_exc(),
