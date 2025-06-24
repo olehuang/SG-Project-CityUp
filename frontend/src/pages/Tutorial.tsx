@@ -1,7 +1,7 @@
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import {
     Box,
     Typography,
@@ -114,8 +114,6 @@ const Tutorial = () => {
         }
     };
 
-    //如若搜索更加智能，比如支持模糊匹配或者更宽泛的关键词搜索，Levenshtein Distance算法，提高模糊匹配能力 添加 debounce()，避免搜索频繁触发，优化性能 让搜索支持多个关键词，如 "photo blurry" 同时匹配多个结果
-
     // Highlighting text
     const highlightText = (text: string, searchTerm: string) => {
         if (!searchTerm.trim()) return text;
@@ -192,7 +190,6 @@ const Tutorial = () => {
                                 </Typography>
                             </Box>
 
-                            {/* 示例图 1、2 */}
                             <Box sx={{ mt: 2 }}>
                                 <img
                                     src="/assets/withoutShadow.png"
@@ -468,9 +465,9 @@ const Tutorial = () => {
                                             alt="Filter status example"
                                             style={{
                                                 width: '100%',
-                                                maxWidth: 800,         // 不超过 800px
+                                                maxWidth: 800,
                                                 borderRadius: 8,
-                                                display: 'block'       // 避免图片靠边留空
+                                                display: 'block'
                                             }}
                                         />
                                     </Box>
@@ -508,7 +505,6 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* 3 */}
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
                                 <Typography
                                     variant="body1"
@@ -534,8 +530,6 @@ const Tutorial = () => {
                                     </Typography>
                                 </Box>
                             </Box>
-
-
                             <Box sx={{ mt: 2 }}>
                                 <img
                                     src="/assets/Pagination.png"
@@ -548,8 +542,6 @@ const Tutorial = () => {
                                     }}
                                 />
                             </Box>
-
-
                             {/* 4. Exit and return */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography
@@ -1284,7 +1276,7 @@ const Tutorial = () => {
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => {
+                            onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSearch();
                                 }
