@@ -204,6 +204,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
                                     <Typography variant="body1">Upload
                                         User: {photos[selectedPhotoIndex].uploader}</Typography>
+
                                 </Box>
                                     <Button variant="contained"
                                             sx={{
