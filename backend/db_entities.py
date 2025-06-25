@@ -107,6 +107,7 @@ class Photo:
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
                  review_time: Optional[datetime] = None,
+                 like:Optional[str]=None,#storage user_id, which user like this photo
                  _id: Optional[ObjectId] = None):
         self._id = _id or ObjectId()
         self.user_id = user_id
@@ -121,6 +122,7 @@ class Photo:
         self.feedback = feedback
         self.reviewer_id = reviewer_id
         self.review_time = review_time
+        self.like = like
 
     def to_dict(self):
         return {
@@ -136,7 +138,8 @@ class Photo:
             "status": self.status.value,
             "feedback": self.feedback,
             "reviewer_id": self.reviewer_id,
-            "review_time": self.review_time
+            "review_time": self.review_time,
+            "like": self.like
         }
 
     @classmethod
@@ -155,7 +158,8 @@ class Photo:
             status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),
             feedback=data.get("feedback"),
             reviewer_id = data.get("reviewer_id"),
-            review_time = data.get("review_time")
+            review_time = data.get("review_time"),
+            like=data.get("like")
         )
 
 
@@ -174,3 +178,4 @@ class PhotoResponse(BaseModel):
     feedback: Optional[str]
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
+    like: Optional[str]

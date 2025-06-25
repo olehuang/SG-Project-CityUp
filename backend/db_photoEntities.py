@@ -16,6 +16,9 @@ from typing import Optional, List
 
 
 
+photo_collection = MongoDB.get_instance().get_collection('photos')
+user_collection = MongoDB.get_instance().get_collection('users')
+buildings_collection = MongoDB.get_instance().get_collection('buildings')
 
 """
 :return a photo list under same address and status= Approved
@@ -81,18 +84,58 @@ async def get_first_nine_photo(address:str,request:Request):
         raise
 
 
+async def isLike(photo_id:str,user_id:str):
+    """
+    :brief : check user has been this photo already like or not
+    :param photo_id: id of photo
+    :param user_id: use to check if photo is like should be in like[] of photo.get("like“)
+    :return: boolean, if photo is already by this user liked return True,
+                      in other case return False
+    """
+    try:
+        photo = await photo_collection.find_one({"_id":photo_id})
+        if not photo:
+            log_error(f"photo :{photo_id} not exist", stack_data=traceback.format_exc(),
+                      time_stamp=datetime.now())
+            return False
+        like_list = photo.get("like") or []
+        return user_id in like_list
+    except Exception as e:
+        log_error(f'isLike: {e}', stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now())
+        raise
 
 
+async def like_photo(photo_id:str,user_id:str):
+    """
+    :brief : if frontend click like button, this function will be call,
+             than user_id of which user click like button will add in like[] of photo.
+             than photo owner 1 point add
+    :param photo_id: which photo will be like
+    :param user_id: which user_id will be in like of photo.get("like") add
+    """
+    try:
+        photo = await photo_collection.find_one({"_id":photo_id})
+        if not photo:
+            log_error("photo not exist",
+                                stack_data=traceback.format_exc(),
+                                time_stamp=datetime.now())
+            return {"error": f"photo {photo_id} not exist"}
+        if not (await isLike(photo_id,user_id)):
+            #get photo owner user_id
+            photo_owner = photo.get("user_id")
+            # insert like user_id of like user into like[] of this photo
+            await photo_collection.update_one(
+                {"_id":photo_id},
+                {"$addToSet":{"like":user_id}}
+            )
+            # update photo owner pointer with point 1
+            return await db_userEntities.update_user_point(photo_owner,1)
+        return {"message":"photo is already like"}
+    except Exception as e:
+        log_error(f'like_photo: {e}', stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now())
+        raise
 
-# async def get_binary_to_image(photo_id:str):
-#     try:
-#         collection = MongoDB.get_instance().get_collection('photos')
-#         photo_doc = await collection.find_one({'photo_id': photo_id})
-#         original_binary = record(photo_doc.get('image_data'))
-#
-#     except Exception as e:
-#         log_error(f'get_photo_data: {e}',
-#                   stack_data=traceback.format_exc(),
-#                   time_stamp=datetime.now())
-#         raise
+
 
