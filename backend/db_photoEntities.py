@@ -125,6 +125,7 @@ async def like_photo(photo_id:str,user_id:str):
             #get photo owner user_id
             photo_owner = photo.get("user_id")
             # insert like user_id of like user into like[] of this photo
+            if photo_owner == user_id: return {"error": f"photo owner can not like selves photo"}
             await photo_collection.update_one(
                 {"_id":photo_id},
                 {"$addToSet":{"like":user_id}}

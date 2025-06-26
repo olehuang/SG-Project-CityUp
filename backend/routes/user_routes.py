@@ -165,7 +165,7 @@ async def get_all_user_after_order(
 
         for idx, user in enumerate(all_users):
             point = user.get("point")
-
+            if point==0: continue
             if point != last_point:
                 aktual_rank = idx + 1
                 last_point = point
