@@ -1,11 +1,12 @@
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional,List
 
 from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
+from typing import Set
 # MongoDB初始化
 from pydantic import BaseModel
 from bson.binary import Binary
@@ -107,7 +108,7 @@ class Photo:
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
                  review_time: Optional[datetime] = None,
-                 like:Optional[str]=None,#storage user_id, which user like this photo
+                 like:Optional[Set[str]]=None,#storage user_id, which user like this photo
                  _id: Optional[ObjectId] = None):
         self._id = _id or ObjectId()
         self.user_id = user_id
@@ -122,7 +123,7 @@ class Photo:
         self.feedback = feedback
         self.reviewer_id = reviewer_id
         self.review_time = review_time
-        self.like = like
+        self.like = set(like) if like is not None else set()
 
     def to_dict(self):
         return {
@@ -139,7 +140,7 @@ class Photo:
             "feedback": self.feedback,
             "reviewer_id": self.reviewer_id,
             "review_time": self.review_time,
-            "like": self.like
+            "like": list(self.like)
         }
 
     @classmethod
@@ -159,7 +160,7 @@ class Photo:
             feedback=data.get("feedback"),
             reviewer_id = data.get("reviewer_id"),
             review_time = data.get("review_time"),
-            like=data.get("like")
+            like=set(data.get("like",[]))
         )
 
 
@@ -178,4 +179,5 @@ class PhotoResponse(BaseModel):
     feedback: Optional[str]
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
-    like: Optional[str]
+    like: Optional[List[str]]
+    canLike:Optional[bool] = None #new, tall frontend this user can like or not for this photo
