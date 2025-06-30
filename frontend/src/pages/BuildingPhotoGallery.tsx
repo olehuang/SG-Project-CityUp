@@ -327,11 +327,7 @@ const BuildingPhotoGallery=()=>{
             </Box>
             {/*All photo Dialog */}
             <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
-            {/*<Button*/}
-            {/*    variant="outlined"*/}
-            {/*    onClick={()=>{navigat("/dashboard");}}*/}
-            {/*    sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}*/}
-            {/*>Exit</Button>*/}
+
         </Box>
     )
 

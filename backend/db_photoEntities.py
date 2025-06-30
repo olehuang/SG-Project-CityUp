@@ -47,6 +47,7 @@ async def get_first_upload_time(address:str,request:Request):
 
 async def get_photo_list(address:str,request:Request,user_id:str=None):
     try:
+
         collection = MongoDB.get_instance().get_collection('photos')
         query = {
             'building_addr': address,
@@ -58,15 +59,26 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
                             .to_list(length=None))
         result_photo_list = []
         for photo_doc in photo_list:
+            photo_id = photo_doc["_id"]
             photo_doc["photo_id"] = str(photo_doc["_id"])
 
-            user =await db_userEntities.get_user(photo_doc["user_id"])
-            photo_doc["username"] = str(user.get("username"))
+            owner =await db_userEntities.get_user(photo_doc["user_id"])
+            photo_doc["username"] = str(owner.get("username"))
 
-            if user_id:# if argument more a user_id, can more a attribute return
-              is_Like =await isLike(photo_doc["photo_id"],user_id)
-              photo_doc["canLike"]= not is_Like
-            else:photo_doc["canLike"] = None
+            if user_id != None:# if argument more a user_id, can more a attribute return
+
+              # user already like this photo or not
+              is_like= user_id in photo_doc["like"]
+              print("is_like",is_like)
+              photo_doc["is_like"] = is_like
+
+              # user is photo owner or not
+              canLike= owner.get("user_id") !=user_id
+              photo_doc["canLike"]= canLike
+              print("photo_doc canLike",photo_doc["canLike"])
+
+              #count how many people like
+              photo_doc["likeCount"] =len(photo_doc["like"])
 
             photo_doc["upload_time"] = str(photo_doc["upload_time"])
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
@@ -102,14 +114,22 @@ async def isLike(photo_id:str,user_id:str):
     """
     try:
         #search one photo if photo and liked user user_id exsist
-        photo = await photo_collection.find_one({"_id":ObjectId(photo_id),"like":user_id})
+        print("isLike which photo:",photo_id)
+        if not isinstance(photo_id, ObjectId):
+            photo_id = ObjectId(photo_id)
+        photo = await photo_collection.find_one({"_id":photo_id})
         if not photo:
             log_error("photo not exist", stack_data=traceback.format_exc())
-            return False
-        return user_id in photo.get("like",[])
+            raise ValueError("Photo not found or user has not liked it")
+        islike =user_id in photo.get("like",[])
+        if photo.get("user_id") == user_id:return True
+        print("isLike:",islike)
+        return islike
     except Exception as e:
         log_error('Error bei function isLike', stack_data=traceback.format_exc())
-        raise e
+        raise
+
+
 
 
 async def like_photo(photo_id:str,user_id:str):
@@ -121,21 +141,25 @@ async def like_photo(photo_id:str,user_id:str):
     :param user_id: which user_id will be in like of photo.get("like") add
     """
     try:
-        photo = await photo_collection.find_one({"_id":ObjectId(photo_id)})
+        photoId=ObjectId(photo_id)
+        photo = await photo_collection.find_one({"_id":photoId})
         if not photo:
             log_error("photo not exist",
                                 stack_data=traceback.format_exc())
             raise HTTPException(status_code=404, detail=f"Photo not found")
         #get photo owner user_id
         photo_owner = photo.get("user_id")
+        print("photo_owner",photo_owner)
+        print("user_id",user_id)
         # insert like user_id of like user into like[] of this photo
         if photo_owner == user_id:
             return {"error": "photo owner can not like selves photo"}
 
         #if like user's user_id not in like[] = this user has no liek this photo
-        if not (user_id in photo.get("like") or []):
+        likes = photo.get("like")
+        if not (user_id in likes):
             await photo_collection.update_one(
-                {"_id":photo_id},
+                {"_id":photoId},
                 {"$addToSet":{"like":user_id}}
             )
             # update photo owner pointer with point 1
@@ -154,7 +178,8 @@ async def disLike(photo_id:str,user_id:str):
     :return:message
     """
     try:
-        photo = await photo_collection.find_one({"_id":ObjectId(photo_id)})
+        photoId=ObjectId(photo_id)
+        photo = await photo_collection.find_one({"_id":photoId})
         if not photo:
             log_error("photo not exist",
                       stack_data=traceback.format_exc())
@@ -166,9 +191,10 @@ async def disLike(photo_id:str,user_id:str):
             return {"error": "photo owner can not dislike selves photo"}
 
         #if like user's user_id not in like[] = this user has no liek this photo
-        if not (user_id in photo.get("like") or []):
+        likes = photo.get("like",[])
+        if (user_id in likes):
             await photo_collection.update_one(
-                {"_id":photo_id},
+                {"_id":photoId},
                 {"$pull":{"like":user_id}}
             )
             # update photo owner pointer with current point -1
@@ -178,4 +204,16 @@ async def disLike(photo_id:str,user_id:str):
         log_error('Error in function like_photo', stack_data=traceback.format_exc())
         raise
 
+
+async def initalLike():
+    """
+    :brief : init photo like[] of all photos as [] !!! do not easy reference
+    :return: none
+    """
+    try:
+        await photo_collection.update_many({}, {"$set": {"like": []}})
+        print("init photo like[] of all photos")
+    except Exception as e:
+        log_error('Error in function initalLike', stack_data=traceback.format_exc())
+        raise
 

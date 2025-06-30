@@ -1,15 +1,21 @@
-import React from "react";
+import React, {useState} from "react";
 import {
     Box,
     Dialog,
     Typography,
     IconButton,
     FormControlLabel,
-    Checkbox
+    Checkbox, Button,
 } from "@mui/material";
-import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";;
+import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
+import axios from "axios";
+import {useAuthHook} from "./AuthProvider";
+import Favorite from "@mui/icons-material/Favorite";
+import FavoriteBorder from "@mui/icons-material/Favorite";
 
-interface Photo {
+
+
+export interface Photo {
     id: string;
     src: string;
     title: string;
@@ -17,11 +23,14 @@ interface Photo {
     uploader: string;
     uploadTime: string;
     canLike:boolean;
+    is_like:boolean;
+    likeCount:string;
 }
 
 interface PhotoPreviewDialogProps {
     open: boolean;
     photo: Photo | null;
+    setPhoto:(photo:any)=>any;
     onClose: () => void;
     onPrev: () => void;
     onNext: () => void;
@@ -34,6 +43,7 @@ interface PhotoPreviewDialogProps {
 const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                                            open,
                                                            photo,
+                                                           setPhoto,
                                                            onClose,
                                                            onPrev,
                                                            onNext,
@@ -41,7 +51,31 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                                            selectedPhotoIds,
                                                            toggleSelect}) => {
 
+    const { user_id } = useAuthHook();
+    const [error, setError] = useState<string | null>(null); // error
     if(!photo) return null;
+
+    //click Favourite Icon toggle like and dislike
+    const handleLikeToggle =async (photo:Photo)=>{
+        if(!photo) return;
+        const baseUrl = "http://localhost:8000/users";
+        try{
+            console.log("islike:",photo.is_like)
+            const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
+            await axios.post(likeUrl,{},{
+                params:{photo_id:photo.id,user_id:user_id}
+            })
+            //update photo
+            setPhoto((prevPhoto:any) =>
+                prevPhoto.map((p:any) =>
+                    p.id === photo.id ? { ...p, is_like: !photo.is_like } : p
+                )
+            );
+
+        }catch (err: any) {
+            setError(err.message || "Unknown error in PhotoCarousel");
+        }
+    }
 
     return (
         <Dialog open={open} onClose={onClose} maxWidth="lg" fullWidth>
@@ -84,7 +118,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             }}
                         />
                     </Box>
-                    <Box>
+                    <Box sx={{textAlign:"left"}}>
                         <Typography variant="body2" sx={{}}>
                             Upload User:  {photo?.uploader}
                         </Typography>
@@ -94,6 +128,12 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                         <Typography variant="body2" sx={{}}>
                             Uploadtime : {photo?.uploadTime}
                         </Typography>
+                        {/*Favorite Button in top right corner*/}
+                        <Button startIcon={<FavoriteBorder
+                            sx={{color: photo.is_like ? "red": "gray"}} />}
+                                onClick={()=>handleLikeToggle(photo)}
+                                sx={{visibility: photo.canLike ?  "visible" : "hidden"}}
+                        > {photo.is_like ?   "Dislike":"Favorite"}</Button>
                         {isSelecting && photo && (
                             <FormControlLabel
                                 control={

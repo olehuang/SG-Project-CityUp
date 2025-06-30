@@ -180,4 +180,6 @@ class PhotoResponse(BaseModel):
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
     like: Optional[List[str]]=None
-    canLike:Optional[bool] = Field(default_factory=None) #new, tall frontend this user can like or not for this photo
+    canLike:Optional[bool] = None #new, tall frontend this user can like or not for this photo
+    is_like:Optional[bool]=None # new, markt has been user liked or not
+    likeCount:Optional[int]=None #new, count how many people likes
