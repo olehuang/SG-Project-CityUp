@@ -10,7 +10,7 @@ import routes.photo_routes
 from db_entities import MongoDB,Building,ReviewStatus,PhotoResponse,Photo
 from error_logging import log_error
 import traceback
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from bson.binary import Binary
 from fastapi import Request,HTTPException
 from typing import Optional, List
@@ -28,7 +28,7 @@ async def get_all_photos_under_same_address(address:str,request:Request,user_id:
     try:
         return await get_photo_list(address,request,user_id=user_id)
     except Exception as e:
-        log_error(f'get_all_photos_under_same_address: {e}',
+        log_error('Error in get_all_photos_under_same_address',str(e),
                   stack_data=traceback.format_exc(),
                   time_stamp=datetime.now())
         raise
@@ -59,17 +59,22 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
         result_photo_list = []
         for photo_doc in photo_list:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+
             user =await db_userEntities.get_user(photo_doc["user_id"])
+            photo_doc["username"] = str(user.get("username"))
+
             if user_id:# if argument more a user_id, can more a attribute return
-                photo_doc["canLike"] = routes.user_routes.canLike(photo_doc["photo_id"],user_id)
-            photo_doc["username"] = str( user.get("username"))
+              is_Like =await isLike(photo_doc["photo_id"],user_id)
+              photo_doc["canLike"]= not is_Like
+            else:photo_doc["canLike"] = None
+
             photo_doc["upload_time"] = str(photo_doc["upload_time"])
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
             #del photo_doc["_id"]
             result_photo_list.append(PhotoResponse(**photo_doc))
         return result_photo_list
     except Exception as e:
-        log_error(f'get_photo_list: {e}',
+        log_error('Erro in get_photo_list',str(e),
                   stack_data=traceback.format_exc(),
                   time_stamp=datetime.now())
         raise
@@ -99,14 +104,12 @@ async def isLike(photo_id:str,user_id:str):
         #search one photo if photo and liked user user_id exsist
         photo = await photo_collection.find_one({"_id":ObjectId(photo_id),"like":user_id})
         if not photo:
-            log_error(f"photo :{photo_id} not exist", stack_data=traceback.format_exc(),
-                      time_stamp=datetime.now())
-            raise
-        return photo is not None
+            log_error("photo not exist", stack_data=traceback.format_exc())
+            return False
+        return user_id in photo.get("like",[])
     except Exception as e:
-        log_error(f'isLike: {e}', stack_data=traceback.format_exc(),
-                  time_stamp=datetime.now())
-        raise
+        log_error('Error bei function isLike', stack_data=traceback.format_exc())
+        raise e
 
 
 async def like_photo(photo_id:str,user_id:str):
@@ -121,14 +124,13 @@ async def like_photo(photo_id:str,user_id:str):
         photo = await photo_collection.find_one({"_id":ObjectId(photo_id)})
         if not photo:
             log_error("photo not exist",
-                                stack_data=traceback.format_exc(),
-                                time_stamp=datetime.now())
-            raise HTTPException(status_code=404, detail=f"Photo {photo_id} not found")
+                                stack_data=traceback.format_exc())
+            raise HTTPException(status_code=404, detail=f"Photo not found")
         #get photo owner user_id
         photo_owner = photo.get("user_id")
         # insert like user_id of like user into like[] of this photo
         if photo_owner == user_id:
-            return {"error": f"photo owner can not like selves photo"}
+            return {"error": "photo owner can not like selves photo"}
 
         #if like user's user_id not in like[] = this user has no liek this photo
         if not (user_id in photo.get("like") or []):
@@ -140,9 +142,40 @@ async def like_photo(photo_id:str,user_id:str):
             return await db_userEntities.update_user_point(photo_owner,1)
         return {"message":"photo is already like"}
     except Exception as e:
-        log_error(f'like_photo: {e}', stack_data=traceback.format_exc(),
-                  time_stamp=datetime.now())
+        log_error('Error in function like_photo', stack_data=traceback.format_exc())
         raise
 
+
+async def disLike(photo_id:str,user_id:str):
+    """
+    :brief: delete like for this photo
+    :param photo_id: which photo marke
+    :param user_id: which user wants to delete like
+    :return:message
+    """
+    try:
+        photo = await photo_collection.find_one({"_id":ObjectId(photo_id)})
+        if not photo:
+            log_error("photo not exist",
+                      stack_data=traceback.format_exc())
+            raise HTTPException(status_code=404, detail=f"Photo not found")
+        #get photo owner user_id
+        photo_owner = photo.get("user_id")
+        # delete like user_id of like user  like[] of this photo
+        if photo_owner == user_id:
+            return {"error": "photo owner can not dislike selves photo"}
+
+        #if like user's user_id not in like[] = this user has no liek this photo
+        if not (user_id in photo.get("like") or []):
+            await photo_collection.update_one(
+                {"_id":photo_id},
+                {"$pull":{"like":user_id}}
+            )
+            # update photo owner pointer with current point -1
+            return await db_userEntities.update_user_point(photo_owner,-1)
+        return {"message":"photo is already dislike"}
+    except Exception as e:
+        log_error('Error in function like_photo', stack_data=traceback.format_exc())
+        raise
 
 

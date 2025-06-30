@@ -6,17 +6,19 @@ import Modal from '@mui/material/Modal';
 import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import FavoriteBorder from '@mui/icons-material/Favorite';
 
 interface PhotoGridProps {
     address: string;
 }
-interface Photo {
+export interface Photo {
     id: string;
     src: string;
     title: string;
     uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
 }
 
 const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
@@ -27,7 +29,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
 
-    const { token } = useAuthHook();
+    const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
@@ -52,7 +54,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
             const url="http://127.0.0.1:8000/photos/get_first_9_photo"
             try{
-                const response = await axios.get(url, {params: {address: address}});
+                const response = await axios.get(url, {params: {address: address,user_id:user_id}});
                 const data=response.data;
                 console.log(data);
 
@@ -63,7 +65,10 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     uploader_id:item.user_id,
                     uploader: item.username,
                     uploadTime: formatTime(item.upload_time),
-                }));
+                    canLike:item.canLike,
+                }
+                ));
+
                 setPhotos(formattedPhotos);
             }catch (err: any) {
                 setError(err.message || "Unknown error");
@@ -204,17 +209,26 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
                                     <Typography variant="body1">Upload
                                         User: {photos[selectedPhotoIndex].uploader}</Typography>
-
+                                    <Typography variant="body1">Upload
+                                       canLike: {photos[selectedPhotoIndex].canLike}</Typography>
                                 </Box>
+                                    <Box sx={{
+                                        display: "flex",
+                                        flexDirection:"row",
+                                        justifyContent: "space-between",
+                                        alignItems:"center"
+                                    }}>
+                                        <Button startIcon={<FavoriteBorder sx={{color:"red"}} />}
+                                        > Favorite</Button>
                                     <Button variant="contained"
                                             sx={{
                                                 alignSelf: "flex-start",
                                                 visibility: roles.includes("admin")? "visible":"hidden",}}
                                             onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
-
                                     >
                                         Download
                                     </Button>
+                                    </Box>
                                 </Box>
                             </Box>
                         </DialogContent>

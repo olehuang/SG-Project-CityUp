@@ -16,6 +16,7 @@ interface Photo {
     uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
 }
 
 interface PhotoPreviewDialogProps {

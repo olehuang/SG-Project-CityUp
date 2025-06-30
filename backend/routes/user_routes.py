@@ -208,7 +208,7 @@ async def canLike(photo_id:str,user_id:str):
         return True
     except Exception as e:
         print("Exception while canLike",traceback.format_exc())
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 @router.get("/like")
@@ -217,4 +217,12 @@ async def like(photo_id:str,user_id:str):
         return await db_photoEntities.like_photo(photo_id,user_id)
     except Exception as e:
         print("Exception while like",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.get("/dislike")
+async def disLike(photo_id:str,user_id:str):
+    try:
+        return await db_photoEntities.disLike(photo_id,user_id)
+    except Exception as e:
+        print("Exception while dislike",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

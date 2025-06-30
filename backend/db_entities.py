@@ -8,7 +8,7 @@ from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 from typing import Set
 # MongoDB初始化
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from bson.binary import Binary
 
 class MongoDB:
@@ -179,5 +179,5 @@ class PhotoResponse(BaseModel):
     feedback: Optional[str]
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
-    like: Optional[List[str]]
-    canLike:Optional[bool] = None #new, tall frontend this user can like or not for this photo
+    like: Optional[List[str]]=None
+    canLike:Optional[bool] = Field(default_factory=None) #new, tall frontend this user can like or not for this photo

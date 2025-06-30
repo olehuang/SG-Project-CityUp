@@ -136,7 +136,7 @@ async def update_user_point(user_id:str,point:int):
     :return:
     """
     #make sure point not negative number
-    if (point<0):log_error("Point can't be less than 0",
+    if (point<-1):log_error("Point can't be less than 0",
                            stack_data=traceback.format_exc(),
                            time_stamp=datetime.now().isoformat())
     #make sure point muss be int type

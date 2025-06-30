@@ -15,6 +15,7 @@ import PhotoCarousel from "./PhotoCarousel";
 import qs from "qs";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import Photo  from "./PhotoGrid"
 
 
 
@@ -31,6 +32,7 @@ interface Photo {
     uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
 }
 const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})=>{
 
@@ -85,7 +87,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     title: item.title,
                     uploader_id:item.user_id,
                     uploader: item.username,
-                    uploadTime: formatTime(item.upload_time)
+                    uploadTime: formatTime(item.upload_time),
+                    canLike:item.canLike,
                 }));
 
                 setPhotos(formattedPhotos);
