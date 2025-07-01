@@ -414,18 +414,18 @@ async def get_user_photos(user_id: str):
         raise HTTPException(status_code=500, detail="Server error while fetching user photos.")
 
 @router.get("/get_photo_list")
-async def get_photo_list(address: str,request:Request):
+async def get_photo_list(address: str,request:Request,user_id:str=None):
     try:
-        photo_list= await db_photoEntities.get_all_photos_under_same_address(address,request)
+        photo_list= await db_photoEntities.get_all_photos_under_same_address(address,request,user_id=user_id)
         return photo_list
     except Exception as e:
-        print(f"get_photo_list error:", traceback.format_exc())
+        print("get_photo_list in photo_router error:",str(e), traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 @router.get("/get_first_9_photo")
-async def get_first_9_photo(address: str,request: Request):
+async def get_first_9_photo(address: str,request: Request,user_id:str=None):
     try:
-        photo_list= await db_photoEntities.get_first_nine_photo(address,request)
+        photo_list= await db_photoEntities.get_first_nine_photo(address,request,user_id=user_id)
         return photo_list
     except Exception as e:
         print(f"get_photo_list error:", traceback.format_exc())

@@ -6,15 +6,18 @@ import {Box, Dialog, DialogTitle, Typography,ImageList,
     IconButton,
     Checkbox,
     FormControlLabel,
+
 } from "@mui/material";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import PhotoOrderSelector from "./PhotoOrderSelector";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import PhotoCarousel from "./PhotoCarousel";
-import qs from "qs";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import Photo  from "./PhotoGrid"
+import FavoriteBorder from "@mui/icons-material/Favorite";
+import Favorite from "@mui/icons-material/Favorite";
 
 
 
@@ -24,14 +27,19 @@ interface Props {
     handleDialogClose: () => void;
 }
 
-interface Photo {
+export interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
+    is_like:boolean;
+    likeCount:string;
 }
 const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})=>{
+
 
     const [photos, setPhotos] = useState<Photo[]>([]);//backend return photo list
     const [loading, setLoading] = useState(false); //loding photo
@@ -48,7 +56,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     const [previewIndex, setPreviewIndex] = useState<number>(0);
 
-    const { token } = useAuthHook();
+    const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
@@ -67,54 +75,39 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     useEffect(() => {
         if (!selectedAddress) return;
 
-        const fetchPhoto = async (address: string) => {
-            setLoading(true);
-            setError(null);
-            console.log("address:", address);
-
-            const url = "http://127.0.0.1:8000/photos/get_photo_list"
-            try {
-                const response = await axios.get(url, {params: {address: address}});
-                const data = response.data;
-                console.log(data);
-
-                const formattedPhotos: Photo[] = data.map((item: any) => ({
-                    id:item.photo_id,
-                    src: item.image_url,
-                    title: item.title,
-                    uploader: item.user_id,
-                    uploadTime: item.upload_time
-                }));
-
-                const userIds: string[] = Array.from(new Set(data.map((p: any) => p.user_id)));
-                const userMap: Record<string, string> = {};
-
-                for (const userId of userIds) {
-                    try {
-                        const res = await axios.get("http://127.0.0.1:8000/users/get_user_name", {
-                            params: {user_id: userId},
-                        });
-                        userMap[userId] = res.data;
-                    } catch (e) {
-                        console.error(`Failed to fetch username for ${userId}`, e);
-                        userMap[userId] = "Unknown";
-                    }
-                }
-                const updatedPhotos = formattedPhotos.map(p => ({
-                    ...p,
-                    id: p.id,
-                    uploader: userMap[p.uploader] ?? "Unknown",
-                    uploadTime: formatTime(p.uploadTime)?? "Unknow"
-                }));
-                setPhotos(updatedPhotos);
-            } catch (err: any) {
-                setError(err.message || "Unknown error");
-            } finally {
-                setLoading(false);
-            }
-        }
         fetchPhoto(selectedAddress)
     }, [selectedAddress]);
+
+    const fetchPhoto = async (address: string) => {
+        setLoading(true);
+        setError(null);
+        console.log("address:", address);
+
+        const url = "http://127.0.0.1:8000/photos/get_photo_list"
+        try {
+            const response = await axios.get(url, {params: {address: address,user_id:user_id}});
+            const data = response.data;
+            console.log(data);
+
+            const formattedPhotos: Photo[] = data.map((item: any) => ({
+                id:item.photo_id,
+                src: item.image_url,
+                title: item.title,
+                uploader_id:item.user_id,
+                uploader: item.username,
+                uploadTime: formatTime(item.upload_time),
+                canLike:item.canLike,
+                is_like:item.is_like,
+                likeCount:item.likeCount,
+            }));
+
+            setPhotos(formattedPhotos);
+        } catch (err: any) {
+            setError(err.message || "Unknown error");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     // order method change
     useEffect(() => {
@@ -226,6 +219,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     //come to prev Photo
     const handlePreview =(photo:Photo)=>{
         const index = sortedPhotos.findIndex(p => p.id === photo.id);
+        console.log(photo)
         setPreviewIndex(index);
         setPreviewPhoto(photo);
         setPreviewOpen(true)
@@ -274,6 +268,28 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
             }
         }
 
+    }
+
+    //click Favourite Icon toggle like and dislike
+    const handleLikeToggle =async (photo:Photo)=>{
+        if(!photo) return;
+        const baseUrl = "http://localhost:8000/users";
+        try{
+            console.log("islike:",photo.is_like)
+            const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
+            await axios.post(likeUrl,{},{
+                params:{photo_id:photo.id,user_id:user_id}
+            })
+            //update photo
+            setSortedPhotos((prevPhotos) =>
+                prevPhotos.map((p) =>
+                    p.id === photo.id ? { ...p, is_like: !photo.is_like } : p
+                )
+            );
+
+        }catch (err: any) {
+            setError(err.message || "Unknown error in like Toggle");
+        }
     }
 
     return(
@@ -329,16 +345,38 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:0}}>
+                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
                                     src={photo.src}
                                     alt={photo.title}
                                     loading="lazy"
-                                    style={{borderRadius: 8,cursor: 'pointer',boxShadow:"0px 4px 12px rgba(0,0,0,0.2)"}}
+                                    style={{
+                                        borderRadius: 8,
+                                        cursor: 'pointer',
+                                        boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
+                                    }}
                                     onClick={() => handlePreview(photo)}
                                 />
+                                {/*Favorite Button in top right corner*/}
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLikeToggle(photo)
+                                    }}
+                                    sx={{
+                                        position: "absolute",
+                                        top: "1%", right: "1%",
+                                        backgroundColor: "rgba(255,255,255,0.8)",
+                                        '&:hover': {
+                                            backgroundColor: "rgba(255,255,255,0.9)",
+                                        },
+                                        zIndex: 2,
+                                        visibility: photo.canLike ? "visible" : "hidden"
+                                    }}
+                                >{photo.is_like ? <Favorite sx={{color: "red"}} /> : <FavoriteBorder />}
+                                </IconButton>
                                 <Box
                                     sx={{
                                         position: "relative",
@@ -352,17 +390,25 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                         //title={photo.title}
                                         sx={{borderRadius:"5px"}}
                                         subtitle={
-                                            `Upload User: ${photo.uploader} 
-                                            | Upload Time: ${photo.uploadTime}`}
+                                            `Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
-                                            isSelecting && (
+                                            <Box>
+                                            {/*<Button startIcon={<FavoriteBorder*/}
+                                            {/*    sx={{color: photo.is_like ? "red": "gray"}} />}*/}
+                                            {/*        onClick={()=>handleLikeToggle(photo)}*/}
+                                            {/*        sx={{visibility: photo.canLike ?  "visible" : "hidden"}}*/}
+                                            {/*> {photo.is_like ?   "Dislike":"Favorite"}</Button>*/}
                                                 <Checkbox
                                                     checked={selectedPhotoIds.has(photo.id)}
                                                     onClick={(e) => e.stopPropagation()} // stop bubble,click checkbox will not  toggleSelect
                                                     onChange={() => toggleSelect(photo.id)}
-                                                    sx={{ color: 'white',cursor: 'pointer'}}
+                                                    sx={{
+                                                        color: 'white',
+                                                        cursor: 'pointer',
+                                                        visibility: isSelecting ? "visible" : "hidden",
+                                                    }}
                                                 />
-                                            )
+                                        </Box>
                                         }
                                     />
                                 </Box>
@@ -382,6 +428,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 isSelecting={isSelecting}
                 selectedPhotoIds={selectedPhotoIds}
                 toggleSelect={toggleSelect}
+                setPhoto={setPreviewPhoto}
             />
         </>
     )

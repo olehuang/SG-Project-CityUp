@@ -1,6 +1,6 @@
 
 import {Box, Typography, Container, Button,Dialog, DialogTitle,LinearProgress,Alert} from "@mui/material";
-import React, {useState,useEffect,} from "react";
+import React, {useState,useEffect,useRef} from "react";
 
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -17,14 +17,18 @@ import CircularProgress from "@mui/material/CircularProgress";
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import Pagination from '@mui/material/Pagination';
 
-
+/**
+ * a class form user, because user ranking in DBMS storage
+ * */
 type User={
     user_id:string,
     username:string,
     point:string,
     rank:number,
 }
-
+/**
+ *take backend in frontend storage
+ * */
 type UserRanking={
     total:number,
     page:number,
@@ -32,9 +36,13 @@ type UserRanking={
     total_page:number,
     users:User[],
 }
-
+/**
+ * Ranking page is to show Point System and how,which user in ranking
+ * */
 const RankingPage =()=>{
 
+    /**default infomation
+     * */
     const defautUser:User={
         user_id: " - ",
         username:" - ",
@@ -53,6 +61,8 @@ const RankingPage =()=>{
     const [getRankingError,setGetRankingError]=useState<string>("");
     const [privateUserError,setPrivateUserError]=useState<string>("");
 
+    const myRuf=useRef<HTMLTableRowElement>(null);
+    const [scollToMyRow, setScollToMyRow]=useState(false);
     const navigat = useNavigate();
     const url="http://127.0.0.1:8000"
 
@@ -66,7 +76,11 @@ const RankingPage =()=>{
         get_user(user_id);
     }, []);
 
-
+    /**
+     * get all user ranking from DBMS and set all users in UserRanking
+     * @param page: actuelle page, default= 1
+     * @param limit: how many user in a page to show
+     * */
     const get_users=async (page=1,limit=10) => {
         try{
             const response = await axios.get<UserRanking>(url+"/users/get_all_user_after_order",
@@ -87,6 +101,10 @@ const RankingPage =()=>{
         }
     }
 
+    /**
+     * get self user infomation, ranking and put it into local
+     * @param user_id: use to take user infomation from DBMS
+     * */
     const get_user=async (user_id:string) => {
         try {
             const response = await axios.get(url+`/users/get_user`,{params:{user_id:user_id}});
@@ -108,7 +126,24 @@ const RankingPage =()=>{
         }
     }
 
+    // const update_point=async (point=1)=>{
+    //
+    //     try{
+    //         const response = axios.post(url+`/users/update_point`,
+    //             {},{params:{user_id:user_id,point:point}});
+    //         //console.log(response.data);
+    //     }catch (e:any) {
+    //         console.log(e.message || "Unknown error");
+    //     }
+    // }
 
+    const toMyPosition = ()=>{
+        if (user.rank && user.rank> 0){
+            const targetPage =Math.ceil(user.rank / limit);
+            setPage(targetPage);
+            setScollToMyRow(true)
+        }
+    }
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",overflowY: "auto",}}>
@@ -122,6 +157,7 @@ const RankingPage =()=>{
                 <Button sx={{marginLeft: "auto"}}
                         size="large"
                         variant={"outlined"}
+
                 > My Position
                 </Button>
                 <Button sx={{margin: "0 2% 0 0.5%"}}
@@ -163,6 +199,7 @@ const RankingPage =()=>{
                         userRanking?.users.map((rowUser, index) => (
                             <TableRow key={index+1}
                                       sx={rowUser.user_id=== user_id? {...styles.tableRowHiligh}:{}}
+                                      ref={rowUser.user_id===user_id? myRuf:null}
                             >
                                 <TableCell >
                                     {(() => {

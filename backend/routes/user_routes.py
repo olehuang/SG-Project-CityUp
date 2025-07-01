@@ -3,6 +3,8 @@ from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
 from datetime import datetime
+
+import db_photoEntities
 from db_entities import User,MongoDB
 import db_userEntities
 import traceback
@@ -163,7 +165,7 @@ async def get_all_user_after_order(
 
         for idx, user in enumerate(all_users):
             point = user.get("point")
-
+            if point==0: continue
             if point != last_point:
                 aktual_rank = idx + 1
                 last_point = point
@@ -190,3 +192,37 @@ async def get_all_user_after_order(
         print("Exception while getting all_user_after_order",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+
+@router.get("/canLike")
+async def canLike(photo_id:str,user_id:str):
+    """
+    if isLike==True that meaning already like by same user,than can not like again
+    else isLike==False that photo has not like by this user,than can like
+   :param photo_id: id of photo
+   :param user_id: use to check if photo is like should be in like[] of photo.get("like“)
+   :return: boolean, if islike=true return false, in other case return false
+   """
+    try:
+        isLike = await db_photoEntities.isLike(photo_id,user_id)
+        if isLike: return False
+        return True
+    except Exception as e:
+        print("Exception while canLike",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.post("/like")
+async def like(photo_id:str,user_id:str):
+    try:
+        return await db_photoEntities.like_photo(photo_id,user_id)
+    except Exception as e:
+        print("Exception while like",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post("/dislike")
+async def disLike(photo_id:str,user_id:str):
+    try:
+        return await db_photoEntities.disLike(photo_id,user_id)
+    except Exception as e:
+        print("Exception while dislike",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))

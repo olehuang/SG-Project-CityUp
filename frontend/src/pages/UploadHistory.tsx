@@ -31,16 +31,13 @@ import { useAuthHook } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 
 const PAGE_SIZE = 10;
-
 const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
-
 const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
     pending: "default", //default color
     reviewing: "warning", // warning color yellow
     approved: "success", // success color green
     rejected: "error", // error color red
 };
-
 
 interface UploadItem {
     photo_id: string;
@@ -99,6 +96,8 @@ const UploadHistory: React.FC = () => {
         return () => clearTimeout(timer);
     }, [searchTerm]);
 
+    // Pull the current user's upload history from the backend /photos/history interface
+    // Supports paging, filtering status, and server-side search
     const fetchUploads = async () => {
         if (!user_id) return;
 
@@ -161,9 +160,9 @@ const UploadHistory: React.FC = () => {
 
     useEffect(() => {
         fetchUploads();
-    }, [user_id, page, statusFilter]); // 【修改】移除debouncedSearchTerm依赖，改为手动搜索
+    }, [user_id, page, statusFilter]); // Triggers a data reload when the user ID, current page, or status filter changes;
 
-    // 【新增】客户端搜索功能
+    // 【新增】Website-Suchfunktion
     const handleSearch = () => {
         if (!searchTerm.trim()) {
             setSearchResults([]);
@@ -259,10 +258,26 @@ const UploadHistory: React.FC = () => {
 
     const formatDate = (dateString: string) => {
         try {
-            return new Date(dateString).toLocaleString();
+            const timeStr =
+                dateString.includes("Z") || dateString.includes("+")
+                    ? dateString
+                    : dateString + "Z";
+
+            return new Intl.DateTimeFormat("de-DE", {
+                timeZone: "Europe/Berlin",
+                dateStyle: "medium",
+                timeStyle: "short",
+                hour12: false,
+            }).format(new Date(timeStr));
         } catch {
             return "Invalid date";
         }
+
+        //try {
+          //  return new Date(dateString).toLocaleString();
+        //} catch {
+          //  return "Invalid date";
+        //}
     };
     //Status Display Formatting
     const getStatusDisplayName = (status: string) => {
@@ -305,32 +320,6 @@ const UploadHistory: React.FC = () => {
                 flexDirection: 'column'
             }}
         >
-            <Button
-                variant="outlined"
-                onClick={() => navigate("/dashboard")}
-                size="small"
-                sx={{
-                    position: "fixed", // 让按钮固定在屏幕右下角
-                    bottom: 20, // 距离底部 20px
-                    right: 20, // 距离右侧 20px
-                    borderRadius: 10,
-                    textTransform: "none",
-                    fontWeight: "bold",
-                    fontSize: 13,
-                    borderColor: "#5D4037",
-                    color: "#5D4037",
-                    px: 3,
-                    py: 1.2,
-                    mb: 2,
-                    alignSelf: "flex-start",
-                    "&:hover": {
-                        borderColor: "#4E342E",
-                        backgroundColor: "#FFF8E1",
-                    }
-                }}
-            >
-                ← Back to Dashboard
-            </Button>
             {error && (
                 <Alert severity="error" sx={{ mb: 2 }}>
                     {error}
@@ -340,7 +329,7 @@ const UploadHistory: React.FC = () => {
             {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
             <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0 }}>
                 <TextField
-                    label="Search by building address, status, or photo ID"
+                    label="Search by building address"
                     variant="outlined"
                     size="small"
                     fullWidth

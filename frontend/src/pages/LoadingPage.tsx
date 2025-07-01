@@ -6,6 +6,11 @@ import Stack from "@mui/material/Stack";
 import CircularProgress from "@mui/material/CircularProgress";
 import Button from "@mui/material/Button";
 
+/**
+ * this page is hidden a bug, if user status is between auth and unauth
+ * is base of Homepage
+ *
+ * */
 const LoadingPage=()=>{
     const navigate = useNavigate();
     const [clicked, setClicked] = useState(false);

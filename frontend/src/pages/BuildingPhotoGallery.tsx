@@ -48,17 +48,21 @@ const mockResults = [
     "Magdalenenstraße 8, 64289 Darmstadt",
 ].sort((a,b)=>a.localeCompare(b));
 
+/**
+ * type Dataform from DBMS
+ * */
 type BuildingInfo = {
     address: string;
     photoNr: number;
     updateTime: string;
 };
 
+/**
+ *  show user which photo under which address has in DBMS storage.
+ *  user can first 9 photo preview (order follow time )and can see all photo in View ALL
+ * */
 const BuildingPhotoGallery=()=>{
 
-    const now = new Date();
-
-    const photos = new Array(9).fill(null);
 
     const [leftWidth, setLeftWidth] = useState(70);
     const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
@@ -80,41 +84,38 @@ const BuildingPhotoGallery=()=>{
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
+
         setIsLoading(true);
         setProgress(0);
 
-
+        /**
+         * fetch Address data from DBMS
+         * */
         const fetchAllData=async ()=>{
             try {
 
                 const response =await axios.get(url+"/buildings/get_addr_with_status");
+
                 const raw_list: BuildingInfo[] = response.data.map((item: any) => ({
                     address: item.building_addr,
                     photoNr: item.photo_count,
-                    updateTime: item.last_update_time,
+                    updateTime: formatTime(item.last_update_time),
                 }));
 
-
-                raw_list.sort((a: BuildingInfo, b: BuildingInfo) => a.address.localeCompare(b.address));
-
+                //take a address list
                 const addrList = raw_list.map(item=>item.address);
                 setAllAddresses(addrList);
                 setSearchResult([...addrList]);
-                const total = addrList.length;
-
 
                 const infoMap:Record<string,{updateTime: string,photoNr:number}>={};
                 raw_list.forEach((item,idx)=>{
-                    console.log("infoMat item:",item);
-
-
+                    // Time format to change
                     infoMap[item.address]={
-                        updateTime:formatTime(item.updateTime)||"unknow",
+                        updateTime:item.updateTime,
                         photoNr:item.photoNr
                     }
 
                 })
-
 
                 setPhotoInfoMap(infoMap);
 
@@ -326,11 +327,7 @@ const BuildingPhotoGallery=()=>{
             </Box>
             {/*All photo Dialog */}
             <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
-            <Button
-                variant="outlined"
-                onClick={()=>{navigat("/dashboard");}}
-                sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}
-            >Exit</Button>
+
         </Box>
     )
 

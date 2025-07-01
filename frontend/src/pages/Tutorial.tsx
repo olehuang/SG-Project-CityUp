@@ -1,7 +1,7 @@
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, } from "react";
 import {
     Box,
     Typography,
@@ -42,8 +42,9 @@ const Tutorial = () => {
         "Photo Upload",
         "Upload History",
         "Building Photo Gallery",
+        "User Information",
         "FAQ",
-        ...(roles.includes("admin") ? ["Photo Review", "User Management"] : [])
+        ...(roles.includes("admin") ? ["Photo Review", "Photo Download","User Management"] : [])
     ];
 
     // Search Keywords Daten
@@ -113,8 +114,6 @@ const Tutorial = () => {
             setSelectedSection(results[0]);
         }
     };
-
-    //如若搜索更加智能，比如支持模糊匹配或者更宽泛的关键词搜索，Levenshtein Distance算法，提高模糊匹配能力 添加 debounce()，避免搜索频繁触发，优化性能 让搜索支持多个关键词，如 "photo blurry" 同时匹配多个结果
 
     // Highlighting text
     const highlightText = (text: string, searchTerm: string) => {
@@ -192,7 +191,6 @@ const Tutorial = () => {
                                 </Typography>
                             </Box>
 
-                            {/* 示例图 1、2 */}
                             <Box sx={{ mt: 2 }}>
                                 <img
                                     src="/assets/withoutShadow.png"
@@ -468,9 +466,9 @@ const Tutorial = () => {
                                             alt="Filter status example"
                                             style={{
                                                 width: '100%',
-                                                maxWidth: 800,         // 不超过 800px
+                                                maxWidth: 800,
                                                 borderRadius: 8,
-                                                display: 'block'       // 避免图片靠边留空
+                                                display: 'block'
                                             }}
                                         />
                                     </Box>
@@ -508,7 +506,6 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* 3 */}
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
                                 <Typography
                                     variant="body1"
@@ -534,8 +531,6 @@ const Tutorial = () => {
                                     </Typography>
                                 </Box>
                             </Box>
-
-
                             <Box sx={{ mt: 2 }}>
                                 <img
                                     src="/assets/Pagination.png"
@@ -548,8 +543,6 @@ const Tutorial = () => {
                                     }}
                                 />
                             </Box>
-
-
                             {/* 4. Exit and return */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography
@@ -597,7 +590,7 @@ const Tutorial = () => {
 
                         <Typography variant="body1" sx={styles.body}>
                             {highlightText(
-                                "In this section, you will learn how to search for building-related photo uploads and download images easily.",
+                                "In this section, you will learn how to search for building-related photo uploads and view images easily.",
                                 searchTerm
                             )}
                         </Typography>
@@ -649,7 +642,7 @@ const Tutorial = () => {
                                     <Typography variant="body1">
                                         <strong>2. View Photos</strong> –{" "}
                                         {highlightText(
-                                            "Click on a photo with address from the right panel or click ",
+                                            "Click on a photo with address from the right panel and click ",
                                             searchTerm
                                         )}
                                         <strong>{highlightText("'view all'", searchTerm)}</strong>{" "}
@@ -659,7 +652,7 @@ const Tutorial = () => {
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/Selectone.png"
-                                            alt="Photo Selectone"
+                                            alt="Select Photo"
                                             style={{
                                                 width: "100%",
                                                 maxWidth: 1000,
@@ -669,8 +662,8 @@ const Tutorial = () => {
                                             }}
                                         />
                                         <img
-                                            src="/assets/Selecttwo.png"
-                                            alt="Photo Selecttwo"
+                                            src="/assets/viewPhoto.png"
+                                            alt="View Photo"
                                             style={{
                                                 width: "100%",
                                                 maxWidth: 1000,
@@ -683,43 +676,92 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* 3. Download Photos */}
+
+                        </Box>
+                    </Box>
+                );
+
+            case "User Information":
+                return (
+                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                        <Typography variant="h4" sx={styles.title}>
+                            {highlightText("User Information", searchTerm)}
+                        </Typography>
+
+                        <Typography variant="body1" sx={styles.body}>
+                            {highlightText(
+                                "In this section, you will learn how to manage your own registration information.",
+                                searchTerm
+                            )}
+                        </Typography>
+
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            {/* 1. Navigate to User Information page */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography
                                     variant="body1"
                                     sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
                                 >
-                                    📁
+                                    📂
                                 </Typography>
-
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Download photos</strong> –{" "}
-                                        {highlightText("Click on a photo from the right panel and then ", searchTerm)}
-                                        {highlightText("click ", searchTerm)}
-                                        <strong>{highlightText("'Download'", searchTerm)}</strong>{" "}
-                                        {highlightText("to save it.", searchTerm)}
-                                        <br />
+                                        <strong>1. Open the User Information page</strong> –{" "}
                                         {highlightText(
-                                            "Multiple photos will be downloaded as a ZIP file, while single images will be saved in their original format.",
+                                            "From the side menu, click ",
+                                            searchTerm
+                                        )}
+                                        <strong>{highlightText("Profile", searchTerm)}</strong>{" "}
+                                        {highlightText("in the dropdown, then select ", searchTerm)}
+                                        <strong>{highlightText("User Information", searchTerm)}</strong>{" "}
+                                        {highlightText(
+                                            "to enter the user information management interface.",
                                             searchTerm
                                         )}
                                     </Typography>
-
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Viewphotoone.png"
-                                            alt="Viewphoto example"
+                                            src="/assets/userinfo1.png"
+                                            alt="User Information navigation"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
                                             }}
                                         />
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                            {/* 2. Modify personal details */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
+                                >
+                                    ✏️
+                                </Typography>
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>2. Edit your personal details</strong> –{" "}
+                                        {highlightText(
+                                            "On this page, you can update your personal information, such as a valid email address, last name, and first name.",
+                                            searchTerm
+                                        )}{" "}
+                                        {highlightText(
+                                            "Click ",
+                                            searchTerm
+                                        )}
+                                        <strong>{highlightText("Save", searchTerm)}</strong>{" "}
+                                        {highlightText("to save changes, or ", searchTerm)}
+                                        <strong>{highlightText("Cancel", searchTerm)}</strong>{" "}
+                                        {highlightText("to discard them.", searchTerm)}
+                                    </Typography>
+                                    <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Download.png"
-                                            alt="Download example"
+                                            src="/assets/userinfo2.png"
+                                            alt="Edit user information"
                                             style={{
                                                 width: "100%",
                                                 maxWidth: 1000,
@@ -942,7 +984,7 @@ const Tutorial = () => {
                                         <img
                                             src="/assets/managment.png"
                                             alt="User search example"
-                                            style={{ width: "100%", maxWidth: 800, borderRadius: 8, display: "block" }}
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
                                         />
                                     </Box>
                                 </Box>
@@ -951,72 +993,176 @@ const Tutorial = () => {
                             {/* 3. Add & Delete Users */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
-                                    ➕
+                                    ➖
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Add and Delete Users</strong> {" "}
+                                        <strong>3. Delete Users</strong> {" "}
                                         <br />
                                         {highlightText(
                                             "To delete a user, click the three dots at the end of the row and select ",
                                             searchTerm
                                         )}
                                         <strong>{highlightText("Delete", searchTerm)}</strong>.
-                                        <br />
-                                        {highlightText("To add a new user, click ", searchTerm)}
-                                        <strong>{highlightText("Add", searchTerm)}</strong>{" "}
-                                        {highlightText("on the top-left corner to go to the create user page.", searchTerm)}
-                                        <br />
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/addDelete.png"
-                                            alt="Create user example"
-                                            style={{ width: "100%", maxWidth: 800, borderRadius: 8, display: "block" }}
+                                            src="/assets/delete.png"
+                                            alt="Delete user example"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
                                         />
                                     </Box>
-                                    <Typography variant="body1">
-                                        {highlightText("Box 1: ", searchTerm)}
-                                        <strong>{highlightText("'Required user actions'", searchTerm)}</strong>{" "}
-                                        {highlightText("is a dropdown to configure mandatory actions for first login. Choose ", searchTerm)}
-                                        <strong>{highlightText("'Verify Email'", searchTerm)}</strong>{" "}
-                                        {highlightText("and make sure the button below is set to ", searchTerm)}
-                                        <strong>{highlightText("On", searchTerm)}</strong>.
-                                        <br />
-                                        {highlightText("Box 2: In the ", searchTerm)}
-                                        <strong>{highlightText("General", searchTerm)}</strong>{" "}
-                                        {highlightText("tab, enter a valid email, full name, and select ", searchTerm)}
-                                        <strong>{highlightText("Join Groups", searchTerm)}</strong>{" "}
-                                        {highlightText("as needed.", searchTerm)}
-                                    </Typography>
-                                    <Box sx={{ mt: 2 }}>
-                                        <img
-                                            src="/assets/createuser.png"
-                                            alt="Create user example"
-                                            style={{ width: "100%", maxWidth: 800, borderRadius: 8, display: "block" }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </Box>
-
-                            {/* 4. Confirm Submission */}
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
-                                    ✅
-                                </Typography>
-                                <Box sx={{ flex: 1 }}>
-                                    <Typography variant="body1">
-                                        <strong>4. Confirm and Create</strong> –{" "}
-                                        {highlightText("Once everything is filled in correctly, click ", searchTerm)}
-                                        <strong>{highlightText("Create", searchTerm)}</strong>{" "}
-                                        {highlightText("to add the user successfully.", searchTerm)}
-                                    </Typography>
-
                                 </Box>
                             </Box>
                         </Box>
                     </Box>
                 ) : null;
+
+            case "Photo Download":
+                return (
+                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                        <Typography variant="h4" sx={styles.title}>
+                            {highlightText("Building Photo Gallery", searchTerm)}
+                        </Typography>
+
+                        <Typography variant="body1" sx={styles.body}>
+                            {highlightText(
+                                "In this section, you will learn how to search for building-related photo uploads and download images easily.",
+                                searchTerm
+                            )}
+                        </Typography>
+
+                        <Box sx={{ ...styles.body, mt: 2 }}>
+                            {/* 1. Search by address */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
+                                >
+                                    🔍
+                                </Typography>
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>1. Search by address</strong> –{" "}
+                                        {highlightText(
+                                            "Enter an address in the search bar to view the latest upload times and the number of photos related to that location.",
+                                            searchTerm
+                                        )}
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/Input.png"
+                                            alt="Search by address example"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                            {/* 2. View Photos */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
+                                >
+                                    📷
+                                </Typography>
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>2. View Photos</strong> –{" "}
+                                        {highlightText(
+                                            "Click on a photo with address from the right panel or click ",
+                                            searchTerm
+                                        )}
+                                        <strong>{highlightText("'view all'", searchTerm)}</strong>{" "}
+                                        {highlightText("to use filter options to sort the photo gallery.", searchTerm)}
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/Selectone.png"
+                                            alt="Photo Selectone"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 1000,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                marginBottom: 12,
+                                            }}
+                                        />
+                                        <img
+                                            src="/assets/Selecttwo.png"
+                                            alt="Photo Selecttwo"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 1000,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                marginBottom: 12,
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                            {/* 3. Download Photos */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography
+                                    variant="body1"
+                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
+                                >
+                                    📁
+                                </Typography>
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>3. Download photos</strong> –{" "}
+                                        {highlightText("Click on a photo from the right panel and then ", searchTerm)}
+                                        {highlightText("click ", searchTerm)}
+                                        <strong>{highlightText("'Download'", searchTerm)}</strong>{" "}
+                                        {highlightText("to save it.", searchTerm)}
+                                        <br />
+                                        {highlightText(
+                                            "Multiple photos will be downloaded as a ZIP file, while single images will be saved in their original format.",
+                                            searchTerm
+                                        )}
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/Viewphotoone.png"
+                                            alt="Viewphoto example"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 1000,
+                                                borderRadius: 8,
+                                                display: "block",
+                                            }}
+                                        />
+                                        <img
+                                            src="/assets/Download.png"
+                                            alt="Download example"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 1000,
+                                                borderRadius: 8,
+                                                display: "block",
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                );
 
 
             case "FAQ":
@@ -1284,7 +1430,7 @@ const Tutorial = () => {
                             placeholder="Search..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            onKeyPress={(e) => {
+                            onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSearch();
                                 }
