@@ -884,6 +884,17 @@ const Tutorial = () => {
                                                 display: "block",
                                             }}
                                         />
+                                        <img
+                                            src="/assets/batch.png"
+                                            alt="select batch photo example"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 1000,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                marginBottom: 12,
+                                            }}
+                                        />
                                     </Box>
                                 </Box>
                             </Box>
@@ -990,7 +1001,7 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* 3. Add & Delete Users */}
+                            {/* 3. Delete Users */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     ➖
@@ -1009,6 +1020,101 @@ const Tutorial = () => {
                                         <img
                                             src="/assets/delete.png"
                                             alt="Delete user example"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+
+                            {/* 4. Add User as Admin */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
+                                    ➕
+                                </Typography>
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>4. Add User as Admin</strong>
+                                        <br />
+                                        {highlightText("Select the user's email, click ", searchTerm)}
+                                        <strong>{highlightText("Group", searchTerm)}</strong>
+                                        {highlightText(" and choose ", searchTerm)}
+                                        <strong>{highlightText("Join Group", searchTerm)}</strong>.
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin1.png"
+                                            alt="Step 1 - Select user and click Group"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin2.png"
+                                            alt="Step 2 - Choose Join Group"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ mt: 2 }}>
+                                        {highlightText("Make sure not to remove the user from the User group.", searchTerm)}
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin3.png"
+                                            alt="Reminder - Keep user in User group"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ mt: 2 }}>
+                                        {highlightText("Next, click ", searchTerm)} <strong>{highlightText(">", searchTerm)}</strong>
+                                        {highlightText(" to open groups, select the ", searchTerm)}
+                                        <strong>{highlightText("admin", searchTerm)}</strong>
+                                        {highlightText(" group and click ", searchTerm)}
+                                        <strong>{highlightText("Join", searchTerm)}</strong>.
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin4.png"
+                                            alt="Step 4 - Navigate to groups"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin5.png"
+                                            alt="Step 5 - Join admin group"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+
+                                    <Typography variant="body1" sx={{ mt: 2 }}>
+                                        {highlightText("After joining, you can remove users from the admin group if needed by clicking ", searchTerm)}
+                                        <strong>{highlightText("Leave", searchTerm)}</strong>
+                                        {highlightText(", then confirm. A success message will appear once the removal is complete.", searchTerm)}
+                                    </Typography>
+
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin6.png"
+                                            alt="Remove user from admin - step 1"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin7.png"
+                                            alt="Confirm admin leave"
+                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                        />
+                                    </Box>
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/addadmin8.png"
+                                            alt="Success message shown"
                                             style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
                                         />
                                     </Box>

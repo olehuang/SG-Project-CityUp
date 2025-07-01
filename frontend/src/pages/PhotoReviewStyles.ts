@@ -250,20 +250,7 @@ export const photoReviewStyles = {
             color: "#D7CCC8",
         }
     },
-    exitButton: {
-        borderRadius: 10,
-        textTransform: "none",
-        fontWeight: "bold",
-        fontSize: 13,
-        borderColor: "#5D4037",
-        color: "#5D4037",
-        px: 3,
-        py: 1.2,
-        "&:hover": {
-            borderColor: "#4E342E",
-            backgroundColor: "#FFF8E1",
-        }
-    },
+
 
     previewDialog: {
         "& .MuiDialog-paper": {

@@ -443,14 +443,7 @@ const PhotoReview = () => {
                                 </Button>
                             </>
                         )}
-                        <Button
-                            variant="outlined"
-                            onClick={() => navigate("/dashboard")}
-                            size="small"
-                            sx={photoReviewStyles.exitButton}
-                        >
-                            Exit
-                        </Button>
+
                     </Box>
                 </Box>
             </Box>
