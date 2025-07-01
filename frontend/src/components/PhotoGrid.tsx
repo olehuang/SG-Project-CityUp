@@ -236,7 +236,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                     <Typography variant="body1">
                                         Upload User: {photos[selectedPhotoIndex].uploader}</Typography>
                                     <Typography variant="body1">
-                                        Like Number: {photos[selectedPhotoIndex].likeCount}</Typography>
+                                        Favorite Number: {photos[selectedPhotoIndex].likeCount}</Typography>
                                 </Box>
                                     <Box sx={{
                                         display: "flex",

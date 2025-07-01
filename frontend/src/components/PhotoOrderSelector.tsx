@@ -31,7 +31,9 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
                 <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
                 <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>
                 <MenuItem value={"Name Asc"}>Sort by Name A-Z</MenuItem>
-                <MenuItem value={"Name Dsc"}>Sort by Name Z-A</MenuItem>
+                <MenuItem value={"Name Desc"}>Sort by Name Z-A</MenuItem>
+                <MenuItem value={"Like Asc"}>Sort by most favorite</MenuItem>
+                <MenuItem value={"Like Desc"}>Sort by least favorite</MenuItem>
             </Select>
         </FormControl>
     )

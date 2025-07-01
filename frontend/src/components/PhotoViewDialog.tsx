@@ -126,28 +126,46 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 case "Name Desc":
                     order = 'ndesc';
                     break;
+                case "Like Asc" :
+                    order = 'lkasc';
+                    break;
+                case "Like Desc":
+                    order = 'lkdesc';
+                    break;
             }
             return order;
         }
+
+
         //follow time/upload Name Desc(Z-A)/Asc(A-Z) Order Photos
         const orderPhoto = (order: string) => {
             return [...photos].sort((a, b) => {
-                const timeA = new Date(a.uploadTime).getTime();
-                const timeB = new Date(b.uploadTime).getTime();
+                const timeA =  new Date(a.uploadTime.replace(',', ''));
+                const timeB = new Date(b.uploadTime.replace(',', ''));
                 const nameA = a.uploader.toLowerCase();
                 const nameB = b.uploader.toLowerCase();
+                const likeA = +a.likeCount;
+                const likeB = +b.likeCount;
+                console.log("timeA:",timeA);
+                console.log("timeB:",timeB);
                 console.log("NameA:",nameA);
                 console.log("NameB:",nameB);
+                console.log("LikeA:"+likeA);
+                console.log("LikeB:"+likeB);
 
                 switch (order) {
                     case 'tasc':
-                        return timeA - timeB;
+                        return timeA.getTime() - timeB.getTime();
                     case 'tdesc':
-                        return timeB - timeA;
+                        return timeB.getTime() - timeA.getTime();
                     case 'nasc' :
                         return nameA.localeCompare(nameB);
                     case 'ndesc':
                         return nameB.localeCompare(nameA);
+                    case 'lkasc':
+                        return likeB - likeA;//most Favorite first
+                    case 'lkdesc':
+                        return likeA - likeB;//least Favorite first
                     default:
                         return 0;
                 }

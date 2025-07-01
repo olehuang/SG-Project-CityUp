@@ -128,6 +128,8 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                         <Typography variant="body2" sx={{}}>
                             Uploadtime : {photo?.uploadTime}
                         </Typography>
+                        <Typography variant="body2">
+                            Favorite Number: {photo.likeCount}</Typography>
                         {/*Favorite Button in top right corner*/}
                         <Button startIcon={<FavoriteBorder
                             sx={{color: photo.is_like ? "red": "gray"}} />}
