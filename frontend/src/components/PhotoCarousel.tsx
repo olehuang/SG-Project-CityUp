@@ -60,7 +60,6 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
         if(!photo) return;
         const baseUrl = "http://localhost:8000/users";
         try{
-            console.log("islike:",photo.is_like)
             const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
             await axios.post(likeUrl,{},{
                 params:{photo_id:photo.id,user_id:user_id}

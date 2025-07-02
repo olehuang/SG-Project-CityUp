@@ -151,7 +151,7 @@ async def get_all_user_after_order(
         skip = (page-1)*limit
         users = MongoDB.get_instance().get_collection('users')
         print("total")
-        total= await users.count_documents({}) #total user to show
+        total= await users.count_documents({"point": {"$gt": 0}}) #total user to show
         total_page=math.ceil(total/limit)
         all_users_cursor=users.find({},{"_id":0,"user_id":1,"username":1,"point":1}).sort("point",-1)
         all_users = await all_users_cursor.to_list(length=None)

@@ -109,7 +109,6 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     //open dialog to see Photo detail
     const handleOpen = (index: number) => {
-        console.log(photos[index])
         setSelectedPhotoIndex(index);
         setOpen(true);
     };
@@ -165,7 +164,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         if(!photo) return;
         const baseUrl = "http://localhost:8000/users";
         try{
-            console.log("islike:",photo.is_like)
+
             const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
             await axios.post(likeUrl,{},{
                 params:{photo_id:photo.id,user_id:user_id}

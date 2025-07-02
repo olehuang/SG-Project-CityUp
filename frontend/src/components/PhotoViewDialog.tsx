@@ -146,12 +146,6 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 const nameB = b.uploader.toLowerCase();
                 const likeA = +a.likeCount;
                 const likeB = +b.likeCount;
-                console.log("timeA:",timeA);
-                console.log("timeB:",timeB);
-                console.log("NameA:",nameA);
-                console.log("NameB:",nameB);
-                console.log("LikeA:"+likeA);
-                console.log("LikeB:"+likeB);
 
                 switch (order) {
                     case 'tasc':
@@ -237,7 +231,6 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     //come to prev Photo
     const handlePreview =(photo:Photo)=>{
         const index = sortedPhotos.findIndex(p => p.id === photo.id);
-        console.log(photo)
         setPreviewIndex(index);
         setPreviewPhoto(photo);
         setPreviewOpen(true)
@@ -293,7 +286,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         if(!photo) return;
         const baseUrl = "http://localhost:8000/users";
         try{
-            console.log("islike:",photo.is_like)
+
             const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
             await axios.post(likeUrl,{},{
                 params:{photo_id:photo.id,user_id:user_id}
