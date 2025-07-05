@@ -404,11 +404,6 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                             `Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
                                             <Box>
-                                            {/*<Button startIcon={<FavoriteBorder*/}
-                                            {/*    sx={{color: photo.is_like ? "red": "gray"}} />}*/}
-                                            {/*        onClick={()=>handleLikeToggle(photo)}*/}
-                                            {/*        sx={{visibility: photo.canLike ?  "visible" : "hidden"}}*/}
-                                            {/*> {photo.is_like ?   "Dislike":"Favorite"}</Button>*/}
                                                 <Checkbox
                                                     checked={selectedPhotoIds.has(photo.id)}
                                                     onClick={(e) => e.stopPropagation()} // stop bubble,click checkbox will not  toggleSelect

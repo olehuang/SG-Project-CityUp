@@ -117,7 +117,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
-
+    const downloadURL = "http://localhost:8000/photos/download_photo/"
     //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
         if(roles.includes("admin")){
@@ -248,14 +248,19 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                                 onClick={()=>handleLikeToggle(photos[selectedPhotoIndex])}
                                                  sx={{visibility: photos[selectedPhotoIndex].canLike ?  "visible" : "hidden"}}
                                         > {photos[selectedPhotoIndex].is_like ?   "Dislike":"Favorite"}</Button>
-                                    <Button variant="contained"
-                                            sx={{
-                                                alignSelf: "flex-start",
-                                                visibility: roles.includes("admin")? "visible":"hidden",}}
-                                            onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
-                                    >
-                                        Download
-                                    </Button>
+                                        <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
+                                           download
+                                           style={{textDecoration: "none"}}
+                                        >
+                                            <Button variant="contained"
+                                                    sx={{
+                                                        alignSelf: "flex-start",
+                                                        visibility: roles.includes("admin") ? "visible" : "hidden",
+                                                    }}
+                                                //onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
+                                            >
+                                                Download
+                                            </Button></a>
                                     </Box>
                                 </Box>
                             </Box>
