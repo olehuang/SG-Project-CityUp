@@ -18,11 +18,11 @@ import KeycloakClient from "./keycloak";
 import Photo  from "./PhotoGrid"
 import FavoriteBorder from "@mui/icons-material/Favorite";
 import Favorite from "@mui/icons-material/Favorite";
-
+import CloseIcon from '@mui/icons-material/Close';
 
 
 interface Props {
-    selectedAddress: string|null;
+    viewAddress: string|null;
     open: boolean;
     handleDialogClose: () => void;
 }
@@ -38,7 +38,7 @@ export interface Photo {
     is_like:boolean;
     likeCount:string;
 }
-const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})=>{
+const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
 
     const [photos, setPhotos] = useState<Photo[]>([]);//backend return photo list
@@ -73,10 +73,22 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     // photo from DB laden and username as uploder change
     useEffect(() => {
-        if (!selectedAddress) return;
 
-        fetchPhoto(selectedAddress)
-    }, [selectedAddress]);
+        if (!viewAddress) return;
+        fetchPhoto(viewAddress)
+
+    }, [viewAddress]);
+
+    useEffect(() => {
+        console.log("open:",open);
+        console.log("isSelecting:",isSelecting);
+        console.log("selectedAddress:",viewAddress);
+        if (!open || !viewAddress){
+            setIsSelecting(false)
+            setSelectedPhotoIds(new Set())
+        }
+    }, [open,viewAddress]);
+
 
     const fetchPhoto = async (address: string) => {
         setLoading(true);
@@ -169,6 +181,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         const sort = toggleSortOrder(selectOrder);
         setSortedPhotos(orderPhoto(sort));
     }, [selectOrder, photos]);
+
+
 
     // select photos then download
     const toggleSelect = (photoId: string) => {
@@ -290,12 +304,14 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     maxWidth={'lg'}
                     fullWidth
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
+                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {viewAddress}
+                </DialogTitle>
                 <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
                     <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
                         <Typography variant="h5" sx={{}}>Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
+
                             {isSelecting && selectedPhotoIds.size > 0 && (
                                 <Button
                                     onClick={downloadPhotos}
@@ -315,6 +331,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 onClick={() => {
                                     setIsSelecting(!isSelecting);
                                     setSelectedPhotoIds(new Set());
+
                                 }}
                                 color={isSelecting ? "error" : "primary"}
                                 sx={{visibility: roles.includes("admin")? "visible":"hidden",}}

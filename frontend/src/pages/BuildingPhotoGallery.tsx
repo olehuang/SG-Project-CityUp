@@ -70,6 +70,7 @@ const BuildingPhotoGallery=()=>{
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
     const [open,setOpen]=useState(false);//Photo dialog
+    const [viewAddress,setViewAddress] = useState<string | null>(null)
     const [isNomatch,setIsNomatch]=useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
@@ -156,13 +157,14 @@ const BuildingPhotoGallery=()=>{
 
     }
 
-    const handleDialogOpen = (index: number) => {
+    const handleDialogOpen = () => {
         setOpen(true);
+        setViewAddress(selectedAddress)
     };
 
     const handleDialogClose = () => {
         setOpen(false);
-
+        setViewAddress(null)
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -212,6 +214,7 @@ const BuildingPhotoGallery=()=>{
             setIsNomatch(true);
         }
     },[searchResult])
+
 
 
 
@@ -298,7 +301,7 @@ const BuildingPhotoGallery=()=>{
                             <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>
                                 <Button variant={"outlined"}
-                                        onClick={()=>setOpen(true)}
+                                        onClick={handleDialogOpen}
                                             sx={{visibility:selectedAddress? "visible":"hidden" }}>
                                             View all</Button>
                             </Box>
@@ -326,7 +329,7 @@ const BuildingPhotoGallery=()=>{
                 </Box>
             </Box>
             {/*All photo Dialog */}
-            <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
+            <PhotoViewDialog viewAddress={viewAddress} open={open} handleDialogClose={handleDialogClose}/>
 
         </Box>
     )
