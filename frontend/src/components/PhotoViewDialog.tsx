@@ -184,49 +184,29 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     };
 
     // download selected photo,single Photo will be direct download, more will as Zip download
-    const handleDownloadSelected = async () => {
-        //const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
-        if (roles.includes("admin")){
-            const selectedPhotosIds = Array.from(selectedPhotoIds);
-            let url = "";
-            let link = document.createElement("a");
-            try {
-                let blob: Blob;
-                let filename: string;
-                if (selectedPhotosIds.length === 1) {
-                    const response = await (await axios.get(
-                        `http://localhost:8000/photos/download_photo/${selectedPhotosIds[0]}`,
-                        {
-                            responseType: 'blob',
-                        }));
-                    blob = response.data
-                    filename = `${'download'}.jpg`;
+    const downloadPhotos = ()=>{
+        const selectedPhotosIds = Array.from(selectedPhotoIds);
+        if (selectedPhotosIds.length===0){setError("muss choose minimal one Photos");}
 
-                } else {
-                    const response = await axios.post(
-                        `http://127.0.0.1:8000/photos/download_zip`, selectedPhotosIds,
-                        {
-                            responseType: "blob"
-                        }
-                    );
-                    blob = new Blob([response.data], {type: "application/zip"});
-                    filename = "photos.zip";
-                }
-
-                url = URL.createObjectURL(blob);
-                link = document.createElement("a");
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } catch (error: any) {
-                console.error("Download ZIP failed", error);
-                setError("Failed to download photos as ZIP.");
+        let url = "";
+        try{
+            if (selectedPhotosIds.length === 1) {
+                url = `http://localhost:8000/photos/download_photo/${selectedPhotosIds[0]}`
+            } else if (selectedPhotosIds.length > 1) {
+                const query = new URLSearchParams();
+                selectedPhotosIds.forEach(id => query.append("photo_ids", id))
+                url = `http://localhost:8000/photos/download_zip?${query.toString()}`;
             }
+            const a = document.createElement("a");
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }catch (error: any) {
+            console.error("Download failed", error);
+            setError("Failed to download photo.");
         }
-    };
+    }
 
     //come to prev Photo
     const handlePreview =(photo:Photo)=>{
@@ -318,7 +298,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
                             {isSelecting && selectedPhotoIds.size > 0 && (
                                 <Button
-                                    onClick={handleDownloadSelected}
+                                    onClick={downloadPhotos}
                                     variant="contained"
                                     color="success"
                                 >
