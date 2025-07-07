@@ -109,7 +109,6 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     //open dialog to see Photo detail
     const handleOpen = (index: number) => {
-        console.log(photos[index])
         setSelectedPhotoIndex(index);
         setOpen(true);
     };
@@ -118,7 +117,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         setOpen(false);
         setSelectedPhotoIndex(null);
     };
-
+    const downloadURL = "http://localhost:8000/photos/download_photo/"
     //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
         if(roles.includes("admin")){
@@ -165,7 +164,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         if(!photo) return;
         const baseUrl = "http://localhost:8000/users";
         try{
-            console.log("islike:",photo.is_like)
+
             const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
             await axios.post(likeUrl,{},{
                 params:{photo_id:photo.id,user_id:user_id}
@@ -236,7 +235,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                     <Typography variant="body1">
                                         Upload User: {photos[selectedPhotoIndex].uploader}</Typography>
                                     <Typography variant="body1">
-                                        Like Number: {photos[selectedPhotoIndex].likeCount}</Typography>
+                                        Favorite Number: {photos[selectedPhotoIndex].likeCount}</Typography>
                                 </Box>
                                     <Box sx={{
                                         display: "flex",
@@ -249,14 +248,19 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                                 onClick={()=>handleLikeToggle(photos[selectedPhotoIndex])}
                                                  sx={{visibility: photos[selectedPhotoIndex].canLike ?  "visible" : "hidden"}}
                                         > {photos[selectedPhotoIndex].is_like ?   "Dislike":"Favorite"}</Button>
-                                    <Button variant="contained"
-                                            sx={{
-                                                alignSelf: "flex-start",
-                                                visibility: roles.includes("admin")? "visible":"hidden",}}
-                                            onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
-                                    >
-                                        Download
-                                    </Button>
+                                        <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
+                                           download
+                                           style={{textDecoration: "none"}}
+                                        >
+                                            <Button variant="contained"
+                                                    sx={{
+                                                        alignSelf: "flex-start",
+                                                        visibility: roles.includes("admin") ? "visible" : "hidden",
+                                                    }}
+                                                //onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
+                                            >
+                                                Download
+                                            </Button></a>
                                     </Box>
                                 </Box>
                             </Box>

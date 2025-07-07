@@ -181,9 +181,10 @@ async def download_photo(photo_id: str):
         print("Download error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error during image download")
 
-@router.post("/download_zip")
-async def download_photos_zip(photo_ids: list[str] = Body(...)):
+@router.get("/download_zip")
+async def download_photos_zip(photo_ids: List[str] = Query(...)):
     try:
+        #photo_id_list = photo_ids.split(",")
         zip_stream = BytesIO()
         with zipfile.ZipFile(zip_stream, "w", zipfile.ZIP_DEFLATED) as zip_file:
             for pid in photo_ids:

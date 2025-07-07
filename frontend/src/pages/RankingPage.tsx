@@ -56,23 +56,23 @@ const RankingPage =()=>{
     const [limit,setLimit] = useState(10);  // each page show limit User
     const [total,setTotal]=useState<number>(100); //total
     const totalPages = userRanking?.total_page || 1; // how many pages will show, default 1
-    const [loading,setLoading]=useState<boolean>(false); //
+    const [usersloading,setUsersLoading]=useState<boolean>(false); //
+    const [userloading,setUserLoading]=useState<boolean>(false); //
     const [ranking,setRanking]=useState<number>();
     const [getRankingError,setGetRankingError]=useState<string>("");
     const [privateUserError,setPrivateUserError]=useState<string>("");
 
     const myRuf=useRef<HTMLTableRowElement>(null);
-    const [scollToMyRow, setScollToMyRow]=useState(false);
+    const [scrollToMyRow, setScrollToMyRow]=useState(false);
+    const [showingMyPosition,setShowingMyPosition]=useState(false);
     const navigat = useNavigate();
     const url="http://127.0.0.1:8000"
 
     useEffect(() => {
-        setLoading(true);
-        get_users(page,limit)
 
+        get_users(page,limit)
     }, [page,limit]);
     useEffect(() => {
-        setLoading(true);
         get_user(user_id);
     }, []);
 
@@ -83,6 +83,7 @@ const RankingPage =()=>{
      * */
     const get_users=async (page=1,limit=10) => {
         try{
+            setUsersLoading(true);
             const response = await axios.get<UserRanking>(url+"/users/get_all_user_after_order",
                 {params:{page:page,limit:limit}});
             const usersR:UserRanking = {
@@ -92,12 +93,13 @@ const RankingPage =()=>{
                 users:response.data.users,
                 total_page:response.data.total_page,
             };
+
             setUserRanking(usersR);
-            console.log("usersR[]:",usersR.users);
+            console.log("totalpages:",usersR.total_page);
         }catch(error:any){
             setGetRankingError("get Ranking Error: "+(error.message || "Unknown error"))
         } finally {
-            setLoading(false);
+            setUsersLoading(false);
         }
     }
 
@@ -107,6 +109,7 @@ const RankingPage =()=>{
      * */
     const get_user=async (user_id:string) => {
         try {
+            setUserLoading(true)
             const response = await axios.get(url+`/users/get_user`,{params:{user_id:user_id}});
             console.log("user:",response.data)
             const re = await axios.get(url+`/users/get_user_rank`,{params:{user_id:user_id}})
@@ -123,27 +126,59 @@ const RankingPage =()=>{
 
         }catch (e:any) {
             setPrivateUserError("get private User Error: "+(e.message || "Unknown error"));
+        }finally {
+            setUserLoading(false)
         }
     }
 
-    // const update_point=async (point=1)=>{
-    //
-    //     try{
-    //         const response = axios.post(url+`/users/update_point`,
-    //             {},{params:{user_id:user_id,point:point}});
-    //         //console.log(response.data);
-    //     }catch (e:any) {
-    //         console.log(e.message || "Unknown error");
-    //     }
-    // }
-
-    const toMyPosition = ()=>{
-        if (user.rank && user.rank> 0){
-            const targetPage =Math.ceil(user.rank / limit);
-            setPage(targetPage);
-            setScollToMyRow(true)
+    const checkUserPage =async (page:number,userId:string)=>{
+        try {
+            const response = await axios.get(url+`/users/get_all_user_after_order`,
+                {params:{page,limit}});
+            return response.data.users.some((u:User) => u.user_id==userId);
+        }catch(error:any){
+            console.log("Error checking user in page",error);
+            return false;
         }
     }
+
+    const toMyPosition = async ()=>{
+        if (user.rank==-1) return;
+        if (showingMyPosition){//trans back to top/ first page
+            setPage(1);
+            setScrollToMyRow(true);
+            setShowingMyPosition(false);
+            return;
+        }
+        if (totalPages>1){
+            const targetPage =  Math.max(1, Math.ceil(user.rank / limit));
+            let foundPage = -1;
+
+            if (await checkUserPage(targetPage,user_id)){
+                foundPage = targetPage;
+            }else {
+                if (targetPage > 1 && await checkUserPage(targetPage-1,user_id)){
+                    foundPage = targetPage-1;
+                }
+                else if (targetPage <totalPages && await checkUserPage(targetPage+1,user_id)){
+                    foundPage = targetPage+1;
+                }
+            }
+            if(foundPage!==-1){
+                setPage(foundPage);
+                setScrollToMyRow(true);
+                setShowingMyPosition(true);
+            }
+        }
+
+    }
+    useEffect(() => {
+        if (scrollToMyRow && !usersloading && myRuf) {
+            console.log("Trying to scroll to:", myRuf.current);
+            myRuf.current?.scrollIntoView({behavior: "smooth", block: "center"});
+            setScrollToMyRow(false);
+        }
+    }, [scrollToMyRow, usersloading, userRanking]);
 
     return (
         <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",overflowY: "auto",}}>
@@ -151,18 +186,15 @@ const RankingPage =()=>{
                 <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>User
                     Name: {user.username }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Ranking: {user.rank!== -1 ? user.rank: "not in Ranking " }</Typography>
+                    Ranking: {user.rank!== -1 && +user.point !== 0 ? user.rank : "not in Ranking " }</Typography>
                 <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Point: { user.point}</Typography>
-                <Button sx={{marginLeft: "auto"}}
+                    Point: {user.point}</Typography>
+                <Button sx={{margin: "auto 2% 0.5% auto", visibility: totalPages > 1 ? "visible" : "hidden",}}
                         size="large"
                         variant={"outlined"}
-
-                > My Position
+                        onClick={toMyPosition}
+                > {showingMyPosition ? "Top" : "My Position"}
                 </Button>
-                <Button sx={{margin: "0 2% 0 0.5%"}}
-                        size="large"
-                        variant={"outlined"}>Top</Button>
             </Box>
             <TableContainer component={Paper}
                             sx={{...styles.tableContainer,overflow:"auto"}}>
@@ -178,7 +210,7 @@ const RankingPage =()=>{
                     </TableHead>
 
                     <TableBody >
-                        {loading ? (
+                        {usersloading ? (
                         <TableRow >
                             <TableCell sx={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
                                 <Box sx={{margin:"auto",textAlign: "center"}}>
@@ -202,14 +234,15 @@ const RankingPage =()=>{
                                       ref={rowUser.user_id===user_id? myRuf:null}
                             >
                                 <TableCell >
+                                    <Box sx={{display: "flex", alignItems:"center", justifyContent: "flex-start"}}>
                                     {(() => {
                                     const rank = rowUser.rank;
                                     if (rank <= 3) {
                                         const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
                                         return <WorkspacePremiumRoundedIcon sx={{ color }} />;
                                     }
-                                    return rank;
-                                })()}
+                                        return <Typography sx={{marginLeft:"2%"}}>{rank}</Typography>;
+                                })()}</Box>
                                 </TableCell>
                                 <TableCell>{rowUser.username}</TableCell>
                                 <TableCell>{rowUser.point}</TableCell>
