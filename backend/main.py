@@ -9,7 +9,7 @@ load_dotenv()
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from routes import photo_routes, user_routes, building_routes
+from routes import photo_routes, user_routes, building_routes,rankings
 from fastapi.staticfiles import StaticFiles
 from fastapi.routing import APIRoute
 
@@ -39,6 +39,7 @@ app.add_middleware(
 app.include_router(user_routes.router, prefix="/users", tags=["Users"])
 app.include_router(photo_routes.router, prefix="/photos", tags=["Photos"])
 app.include_router(building_routes.router, prefix="/buildings", tags=["Buildings"])
+app.include_router(rankings.router, prefix="/rankings", tags=["Rankings"])
 
 if __name__ == '__main__':
     uvicorn.run(app, host="127.0.0.1", port=8000)

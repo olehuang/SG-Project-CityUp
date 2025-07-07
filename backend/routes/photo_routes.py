@@ -15,6 +15,7 @@ import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
 from bson.binary import Binary
+from routes.rankings import auto_checkin_on_upload,reward_photo_approval
 #for photo download
 from starlette.responses import StreamingResponse
 import io
@@ -72,6 +73,7 @@ async def upload_photo(
         if not photos:
             raise HTTPException(status_code=400, detail="No photos were provided")
         uploaded_photos = []
+        auto_checkin_result = None
         for photo in photos:
             # 验证文件类型
             if not photo.content_type.startswith("image/"):
@@ -107,10 +109,26 @@ async def upload_photo(
                 "photo_id": str(result.inserted_id),
                 "filename": photo.filename
             })
-        return {
-            "message": f"Successfully uploaded {len(uploaded_photos)} photos. All photos are awaiting review.",
+
+        if uploaded_photos:
+            auto_checkin_result = await auto_checkin_on_upload(user_id, datetime.now(timezone.utc))
+
+        base_message = f"Successfully uploaded {len(uploaded_photos)} photos. All photos are awaiting review."
+        if auto_checkin_result:
+            checkin_message = f" Auto checkin completed: {auto_checkin_result['consecutive_days']} consecutive days, earned {auto_checkin_result['points_earned']} points!"
+            full_message = base_message + checkin_message
+        else:
+            full_message = base_message
+
+        response_data = {
+            "message": full_message,
             "uploaded_photos": uploaded_photos
         }
+
+        if auto_checkin_result:
+            response_data["auto_checkin"] = auto_checkin_result
+
+        return response_data
     except HTTPException:
         raise
     except Exception as e:
@@ -292,6 +310,8 @@ async def review_single_photo(request: PhotoReviewRequest):
                 detail="Photo not found or not in 'reviewing' state for this reviewer."
             )
 
+        if final_status == ReviewStatus.Approved:
+            await reward_photo_approval(updated_photo_doc["user_id"], request.photo_id)
         updated_photo_doc["photo_id"] = str(updated_photo_doc["_id"])
         del updated_photo_doc["_id"]
         if "image_data" in updated_photo_doc:
@@ -339,13 +359,14 @@ async def review_batch_photos(request: BatchReviewRequest):
                 detail="No photos found or updated. They might not be in 'reviewing' state by this reviewer."
             )
 
-        # 获取更新后的照片信息
         updated_photos_cursor = photo_collection.find(
             {"_id": {"$in": object_ids},
              "status": final_status.value,
              "reviewer_id": request.reviewer_id})
         updated_photos_list = []
         async for photo_doc in updated_photos_cursor:
+            if final_status == ReviewStatus.Approved:
+                await reward_photo_approval(photo_doc["user_id"], str(photo_doc["_id"]))
             photo_doc["photo_id"] = str(photo_doc["_id"])
             del photo_doc["_id"]
             if "image_data" in photo_doc:
