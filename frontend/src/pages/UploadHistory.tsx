@@ -73,8 +73,8 @@ const UploadHistory: React.FC = () => {
     const [error, setError] = useState<string | null>(null); // error message
     const [detailOpen, setDetailOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<UploadItem | null>(null);
-    const navigate = useNavigate();
-    // 【新增】搜索结果状态和原始数据缓存
+    // const navigate = useNavigate();
+    // 新增】搜索结果状态和原始数据缓存
     const [originalUploads, setOriginalUploads] = useState<UploadItem[]>([]);
     const [searchResults, setSearchResults] = useState<UploadItem[]>([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
@@ -434,7 +434,7 @@ const UploadHistory: React.FC = () => {
                                     <TableCell>Image</TableCell>
                                     <TableCell>Building Address</TableCell>
                                     <TableCell>Status</TableCell>
-                                    <TableCell align="center">Uploaded At</TableCell>
+                                    <TableCell>Uploaded At</TableCell>
                                     <TableCell>Action</TableCell>
                                 </TableRow>
                             </TableHead>
