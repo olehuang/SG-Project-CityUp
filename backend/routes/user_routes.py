@@ -199,16 +199,14 @@ async def get_all_user_after_order(
         limit: int = Query(10, ge=1, le=50)
 ):
     try:
-        # 调用 rankings 模块的核心逻辑，不包含签到信息以提高性能
         result = await rankings.get_leaderboard_data(page, limit, include_checkin_info=False)
 
-        # 转换为原有的返回格式
         return {
             "total": result["pagination"]["total"],
             "page": result["pagination"]["page"],
             "limit": result["pagination"]["limit"],
             "total_page": result["pagination"]["total_pages"],
-            "users": result["users"]  # 直接使用，因为格式已经匹配
+            "users": result["users"]
         }
 
     except Exception as e:

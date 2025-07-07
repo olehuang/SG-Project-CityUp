@@ -288,8 +288,8 @@ async def get_user_ranking(user_id: str):
 @router.get("/checkin/history")
 async def get_checkin_history(
         user_id: str,
-        page: int = Query(1, ge=1, description="页码"),
-        limit: int = Query(30, ge=1, le=100, description="每页数量")
+        page: int = Query(1, ge=1, description="page number"),
+        limit: int = Query(30, ge=1, le=100, description="Quantity per page")
 ):
     try:
         skip = (page - 1) * limit
