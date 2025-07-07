@@ -304,7 +304,18 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                     maxWidth={'lg'}
                     fullWidth
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {viewAddress}
+                <DialogTitle sx={{
+                    backgroundColor: "#FAF6E9",
+                    padding:"1% 1% 0 1%",
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center",
+                }}
+                > Photos Under Adresse - {viewAddress}
+                    <IconButton sx={{marginLeft:"auto"}}
+                        onClick={handleDialogClose}>
+                        <CloseIcon />
+                    </IconButton>
                 </DialogTitle>
                 <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
                     <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
