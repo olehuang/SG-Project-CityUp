@@ -12,6 +12,7 @@ import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import Favorite from "@mui/icons-material/Favorite";
 import FavoriteBorder from "@mui/icons-material/Favorite";
+import CloseIcon from "@mui/icons-material/Close";
 
 
 
@@ -85,7 +86,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                 alignItems: "center",
                 backgroundColor: "#FAF6E9",
             }}>
-                {/*<DialogTitle>{previewPhoto?.title}</DialogTitle>*/}
+
                 {/*link Arrow area*/}
                 <Box sx={styles.linkArrowArea} onClick={onPrev}>
                     <IconButton
@@ -117,12 +118,10 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             }}
                         />
                     </Box>
+                    {/*infomation Area */}
                     <Box sx={{textAlign:"left"}}>
                         <Typography variant="body2" sx={{}}>
                             Upload User:  {photo?.uploader}
-                        </Typography>
-                        <Typography variant="body2" sx={{}}>
-                            Upload User id:  {photo?.uploader_id}
                         </Typography>
                         <Typography variant="body2" sx={{}}>
                             Uploadtime : {photo?.uploadTime}
@@ -149,7 +148,18 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             />
                         )}
                     </Box>
+                    <IconButton
+                        sx={{
+                            margin:" 1% 5% auto auto",
+                            top:"1%", right:"1%",
+                            position: "absolute",
+                            zIndex:10,
+                    }}
+                                onClick={onClose}>
+                        <CloseIcon />
+                    </IconButton>
                 </Box>
+
                 {/*right Arrow area*/}
                 <Box sx={styles.rightArrowArea} onClick={onNext}>
                     <IconButton

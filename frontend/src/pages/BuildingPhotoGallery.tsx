@@ -121,7 +121,6 @@ const BuildingPhotoGallery=()=>{
                 setPhotoInfoMap(infoMap);
 
             }catch (e:any) {
-                console.log(e.message || "Unknown error")
                 setError(e.message || "Unknown error")
                 setAllAddresses(mockResults);
                 setSearchResult(mockResults);
@@ -203,7 +202,6 @@ const BuildingPhotoGallery=()=>{
     const handleSelect = (selected: string) => {
         //handleSearch(selected);
         setSelectedAddress(selected);
-        console.log("select:",selected)
 
     };
 

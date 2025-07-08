@@ -95,7 +95,6 @@ const RankingPage =()=>{
             };
 
             setUserRanking(usersR);
-            console.log("totalpages:",usersR.total_page);
         }catch(error:any){
             setGetRankingError("get Ranking Error: "+(error.message || "Unknown error"))
         } finally {
@@ -111,7 +110,7 @@ const RankingPage =()=>{
         try {
             setUserLoading(true)
             const response = await axios.get(url+`/users/get_user`,{params:{user_id:user_id}});
-            console.log("user:",response.data)
+
             const re = await axios.get(url+`/users/get_user_rank`,{params:{user_id:user_id}})
             const responseUser: User = {
                 user_id: response.data.user_id,
@@ -120,8 +119,6 @@ const RankingPage =()=>{
                 rank: re.data.rank,
             };
             setUser(responseUser);
-
-            console.log(re.data)
             setRanking(re.data)
 
         }catch (e:any) {
@@ -137,7 +134,6 @@ const RankingPage =()=>{
                 {params:{page,limit}});
             return response.data.users.some((u:User) => u.user_id==userId);
         }catch(error:any){
-            console.log("Error checking user in page",error);
             return false;
         }
     }
@@ -174,7 +170,6 @@ const RankingPage =()=>{
     }
     useEffect(() => {
         if (scrollToMyRow && !usersloading && myRuf) {
-            console.log("Trying to scroll to:", myRuf.current);
             myRuf.current?.scrollIntoView({behavior: "smooth", block: "center"});
             setScrollToMyRow(false);
         }

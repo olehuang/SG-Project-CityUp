@@ -63,7 +63,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -80,9 +79,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     }, [viewAddress]);
 
     useEffect(() => {
-        console.log("open:",open);
-        console.log("isSelecting:",isSelecting);
-        console.log("selectedAddress:",viewAddress);
         if (!open || !viewAddress){
             setIsSelecting(false)
             setSelectedPhotoIds(new Set())
@@ -93,13 +89,12 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     const fetchPhoto = async (address: string) => {
         setLoading(true);
         setError(null);
-        console.log("address:", address);
+
 
         const url = "http://127.0.0.1:8000/photos/get_photo_list"
         try {
             const response = await axios.get(url, {params: {address: address,user_id:user_id}});
             const data = response.data;
-            console.log(data);
 
             const formattedPhotos: Photo[] = data.map((item: any) => ({
                 id:item.photo_id,
@@ -217,7 +212,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
             a.click();
             document.body.removeChild(a);
         }catch (error: any) {
-            console.error("Download failed", error);
             setError("Failed to download photo.");
         }
     }
