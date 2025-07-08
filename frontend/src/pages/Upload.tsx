@@ -313,7 +313,8 @@ const Upload: React.FC = () => {
         <div
             style={{
                 width: "100%",
-                minHeight: "100vh",
+                height: "100vh",
+                overflowY: "auto",
                 background: "#FFF8E1",
                 display: "flex",
                 flexDirection: isSmallScreen ? "column" : "row",
@@ -321,7 +322,6 @@ const Upload: React.FC = () => {
                 justifyContent: "stretch",
                 boxSizing: "border-box",
                 position: "relative",
-
                 padding: isSmallScreen ? "20px" : "0",
             }}
         >
@@ -331,7 +331,7 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 2,
                     width: isSmallScreen ? "100%" : "68%",
-                    padding: isSmallScreen ? "20px" : "44px 38px 44px 6vw",
+                    padding: isSmallScreen ? "20px" : "10px 38px 44px 6vw",
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -527,14 +527,15 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 1,
                     width: isSmallScreen ? "100%" : "32%",
+                    overflowY:"auto",
                     padding: isSmallScreen ? "20px"
-                        : `151px 6vw 44px 38px`,
+                        : `119px 6vw 44px 38px`,
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     background: "transparent",
                     // 与左侧区域顶部完全对齐
-                    paddingTop: isSmallScreen ? "20px" : "151px"
+                    paddingTop: isSmallScreen ? "20px" : "119px"
                 }}
             >
                 {/* 拍照/相册按钮 */}
@@ -612,7 +613,7 @@ const Upload: React.FC = () => {
                     display: "flex",
                     gap: 10,
                     flexWrap: "wrap",
-                    marginBottom: 12,
+                    marginBottom: 0,
                     minHeight: 90,
                     maxHeight: "25vh",
                     overflowY: "auto"
@@ -664,7 +665,7 @@ const Upload: React.FC = () => {
                         background: "#fffde7",
                         borderRadius: 12,
                         padding: "16px",
-                        marginBottom: 16,
+                        marginBottom: 5,
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
