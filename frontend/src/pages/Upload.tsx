@@ -234,12 +234,12 @@ const Upload: React.FC = () => {
         setPhotos([...photos, ...newPhotos]);
     };
 
-    // 删除照片
+    // delet
     const removePhoto = (id: string) => {
         setPhotos(photos.filter((p) => p.id !== id));
     };
 
-    // 提交照片
+    // submit
     const handleSubmit = async () => {
         setError(null);
         if (!auth || !user_id) {
@@ -292,7 +292,7 @@ const Upload: React.FC = () => {
         setIsSubmitting(false);
     };
 
-    // 监控地图高度
+    // 监控地图高度Monitor map height
     useLayoutEffect(() => {
         const updateMapRect = () => {
             if (mapDivRef.current && leftSectionRef.current) {
@@ -325,7 +325,7 @@ const Upload: React.FC = () => {
                 padding: isSmallScreen ? "20px" : "0",
             }}
         >
-            {/* 左侧区域 - 地图和地址输入 */}
+            {/* 左侧区域 - 地图和地址输入Left Area - Map and Address Input */}
             <div
                 ref={leftSectionRef}
                 style={{
@@ -349,7 +349,7 @@ const Upload: React.FC = () => {
                     Upload Building Photos
                 </h1>
 
-                {/* 地址输入和搜索 */}
+                {/* Address entry and search */}
                 <div style={{ marginBottom: 16 }}>
                     <label htmlFor="address"
                            style={{
@@ -362,7 +362,7 @@ const Upload: React.FC = () => {
                     </label>
                     <div style={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: 8, alignItems: "center", width: "100%" }}>
 
-                        {/* 门牌号输入框 */}
+                        {/* 门牌号输入框Door number input box */}
                         {houseNumberMissing && (
                             <input
                                 ref={houseNumberRef}
@@ -390,7 +390,7 @@ const Upload: React.FC = () => {
                             />
                         )}
 
-                        {/* 地址输入框和搜索按钮 */}
+                        {/* 地址输入框和搜索按钮 Address input box and search button*/}
                         <div style={{ display: "flex", flex: 1, width: "100%", gap: 8 }}>
                             <input
                                 id="address"
@@ -431,21 +431,21 @@ const Upload: React.FC = () => {
                     </div>
                 </div>
 
-                {/* 缺失门牌号提示 */}
+                {/* 缺失门牌号提示 Missing door number alert*/}
                 {houseNumberMissing && (
                     <div style={{ color: "#e53935", fontSize: 14, marginTop: 8 }}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
 
-                {/* 地图容器 */}
+                {/* 地图容器Map Container */}
                 <div
                     ref={mapDivRef}
                     style={{
                         width: "100%",
-                        height: isSmallScreen ? "60vh" : "60vh", // 增加地图高度
-                        maxHeight: 500, // 增加最大高度
-                        minHeight: isSmallScreen ? 300 : 350, // 增加最小高度
+                        height: isSmallScreen ? "60vh" : "60vh",
+                        maxHeight: 500,
+                        minHeight: isSmallScreen ? 300 : 350,
                         borderRadius: 16,
                         overflow: "hidden",
                         marginBottom: 8,
@@ -493,7 +493,7 @@ const Upload: React.FC = () => {
                     )}
                 </div>
 
-                {/* 地图操作提示 */}
+                {/* 地图操作提示Map operation */}
                 <div style={{
                     textAlign: "center",
                     marginTop: "10px",
@@ -503,7 +503,7 @@ const Upload: React.FC = () => {
                     Drag the marker to adjust the building location
                 </div>
 
-                {/* 悬浮分割线 - 放置在左侧区域内 */}
+                {/* 悬浮分割线 - 放置在左侧区域内Hovering divider */}
                 {!isSmallScreen && (
                     <div
                         style={{
@@ -522,7 +522,7 @@ const Upload: React.FC = () => {
                 )}
             </div>
 
-            {/* 右侧区域 - 照片上传 */}
+            {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
             <div
                 style={{
                     flex: isSmallScreen ? "none" : 1,
@@ -534,11 +534,10 @@ const Upload: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     background: "transparent",
-                    // 与左侧区域顶部完全对齐
                     paddingTop: isSmallScreen ? "20px" : "119px"
                 }}
             >
-                {/* 拍照/相册按钮 */}
+                {/* 拍照/相册按钮 Photo/Album button*/}
                 <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
                     <button
                         onClick={handleTakePhoto}
@@ -608,7 +607,7 @@ const Upload: React.FC = () => {
                     />
                 </div>
 
-                {/* 照片缩略图区域 */}
+                {/* 照片缩略图区域 Photo thumbnail area*/}
                 <div style={{
                     display: "flex",
                     gap: 10,
@@ -658,7 +657,7 @@ const Upload: React.FC = () => {
                     ))}
                 </div>
 
-                {/* 拍摄要求说明 */}
+                {/* 拍摄要求说明 Explanation of filming requirements */}
                 <div
                     style={{
                         fontSize: "0.98rem",
@@ -691,7 +690,7 @@ const Upload: React.FC = () => {
                     </ul>
                 </div>
 
-                {/* 错误提示 */}
+                {/* 错误提示 error handle*/}
                 {error && (
                     <div
                         style={{
@@ -712,7 +711,7 @@ const Upload: React.FC = () => {
                     </div>
                 )}
 
-                {/* 提交按钮 */}
+                {/* 提交按钮 Submit button*/}
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
