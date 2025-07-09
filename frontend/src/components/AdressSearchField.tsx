@@ -127,7 +127,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         setSearchResult([...allAddresses])
                         setIsNomatch(false)
                         setHasSearched(false)
-                }}> Back</Button>}
+                }}> All Address </Button>}
                 {history.length > 0 && (
                     <Button
                         sx={{marginRight:"auto"}}

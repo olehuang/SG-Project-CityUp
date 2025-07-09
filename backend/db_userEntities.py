@@ -135,15 +135,25 @@ async def update_user_point(user_id:str,point:int):
     :param point: how many points to update
     :return:
     """
+    #make sure point not negative number
+    if (point<-1):log_error("Point can't be less than 0",
+                           stack_data=traceback.format_exc(),
+                           time_stamp=datetime.now().isoformat())
+    #make sure point muss be int type
+    if not isinstance(point,int):log_error("Point can't be int type",
+                                           stack_data=traceback.format_exc(),
+                                           time_stamp=datetime.now().isoformat())
     try:
         users = MongoDB.get_instance().get_collection('users')
         query = {"user_id":user_id}
+        #get user info
         user=await users.find_one(query)
         if user is None:
             return {"message": "User does not exist"}
+        # update user point
         user_point=user.get('point')+point
         neu_valiue={"$set": {"point": user_point}}
-        result = await users.update_one(query, neu_valiue)
+        await users.update_one(query, neu_valiue)
         return {"message": "User point updated successfully"}
     except Exception as e:
         log_error("Error from update_user_point : {}".format(e),

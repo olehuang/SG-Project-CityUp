@@ -38,11 +38,11 @@ const Sidebar = ({ open, onClose, variant }: SidebarProps) => {
     const {token}=useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
 
+
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo= await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles||[]);
-            console.log(userInfo?.roles);
         }
         if (token!==null && token!==undefined) {
             fetchRoles();

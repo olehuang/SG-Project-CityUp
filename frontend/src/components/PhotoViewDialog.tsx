@@ -6,33 +6,43 @@ import {Box, Dialog, DialogTitle, Typography,ImageList,
     IconButton,
     Checkbox,
     FormControlLabel,
+
 } from "@mui/material";
 import axios from "axios";
 import CircularProgress from "@mui/material/CircularProgress";
 import PhotoOrderSelector from "./PhotoOrderSelector";
 import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import PhotoCarousel from "./PhotoCarousel";
-import qs from "qs";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
 import useMediaQuery from "@mui/material/useMediaQuery";
 
+import Photo  from "./PhotoGrid"
+import FavoriteBorder from "@mui/icons-material/Favorite";
+import Favorite from "@mui/icons-material/Favorite";
+import CloseIcon from '@mui/icons-material/Close';
 
 
 interface Props {
-    selectedAddress: string|null;
+    viewAddress: string|null;
     open: boolean;
     handleDialogClose: () => void;
+
 }
 
-interface Photo {
+export interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
+    is_like:boolean;
+    likeCount:string;
 }
-const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})=>{
+const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
+
 
     const [photos, setPhotos] = useState<Photo[]>([]);//backend return photo list
     const [loading, setLoading] = useState(false); //loding photo
@@ -49,7 +59,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     const [previewIndex, setPreviewIndex] = useState<number>(0);
 
-    const { token } = useAuthHook();
+    const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
     const isMobile = useMediaQuery("(max-width:768px)");
 
@@ -58,7 +68,6 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -68,56 +77,49 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     // photo from DB laden and username as uploder change
     useEffect(() => {
-        if (!selectedAddress) return;
 
-        const fetchPhoto = async (address: string) => {
-            setLoading(true);
-            setError(null);
-            console.log("address:", address);
+        if (!viewAddress) return;
+        fetchPhoto(viewAddress)
 
-            const url = "http://127.0.0.1:8000/photos/get_photo_list"
-            try {
-                const response = await axios.get(url, {params: {address: address}});
-                const data = response.data;
-                console.log(data);
+    }, [viewAddress]);
 
-                const formattedPhotos: Photo[] = data.map((item: any) => ({
-                    id:item.photo_id,
-                    src: item.image_url,
-                    title: item.title,
-                    uploader: item.user_id,
-                    uploadTime: item.upload_time
-                }));
-
-                const userIds: string[] = Array.from(new Set(data.map((p: any) => p.user_id)));
-                const userMap: Record<string, string> = {};
-
-                for (const userId of userIds) {
-                    try {
-                        const res = await axios.get("http://127.0.0.1:8000/users/get_user_name", {
-                            params: {user_id: userId},
-                        });
-                        userMap[userId] = res.data;
-                    } catch (e) {
-                        console.error(`Failed to fetch username for ${userId}`, e);
-                        userMap[userId] = "Unknown";
-                    }
-                }
-                const updatedPhotos = formattedPhotos.map(p => ({
-                    ...p,
-                    id: p.id,
-                    uploader: userMap[p.uploader] ?? "Unknown",
-                    uploadTime: formatTime(p.uploadTime)?? "Unknow"
-                }));
-                setPhotos(updatedPhotos);
-            } catch (err: any) {
-                setError(err.message || "Unknown error");
-            } finally {
-                setLoading(false);
-            }
+    useEffect(() => {
+        if (!open || !viewAddress){
+            setIsSelecting(false)
+            setSelectedPhotoIds(new Set())
         }
-        fetchPhoto(selectedAddress)
-    }, [selectedAddress]);
+    }, [open,viewAddress]);
+
+
+    const fetchPhoto = async (address: string) => {
+        setLoading(true);
+        setError(null);
+
+
+        const url = "http://127.0.0.1:8000/photos/get_photo_list"
+        try {
+            const response = await axios.get(url, {params: {address: address,user_id:user_id}});
+            const data = response.data;
+
+            const formattedPhotos: Photo[] = data.map((item: any) => ({
+                id:item.photo_id,
+                src: item.image_url,
+                title: item.title,
+                uploader_id:item.user_id,
+                uploader: item.username,
+                uploadTime: formatTime(item.upload_time),
+                canLike:item.canLike,
+                is_like:item.is_like,
+                likeCount:item.likeCount,
+            }));
+
+            setPhotos(formattedPhotos);
+        } catch (err: any) {
+            setError(err.message || "Unknown error");
+        } finally {
+            setLoading(false);
+        }
+    }
 
     // order method change
     useEffect(() => {
@@ -136,28 +138,40 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 case "Name Desc":
                     order = 'ndesc';
                     break;
+                case "Like Asc" :
+                    order = 'lkasc';
+                    break;
+                case "Like Desc":
+                    order = 'lkdesc';
+                    break;
             }
             return order;
         }
+
+
         //follow time/upload Name Desc(Z-A)/Asc(A-Z) Order Photos
         const orderPhoto = (order: string) => {
             return [...photos].sort((a, b) => {
-                const timeA = new Date(a.uploadTime).getTime();
-                const timeB = new Date(b.uploadTime).getTime();
+                const timeA =  new Date(a.uploadTime.replace(',', ''));
+                const timeB = new Date(b.uploadTime.replace(',', ''));
                 const nameA = a.uploader.toLowerCase();
                 const nameB = b.uploader.toLowerCase();
-                console.log("NameA:",nameA);
-                console.log("NameB:",nameB);
+                const likeA = +a.likeCount;
+                const likeB = +b.likeCount;
 
                 switch (order) {
                     case 'tasc':
-                        return timeA - timeB;
+                        return timeA.getTime() - timeB.getTime();
                     case 'tdesc':
-                        return timeB - timeA;
+                        return timeB.getTime() - timeA.getTime();
                     case 'nasc' :
                         return nameA.localeCompare(nameB);
                     case 'ndesc':
                         return nameB.localeCompare(nameA);
+                    case 'lkasc':
+                        return likeB - likeA;//most Favorite first
+                    case 'lkdesc':
+                        return likeA - likeB;//least Favorite first
                     default:
                         return 0;
                 }
@@ -167,6 +181,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
         const sort = toggleSortOrder(selectOrder);
         setSortedPhotos(orderPhoto(sort));
     }, [selectOrder, photos]);
+
+
 
     // select photos then download
     const toggleSelect = (photoId: string) => {
@@ -182,49 +198,28 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
     };
 
     // download selected photo,single Photo will be direct download, more will as Zip download
-    const handleDownloadSelected = async () => {
-        //const selectedPhotos = sortedPhotos.filter(p => selectedPhotoIds.has(p.id));
-        if (roles.includes("admin")){
-            const selectedPhotosIds = Array.from(selectedPhotoIds);
-            let url = "";
-            let link = document.createElement("a");
-            try {
-                let blob: Blob;
-                let filename: string;
-                if (selectedPhotosIds.length === 1) {
-                    const response = await (await axios.get(
-                        `http://localhost:8000/photos/download_photo/${selectedPhotosIds[0]}`,
-                        {
-                            responseType: 'blob',
-                        }));
-                    blob = response.data
-                    filename = `${'download'}.jpg`;
+    const downloadPhotos = ()=>{
+        const selectedPhotosIds = Array.from(selectedPhotoIds);
+        if (selectedPhotosIds.length===0){setError("muss choose minimal one Photos");}
 
-                } else {
-                    const response = await axios.post(
-                        `http://127.0.0.1:8000/photos/download_zip`, selectedPhotosIds,
-                        {
-                            responseType: "blob"
-                        }
-                    );
-                    blob = new Blob([response.data], {type: "application/zip"});
-                    filename = "photos.zip";
-                }
-
-                url = URL.createObjectURL(blob);
-                link = document.createElement("a");
-                link.href = url;
-                link.download = filename;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                URL.revokeObjectURL(url);
-            } catch (error: any) {
-                console.error("Download ZIP failed", error);
-                setError("Failed to download photos as ZIP.");
+        let url = "";
+        try{
+            if (selectedPhotosIds.length === 1) {
+                url = `http://localhost:8000/photos/download_photo/${selectedPhotosIds[0]}`
+            } else if (selectedPhotosIds.length > 1) {
+                const query = new URLSearchParams();
+                selectedPhotosIds.forEach(id => query.append("photo_ids", id))
+                url = `http://localhost:8000/photos/download_zip?${query.toString()}`;
             }
+            const a = document.createElement("a");
+            a.href = url;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }catch (error: any) {
+            setError("Failed to download photo.");
         }
-    };
+    }
 
     //come to prev Photo
     const handlePreview =(photo:Photo)=>{
@@ -279,6 +274,28 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     }
 
+    //click Favourite Icon toggle like and dislike
+    const handleLikeToggle =async (photo:Photo)=>{
+        if(!photo) return;
+        const baseUrl = "http://localhost:8000/users";
+        try{
+
+            const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
+            await axios.post(likeUrl,{},{
+                params:{photo_id:photo.id,user_id:user_id}
+            })
+            //update photo
+            setSortedPhotos((prevPhotos) =>
+                prevPhotos.map((p) =>
+                    p.id === photo.id ? { ...p, is_like: !photo.is_like } : p
+                )
+            );
+
+        }catch (err: any) {
+            setError(err.message || "Unknown error in like Toggle");
+        }
+    }
+
     return(
         <>
             <Dialog open={open}
@@ -286,16 +303,32 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     maxWidth={'lg'}
                     fullWidth
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
+                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {viewAddress}</DialogTitle>
                 <Box sx={{padding: "1% 1% 0 1%",backgroundColor: "#FAF6E9", fontSize: { xs: 16, sm: 18, md: 20 }}}>
+                <DialogTitle sx={{
+                    backgroundColor: "#FAF6E9",
+                    padding:"1% 1% 0 1%",
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center",
+                }}
+                > Photos Under Adresse - {viewAddress}
+                    <IconButton sx={{marginLeft:"auto"}}
+                        onClick={handleDialogClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
+                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
                     <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
                         <Typography variant="h5" sx={{}}>Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, //
                             mb: 1, gap: 2, alignItems: "center",margin: 0}}>
+                        <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
+
                             {isSelecting && selectedPhotoIds.size > 0 && (
                                 <Button
-                                    onClick={handleDownloadSelected}
+                                    onClick={downloadPhotos}
                                     variant="contained"
                                     color="success"
                                 >
@@ -312,8 +345,10 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                 onClick={() => {
                                     setIsSelecting(!isSelecting);
                                     setSelectedPhotoIds(new Set());
+
                                 }}
-                                color={isSelecting ? "error" : "primary"}
+                                color={isSelecting ? "error" : "primary" as "error" | "primary"}
+
                                 sx={{visibility: roles.includes("admin")? "visible":"hidden",}}
                             >
                                 {isSelecting ? "Cancel" : "Select"}
@@ -350,6 +385,24 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                     }}
                                     onClick={() => handlePreview(photo)}
                                 />
+                                {/*Favorite Button in top right corner*/}
+                                <IconButton
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleLikeToggle(photo)
+                                    }}
+                                    sx={{
+                                        position: "absolute",
+                                        top: "1%", right: "1%",
+                                        backgroundColor: "rgba(255,255,255,0.8)",
+                                        '&:hover': {
+                                            backgroundColor: "rgba(255,255,255,0.9)",
+                                        },
+                                        zIndex: 2,
+                                        visibility: photo.canLike ? "visible" : "hidden"
+                                    }}
+                                >{photo.is_like ? <Favorite sx={{color: "red"}} /> : <FavoriteBorder />}
+                                </IconButton>
                                 <Box
                                     sx={{
                                         position: "relative",
@@ -373,15 +426,20 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                                 Upload User: {photo.uploader} | Upload Time: {photo.uploadTime}
                                             </Typography>
                                         }
+                                            `Upload Time: ${photo.uploadTime}`}
                                         actionIcon={
-                                            isSelecting && (
+                                            <Box>
                                                 <Checkbox
                                                     checked={selectedPhotoIds.has(photo.id)}
                                                     onClick={(e) => e.stopPropagation()} // stop bubble,click checkbox will not  toggleSelect
                                                     onChange={() => toggleSelect(photo.id)}
-                                                    sx={{ color: 'white',cursor: 'pointer'}}
+                                                    sx={{
+                                                        color: 'white',
+                                                        cursor: 'pointer',
+                                                        visibility: isSelecting ? "visible" : "hidden",
+                                                    }}
                                                 />
-                                            )
+                                        </Box>
                                         }
                                     />
                                 </Box>
@@ -401,6 +459,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                 isSelecting={isSelecting}
                 selectedPhotoIds={selectedPhotoIds}
                 toggleSelect={toggleSelect}
+                setPhoto={setPreviewPhoto}
             />
         </>
     )

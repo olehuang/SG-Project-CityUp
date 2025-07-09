@@ -1,21 +1,27 @@
 import React, {useEffect, useState} from "react";
-import {Box, Typography, Dialog, DialogTitle, DialogContent, Button} from "@mui/material";
+import {Box, Typography, Dialog, DialogTitle, DialogContent, Button, IconButton} from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
 import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import FavoriteBorder from '@mui/icons-material/Favorite';
+import CloseIcon from "@mui/icons-material/Close";
 
 interface PhotoGridProps {
     address: string;
 }
-interface Photo {
+export interface Photo {
     id: string;
     src: string;
     title: string;
+    uploader_id:string;
     uploader: string;
     uploadTime: string;
+    canLike:boolean;
+    is_like:boolean;
+    likeCount:string;
 }
 
 const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
@@ -25,14 +31,15 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const [open,setOpen]=useState(false);
     const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number | null>(null);
 
-    const { token } = useAuthHook();
+
+    const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
+
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -42,35 +49,41 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     //get first 9 photo form DB follow Uploadtime
     useEffect(() => {
         if(!address) return;
+        fetchPhoto(address)
+    }, [address]);
 
-        const fetchPhoto= async (address:string)=>{
-            setLoading(true);
-            setError(null);
-            console.log("address:",address);
+    // from backend take photos
+    const fetchPhoto= async (address:string)=>{
+        setLoading(true);
+        setError(null);
 
-            const url="http://127.0.0.1:8000/photos/get_first_9_photo"
-            try{
-                const response = await axios.get(url, {params: {address: address}});
-                const data=response.data;
-                console.log(data);
 
-                const formattedPhotos: Photo[] = data.map((item: any) => ({
+        const url="http://127.0.0.1:8000/photos/get_first_9_photo"
+        try{
+            const response = await axios.get(url, {params: {address: address,user_id:user_id}});
+            const data=response.data;
+
+
+            const formattedPhotos: Photo[] = data.map((item: any) => ({
                     id:item.photo_id,
                     src: item.image_url,
                     title: item.title,
-                    uploader: item.user_id,
+                    uploader_id:item.user_id,
+                    uploader: item.username,
                     uploadTime: formatTime(item.upload_time),
-                }));
-                setPhotos(formattedPhotos);
-            }catch (err: any) {
-                setError(err.message || "Unknown error");
-            } finally {
-                setLoading(false);
-            }
+                    canLike:item.canLike,
+                    is_like:item.is_like,
+                    likeCount:item.likeCount,
+                }
+            ));
 
+            setPhotos(formattedPhotos);
+        }catch (err: any) {
+            setError(err.message || "Unknown error in fetchPhoto");
+        } finally {
+            setLoading(false);
         }
-        fetchPhoto(address)
-    }, [address]);
+    }
 
     // change Time format to EU format
     const formatTime =  (time:any)=>{
@@ -86,7 +99,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     timeStyle:"medium",
                 }).format(new Date(timeStr));
             } catch (error) {
-                console.error(error, "updateTime:", time);
+                setError(error+"in PhotoGrid formatTime")
                 formattedTime = "Invalid Date";
             }finally {
                 return formattedTime;
@@ -103,8 +116,14 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     //close Dialog
     const handleClose = () => {
         setOpen(false);
-        setSelectedPhotoIndex(null);
     };
+
+    //close Dialog
+    const handleDialogClose = () => {
+        setOpen(false);
+
+    };
+    const downloadURL = "http://localhost:8000/photos/download_photo/"
     //download photo which one in Dialog see
     const handleOfDownload=async (photo:Photo)=>{
         if(roles.includes("admin")){
@@ -123,17 +142,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 document.body.removeChild(link);
                 URL.revokeObjectURL(url);
             } catch (e: any) {
-                setError(e.message || "Unknown error");
+                setError(e.message || "Unknown error in Download");
             }
-        }
-    }
-    //show upload user name
-    const getUsername=async (user_id:string)=>{
-        try{
-            const response= await axios.get(`http://127.0.0.1:8000/users/get_user_name`, {params: {user_id:user_id}});
-            return response.data;
-        }catch (e:any) {
-            setError(e.message || "Unknown error");
         }
     }
 
@@ -154,6 +164,27 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     if (!photos || !Array.isArray(photos)) {
         return <Typography color="error">Error loading photos.</Typography>;
+    }
+
+    const handleLikeToggle =async (photo:Photo)=>{
+        if(!photo) return;
+        const baseUrl = "http://localhost:8000/users";
+        try{
+
+            const likeUrl = photo.is_like ?  baseUrl+"/dislike":baseUrl+"/like";
+            await axios.post(likeUrl,{},{
+                params:{photo_id:photo.id,user_id:user_id}
+            })
+            //update photo
+            setPhotos((prevPhotos) =>
+                prevPhotos.map((p) =>
+                    p.id === photo.id ? { ...p, is_like: !photo.is_like } : p
+                )
+            );
+
+        }catch (err: any) {
+            setError(err.message || "Unknown error in like Toggle");
+        }
     }
 
     return (
@@ -186,9 +217,21 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={'lg'}
-                    sx={{}}
+
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",}}>Photo Detail</DialogTitle>
+                <DialogTitle
+                    sx={{
+                    backgroundColor: "#FAF6E9",
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center",
+                    }}
+                >Photo Detail
+                    <IconButton sx={{marginLeft:"auto"}}
+                                onClick={handleDialogClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
                 <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>
@@ -205,20 +248,38 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                 {/* Photo infomation Area */}
                                 <Box sx={styles.dialogInfoArea}><Box sx={{mb: 2, textAlign: "left"}}>
                                     <Typography variant="h6">{photos[selectedPhotoIndex].title}</Typography>
-                                    <Typography variant="body1">Upload
-                                        Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
-                                    <Typography variant="body1">Upload
-                                        User: {getUsername(photos[selectedPhotoIndex].uploader)}</Typography>
+                                    <Typography variant="body1">
+                                        Upload Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
+                                    <Typography variant="body1">
+                                        Upload User: {photos[selectedPhotoIndex].uploader}</Typography>
+                                    <Typography variant="body1">
+                                        Favorite Number: {photos[selectedPhotoIndex].likeCount}</Typography>
                                 </Box>
-                                    <Button variant="contained"
-                                            sx={{
-                                                alignSelf: "flex-start",
-                                                visibility: roles.includes("admin")? "visible":"hidden",}}
-                                            onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
-
-                                    >
-                                        Download
-                                    </Button>
+                                    <Box sx={{
+                                        display: "flex",
+                                        flexDirection:"row",
+                                        justifyContent: "space-between",
+                                        alignItems:"center"
+                                    }}>
+                                        <Button startIcon={<FavoriteBorder
+                                            sx={{color: photos[selectedPhotoIndex].is_like ? "red": "gray"}} />}
+                                                onClick={()=>handleLikeToggle(photos[selectedPhotoIndex])}
+                                                 sx={{visibility: photos[selectedPhotoIndex].canLike ?  "visible" : "hidden"}}
+                                        > {photos[selectedPhotoIndex].is_like ?   "Dislike":"Favorite"}</Button>
+                                        <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
+                                           download
+                                           style={{textDecoration: "none"}}
+                                        >
+                                            <Button variant="contained"
+                                                    sx={{
+                                                        alignSelf: "flex-start",
+                                                        visibility: roles.includes("admin") ? "visible" : "hidden",
+                                                    }}
+                                                //onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
+                                            >
+                                                Download
+                                            </Button></a>
+                                    </Box>
                                 </Box>
                             </Box>
                         </DialogContent>

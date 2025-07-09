@@ -3,6 +3,9 @@ from pydantic import BaseModel
 from typing import Optional, List
 from bson import ObjectId
 from datetime import datetime
+from . import rankings
+
+import db_photoEntities
 from db_entities import User,MongoDB
 import db_userEntities
 import traceback
@@ -135,58 +138,66 @@ async def get_user(user_id:str):
 @router.get("/get_user_rank")
 async def get_user_rank(user_id:str):
     try:
-        return await db_userEntities.get_userRanking(user_id)
+        # return await db_userEntities.get_userRanking(user_id)
+        return await rankings.get_user_ranking(user_id)
     except Exception as e:
         print("Exception while getting user",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+
 @router.get("/get_all_user_after_order")
 async def get_all_user_after_order(
-        page:int = Query(1,ge=1),
-        limit:int = Query(10,ge=1,le=50)
+        page: int = Query(1, ge=1),
+        limit: int = Query(10, ge=1, le=50)
 ):
     try:
-        skip = (page-1)*limit
-        users = MongoDB.get_instance().get_collection('users')
-        print("total")
-        total= await users.count_documents({}) #total user to show
-        total_page=math.ceil(total/limit)
-        all_users_cursor=users.find({},{"_id":0,"user_id":1,"username":1,"point":1}).sort("point",-1)
-        all_users = await all_users_cursor.to_list(length=None)
+        result = await rankings.get_leaderboard_data(page, limit, include_checkin_info=False)
 
-
-        result_user =[]
-
-        last_point=None
-        last_rank= 0
-        aktual_rank=0
-
-        for idx, user in enumerate(all_users):
-            point = user.get("point")
-
-            if point != last_point:
-                aktual_rank = idx + 1
-                last_point = point
-                last_rank = aktual_rank
-            result_user.append({
-                "user_id": user.get("user_id"),
-                "username": user.get("username"),
-                "point": point,
-                "rank": last_rank
-            })
-
-        start = (page-1)*limit
-        end = (page)*limit
-        paged_users = result_user[start:end]
-
-        return{
-            "total":total,
-            "page":page,
-            "limit":limit,
-            "total_page":total_page,
-            "users":paged_users,
+        return {
+            "total": result["pagination"]["total"],
+            "page": result["pagination"]["page"],
+            "limit": result["pagination"]["limit"],
+            "total_page": result["pagination"]["total_pages"],
+            "users": result["users"]
         }
+
     except Exception as e:
-        print("Exception while getting all_user_after_order",traceback.format_exc())
+        print("Exception while getting all_user_after_order", traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+
+@router.get("/canLike")
+async def canLike(photo_id:str,user_id:str):
+    """
+    if isLike==True that meaning already like by same user,than can not like again
+    else isLike==False that photo has not like by this user,than can like
+   :param photo_id: id of photo
+   :param user_id: use to check if photo is like should be in like[] of photo.get("like“)
+   :return: boolean, if islike=true return false, in other case return false
+   """
+    try:
+        isLike = await db_photoEntities.isLike(photo_id,user_id)
+        if isLike: return False
+        return True
+    except Exception as e:
+        print("Exception while canLike",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+@router.post("/like")
+async def like(photo_id:str,user_id:str):
+    try:
+        return await db_photoEntities.like_photo(photo_id,user_id)
+    except Exception as e:
+        print("Exception while like",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+@router.post("/dislike")
+async def disLike(photo_id:str,user_id:str):
+    try:
+        return await db_photoEntities.disLike(photo_id,user_id)
+    except Exception as e:
+        print("Exception while dislike",traceback.format_exc())
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 

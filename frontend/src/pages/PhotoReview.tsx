@@ -361,7 +361,7 @@ const PhotoReview = () => {
                                                 variant="body2"
                                                 sx={photoReviewStyles.addressText}
                                             >
-                                                Building ID: {photo.building_addr}
+                                                {photo.building_addr}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>
@@ -377,7 +377,13 @@ const PhotoReview = () => {
                                                 variant="body2"
                                                 sx={photoReviewStyles.timeText}
                                             >
-                                                {new Date(photo.upload_time).toLocaleString("zh-CN")}
+                                                {new Intl.DateTimeFormat("de-DE", {
+                                                    timeZone: "Europe/Berlin",
+                                                    dateStyle: "medium",
+                                                    timeStyle: "medium",
+                                                }).format(new Date(photo.upload_time
+                                                    + (photo.upload_time.includes('Z')
+                                                    || photo.upload_time.includes('+') ? '' : 'Z')))}
                                             </Typography>
                                         </TableCell>
                                         <TableCell>

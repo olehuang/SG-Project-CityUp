@@ -1,13 +1,14 @@
 import os
 from datetime import datetime
 from enum import Enum
-from typing import Optional
+from typing import Optional,List
 
 from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
+from typing import Set
 # MongoDB初始化
-from pydantic import BaseModel
+from pydantic import BaseModel,Field
 from bson.binary import Binary
 
 class MongoDB:
@@ -107,6 +108,7 @@ class Photo:
                  feedback: Optional[str] = None,
                  reviewer_id: Optional[str] = None,
                  review_time: Optional[datetime] = None,
+                 like:Optional[Set[str]]=None,#storage user_id, which user like this photo
                  _id: Optional[ObjectId] = None):
         self._id = _id or ObjectId()
         self.user_id = user_id
@@ -121,6 +123,7 @@ class Photo:
         self.feedback = feedback
         self.reviewer_id = reviewer_id
         self.review_time = review_time
+        self.like = set(like) if like is not None else set()
 
     def to_dict(self):
         return {
@@ -136,7 +139,8 @@ class Photo:
             "status": self.status.value,
             "feedback": self.feedback,
             "reviewer_id": self.reviewer_id,
-            "review_time": self.review_time
+            "review_time": self.review_time,
+            "like": list(self.like)
         }
 
     @classmethod
@@ -155,7 +159,8 @@ class Photo:
             status=ReviewStatus(data.get("status", ReviewStatus.Pending.value)),
             feedback=data.get("feedback"),
             reviewer_id = data.get("reviewer_id"),
-            review_time = data.get("review_time")
+            review_time = data.get("review_time"),
+            like=set(data.get("like",[]))
         )
 
 
@@ -174,3 +179,7 @@ class PhotoResponse(BaseModel):
     feedback: Optional[str]
     reviewer_id: Optional[str]
     review_time: Optional[datetime]
+    like: Optional[List[str]]=None
+    canLike:Optional[bool] = None #new, tall frontend this user can like or not for this photo
+    is_like:Optional[bool]=None # new, markt has been user liked or not
+    likeCount:Optional[int]=None #new, count how many people likes

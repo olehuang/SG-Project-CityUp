@@ -70,6 +70,7 @@ const BuildingPhotoGallery=()=>{
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
     const [open,setOpen]=useState(false);//Photo dialog
+    const [viewAddress,setViewAddress] = useState<string | null>(null)
     const [isNomatch,setIsNomatch]=useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
@@ -120,7 +121,6 @@ const BuildingPhotoGallery=()=>{
                 setPhotoInfoMap(infoMap);
 
             }catch (e:any) {
-                console.log(e.message || "Unknown error")
                 setError(e.message || "Unknown error")
                 setAllAddresses(mockResults);
                 setSearchResult(mockResults);
@@ -156,13 +156,14 @@ const BuildingPhotoGallery=()=>{
 
     }
 
-    const handleDialogOpen = (index: number) => {
+    const handleDialogOpen = () => {
         setOpen(true);
+        setViewAddress(selectedAddress)
     };
 
     const handleDialogClose = () => {
         setOpen(false);
-
+        setViewAddress(null)
     };
 
     const handleMouseDown = (e: React.MouseEvent) => {
@@ -201,7 +202,6 @@ const BuildingPhotoGallery=()=>{
     const handleSelect = (selected: string) => {
         //handleSearch(selected);
         setSelectedAddress(selected);
-        console.log("select:",selected)
 
     };
 
@@ -215,38 +215,26 @@ const BuildingPhotoGallery=()=>{
 
 
 
+
     return(
         <Box sx={{
             ...pageBackgroundStyles.container,
-            //justifyContent:"content",
-            display:'flex',
-            flexDirection: 'column',
+            justifyContent:"content",
+            display:'contents',
             overflow: "hidden",
-            position: 'relative',
-            minHeight: '100vh',
-            width: '100%',
-            maxWidth: '100vw',
-            boxSizing: 'border-box'
+            position: 'relative'
         }}>
-            <Box sx={{
-                ...BuildingPhotoGalleryStyles.container,
-                width: '100%',
-                maxWidth: '100vw',
-                margin: '0 auto',
-                padding: { xs: '8px', sm: '12px', md: '16px' },
-                boxSizing: 'border-box'
-            }}>
+            <Box  sx={BuildingPhotoGalleryStyles.container}>
                 {/*Search box*/}
-                <Box sx={{ width: '100%', marginBottom: 2,boxSizing: 'border-box'  }}>
-                    <AdressSearchField
-                        isNomatch={isNomatch}
-                        setIsNomatch={setIsNomatch}
-                        onSearch={handleSearch}
-                        onSelect={handleSelect}
-                        setSearchResult={setSearchResult}
-                        allAddresses={allAddresses}
-                    />
-                </Box>
+                <AdressSearchField
+                    isNomatch={isNomatch}
+                    setIsNomatch={setIsNomatch}
+                    onSearch={handleSearch}
+                    onSelect={handleSelect}
+                    setSearchResult={setSearchResult}
+                    allAddresses={allAddresses}
+
+                />
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
                         <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
@@ -259,13 +247,10 @@ const BuildingPhotoGallery=()=>{
                      sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
                     {/*Adresse Table */}
                     <Box sx={{...BuildingPhotoGalleryStyles.leftContainer,
-                        width: { xs: '100%', md: `calc(${leftWidth}% - 6px)` }
+                        width: `calc(${leftWidth}% - 6px)`
                     }}>
                     <TableContainer component={Paper}
-                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1"
-                                        overflowX: 'auto',
-                                        width: '100%',
-                                        boxSizing: 'border-box',
+                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1",
                                     }}>
                         <Table  size="medium" aria-label="building table">
                             <TableHead sx={{backgroundColor:"#F1EFEC",//"#abd1e6",
@@ -289,9 +274,7 @@ const BuildingPhotoGallery=()=>{
                                                 }),}}
                                             onClick={() => handleSelect(addr)}
                                         >
-                                            <TableCell sx={{ wordBreak: 'break-word' }}>
-                                                {addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}
-                                            </TableCell>
+                                            <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi,'')}</TableCell>
                                             <TableCell>{photoInfoMap[addr]?.updateTime || "Loading..."}</TableCell>
                                             <TableCell>{photoInfoMap[addr]?.photoNr ?? "-"}</TableCell>
                                         </TableRow>
@@ -307,40 +290,18 @@ const BuildingPhotoGallery=()=>{
                     </TableContainer>
                     </Box>
                     {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
-                    <Box
-                        onMouseDown={handleMouseDown}
-                        sx={{
-                            ...BuildingPhotoGalleryStyles.resizer,
-                            display: { xs: 'none', md: 'block' }
-                        }}
-                    />
+                    <Box onMouseDown={handleMouseDown} sx={BuildingPhotoGalleryStyles.resizer} />
                     <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer,
                         //width: `calc(${100 - leftWidth}% - 6px)`
-                        flex: 1,
-                        width: { xs: '100%', md: `calc(${100 - leftWidth}% - 6px)` }
+                        flex: 1
                     }}>
                         <Box >
-                            <Box
-                                sx={{
-                                    ...BuildingPhotoGalleryStyles.rightContainerTitle,
-                                    display: 'flex',
-                                    flexWrap: 'wrap',
-                                    justifyContent: 'space-between',
-                                    alignItems: 'center',
-                                    gap: '10px'
-                                }}
-                            >
+                            <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>
-                                <Button
-                                    variant={"outlined"}
-                                    onClick={() => setOpen(true)}
-                                    sx={{
-                                        visibility: selectedAddress ? "visible" : "hidden",
-                                        minWidth: 'auto',
-                                        flexShrink: 0
-                                    }}
-                                >
-                                    View all</Button>
+                                <Button variant={"outlined"}
+                                        onClick={handleDialogOpen}
+                                            sx={{visibility:selectedAddress? "visible":"hidden" }}>
+                                            View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (
@@ -354,8 +315,7 @@ const BuildingPhotoGallery=()=>{
                                         </Typography>
                                         </Box>
                                         )
-                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center",textAlign: 'center',                  // ⭐️ 小屏居中
-                                                padding: 2}}>
+                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
                                         <Typography variant="body2" color="textSecondary">
                                             Please select an address to view photos.
                                         </Typography>
@@ -367,12 +327,8 @@ const BuildingPhotoGallery=()=>{
                 </Box>
             </Box>
             {/*All photo Dialog */}
-            <PhotoViewDialog selectedAddress={selectedAddress} open={open} handleDialogClose={handleDialogClose}/>
-            {/*<Button*/}
-            {/*    variant="outlined"*/}
-            {/*    onClick={()=>{navigat("/dashboard");}}*/}
-            {/*    sx={{...photoReviewStyles.exitButton, position: 'absolute',marginTop:"1.5%",bottom:"1%",right:"4%"}}*/}
-            {/*>Exit</Button>*/}
+            <PhotoViewDialog viewAddress={viewAddress} open={open} handleDialogClose={handleDialogClose}/>
+
         </Box>
     )
 
