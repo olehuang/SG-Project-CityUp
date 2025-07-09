@@ -22,7 +22,7 @@ const iconMap: Record<string, React.ReactNode> = {
     "Upload": <UploadFile fontSize="large" />,
     "Product Introduction": <Info fontSize="large" />,
     "Upload History": <History fontSize="large" />,
-    "Building Photo Gallery": <PhotoLibrary fontSize="large" />,
+    "Photo Gallery": <PhotoLibrary fontSize="large" />,
     "Tutorial": <MenuBook fontSize="large" />,
     "Photo Review": <RateReview fontSize="large" />,
 };
@@ -47,7 +47,7 @@ const DashboardPage: React.FC = () => {
     const topItems = [
         { label: "Tutorial", desc: "Step-by-step guide" },
         { label: "Upload", desc: "Add your photos here" },
-        { label: "Building Photo Gallery", desc: "Browse building photos" },
+        { label: "Photo Gallery", desc: "Browse building photos" },
     ];
 
     const bottomItems = [
@@ -60,7 +60,7 @@ const DashboardPage: React.FC = () => {
         switch (label) {
             case "Tutorial": return "tutorial";
             case "Upload": return "upload";
-            case "Building Photo Gallery": return "buildingPhoto";
+            case "Photo Gallery": return "photoGallery";
             case "Product Introduction": return "productIntroduction";
             case "Upload History": return "uploadHistory";
             case "Photo Review": return "photoReview";

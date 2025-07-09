@@ -1,4 +1,4 @@
-const BuildingPhotoStyles={
+const PhotoGarlleryStyles={
     container:{
         width: '95%',
         position: "absolute",
@@ -96,4 +96,4 @@ const BuildingPhotoStyles={
     }
 }
 
-export default BuildingPhotoStyles
+export default PhotoGarlleryStyles

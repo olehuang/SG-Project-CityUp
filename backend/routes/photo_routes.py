@@ -11,6 +11,7 @@ import time
 from pymongo import ReturnDocument
 import math
 
+import db_buildingEntities
 import db_photoEntities
 from db_entities import MongoDB, Photo, ReviewStatus,PhotoResponse
 import db_userEntities
@@ -26,6 +27,7 @@ import zipfile
 router = APIRouter()
 photo_collection = MongoDB.get_instance().get_collection("photos")
 users_collection = MongoDB.get_instance().get_collection("users")
+buildings = MongoDB.get_instance().get_collection("buildings")
 
 # 上传目录
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads/photos")
@@ -100,6 +102,12 @@ async def upload_photo(
                 upload_time=datetime.now(timezone.utc),
                 status=ReviewStatus.Pending
             )
+            #save building addr into DBMS
+            geo_coords ={"lat":lat,"lng":lng}
+
+            await db_buildingEntities.save_building(
+                db_buildingEntities.Building(address=building_addr,
+                                             geo_coords=geo_coords))
             result = await photo_collection.insert_one(photo_obj.to_dict())
             print(f"Document inserted with ID: {result.inserted_id}")
             if not result.inserted_id:

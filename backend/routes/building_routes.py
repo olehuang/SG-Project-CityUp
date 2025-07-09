@@ -30,8 +30,7 @@ async def get_photo_status_by_address():
     :return: a list with all photo status(addr, photoNr,last_Upload_time)
     """
     try:
-        photo = MongoDB.get_instance().get_collection("photos");
-
+        photo = MongoDB.get_instance().get_collection("photos")
         # Use pipeline to concatenate the address,
         # number of pictures, and last upload time into a table
         pipeline = [
@@ -44,16 +43,21 @@ async def get_photo_status_by_address():
                 "$group": {
                     "_id": "$building_addr",
                     "photo_count": {"$sum": 1},
-                    "last_update_time": {"$max": "$upload_time"}
+                    "last_update_time": {"$max": "$upload_time"},
+
                 }
             },
-            {"$sort": {"_id": 1}}
+            {"$sort": {"photo_count": -1,# -1：max first, 1: min last
+                       "last_update_time":-1 # if same count will after time, newer first
+                       }
+             }
         ]
         result_cursor = await photo.aggregate(pipeline)
         result=[]
+
         # Convenient results, skipping elements with zero number of photos
         async for doc in result_cursor:
-            if doc["photo_count"] ==0:continue
+            if doc["photo_count"] ==0: continue
             result.append({
                 "building_addr": str(doc["_id"]),
                 "photo_count": doc["photo_count"],

@@ -24,7 +24,7 @@ import PhotoGrid from "../components/PhotoGrid";
 import {hover} from "@testing-library/user-event/dist/hover";
 import axios from "axios";
 import PhotoViewDialog from "../components/PhotoViewDialog";
-import BuildingPhotoGalleryStyles from "./BuildingPhotoStyles";
+import BuildingPhotoGalleryStyles from "./PhotoGarlleryStyles";
 import {useNavigate} from "react-router-dom";
 import {photoReviewStyles} from "./PhotoReviewStyles";
 import {useAuthHook} from "../components/AuthProvider";
@@ -34,18 +34,7 @@ import CircularProgress from '@mui/material/CircularProgress';
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
-    "Karolinenpl. 5, 64283 Darmstadt",
-    "Luisenplatz, Luisenpl. 5, 64283 Darmstadt",
-    "Marktpl. 15, 64283 Darmstadt",
-    "Friedenspl. 1, 64283 Darmstadt",
-    "Schloßgartenstraße, 64289 Darmstadt",
-    "Schloßgartenstraße 10, 64289 Darmstadt",
-    "Schloßgartenstraße 6b, 64289 Darmstadt",
-    "Schloßgartenstraße 7, 64289 Darmstadt",
-    "Hochschulstraße 14, 64289 Darmstadt",
-    "Schlossgraben 1, 64283 Darmstadt",
-    "Landgraf-Georg-Straße, 64283 Darmstadt",
-    "Magdalenenstraße 8, 64289 Darmstadt",
+
 ].sort((a,b)=>a.localeCompare(b));
 
 /**
@@ -61,7 +50,7 @@ type BuildingInfo = {
  *  show user which photo under which address has in DBMS storage.
  *  user can first 9 photo preview (order follow time )and can see all photo in View ALL
  * */
-const BuildingPhotoGallery=()=>{
+const PhotoGallery=()=>{
 
 
     const [leftWidth, setLeftWidth] = useState(70);
@@ -233,7 +222,6 @@ const BuildingPhotoGallery=()=>{
                     onSelect={handleSelect}
                     setSearchResult={setSearchResult}
                     allAddresses={allAddresses}
-
                 />
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
@@ -335,4 +323,4 @@ const BuildingPhotoGallery=()=>{
 }
 
 
-export default BuildingPhotoGallery;
+export default PhotoGallery;
