@@ -104,7 +104,7 @@ const Upload: React.FC = () => {
                 addr.suburb
             ]
                 .filter(Boolean)
-                .join(",")
+                .join(", ")
                 .toLowerCase();
             // 地址不在达姆时处理
             const isInDarmstadt = locationString.includes("darmstadt");
@@ -128,7 +128,7 @@ const Upload: React.FC = () => {
             }
             const parts = [hn,addr.road,"Darmstadt",addr.postcode,"Hessen","Deutschland"]
                 .filter(Boolean);
-            setAddress(parts.join(","));
+            setAddress(parts.join(", "));
         } catch {
             setError("Address resolution failure");
         }
@@ -370,9 +370,9 @@ const Upload: React.FC = () => {
                                 value={houseNumber}
                                 onChange={(e) => {
                                     setHouseNumber(e.target.value);
-                                    const parts = address.split(",");
+                                    const parts = address.split(", ");
                                     parts[0] = e.target.value || "";
-                                    setAddress(parts.filter(Boolean).join(","));
+                                    setAddress(parts.filter(Boolean).join(", "));
                                 }}
                                 placeholder="Door Nr."
                                 style={{
@@ -503,23 +503,7 @@ const Upload: React.FC = () => {
                     Drag the marker to adjust the building location
                 </div>
 
-                {/* 悬浮分割线 - 放置在左侧区域内Hovering divider */}
-                {!isSmallScreen && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            right: 0,
-                            top: `${mapRect.top}px`,
-                            height: `${mapRect.height}px`,
-                            width: "2px",
-                            background: "#e6dfcc",
-                            borderRadius: 2,
-                            zIndex: 10,
-                            pointerEvents: "none",
-                            boxShadow: "0 2px 10px rgba(200,180,140,0.07)",
-                        }}
-                    />
-                )}
+
             </div>
 
             {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
