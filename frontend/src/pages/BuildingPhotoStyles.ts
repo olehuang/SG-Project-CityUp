@@ -1,11 +1,12 @@
 const BuildingPhotoStyles={
     container:{
-        width: '95%',
-        position: "absolute",
-        left:"2%",
-        marginRight:"2%",
-        paddingTop: "0.5%",
-        height:"79%",//`calc(100vh - ${70}px)`,
+        width: '100%',
+        maxWidth: '100vw',
+        position: "relative",
+        left: 0,
+        margin: '0 auto',
+        padding: { xs: '8px', sm: '12px', md: '16px' },
+        height: "100vh", //`calc(100vh - ${70}px)`,
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
@@ -13,41 +14,51 @@ const BuildingPhotoStyles={
         display: "flex",
         flexDirection: "column",
         boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
+        gap: 2,
+        boxSizing: 'border-box'
     },
     innerContainer:{
-        top:"5%",
-        margin:"1% 1% 1% 1%",
+        margin:{ xs: '4px', md: '8px' },
         paddingTop:"0%",
+        padding: { xs: '4px', md: '8px' },
         justifyContent:"left",
         display:"flex",
-        flexDirection: "row",//  Direction of all result
-        gap: "6px",// space between resualt
-        height:"95%",
+        flexDirection: { xs: "column", md: "row" },//  Direction of all result
+        gap: { xs: 2, md: 3 },// space between resualt
+        height: "calc(100% - 120px)",
         // border:"1px solid red",
         backgroundColor: "#FAF6E9",
         borderRadius:"5px",
         overflow: "hidden",
         boxShadow: "0px 10px 12px rgba(0, 0, 0, 0.1)",
+        width: '100%',
+        flex: 1,
+        boxSizing: 'border-box'
     },
     leftContainer:{
         paddingBottom:"0",
+        paddingRight: { xs: 0, md: 1 },
         justifyContent:"left",
         display:"flex",
-        flexDirection:"column",//  Direction of all result
+        flexDirection: "column",//  Direction of all result
         gap: "8px",// space between resualt
-        width:"60%",
-        height:"100%",
-
+        width: { xs: "100%", md: "calc(70% - 3px)" },
+        minWidth: { xs: "100%", md: "300px" },
+        maxHeight:  { xs: '40vh', md: '100%' },
         borderRadius:"5px",
         overflowY: "auto",
+        flex: { xs: 'none', md: '0 0 auto' },
+        marginBottom: { xs: 2, md: 0 },
+        boxSizing: 'border-box'
     },
     searchTitle:{
-        position: "absolut",
+        position: "relative",
+        boxSizing: 'border-box',
         display: "flex",
         justifyContent:"space-between",
         backgroundColor:"#fff",
         width:"100%",
-        gridTemplateColumns: "50% 30% 20%",
+
     },
     serachResault:{
         cursor: "pointer",
@@ -66,30 +77,39 @@ const BuildingPhotoStyles={
         paddingBottom:"0",
         display:"flex",
         flexDirection: "column",
-        flexWrap:"wrap",
+        flexWrap:"nowrap",
         gap: "8px",// space between resualt
-
-        height:"100%",
+        paddingLeft: { xs: 0, md: 1 },
+        height: { xs: "auto", md: "100%" },
         backgroundColor: "#FAF6E9",
         //border:"1px solid brown",
         borderRadius:"5px",
         overflowY: "auto",
+        width: { xs: "100%", md: "calc(30% - 3px)" },
+        flex: "none",
+        minWidth: { xs: "100%", md: "200px" },
+        maxWidth: { xs: "100%", md: "400px" },
+        boxSizing: 'border-box'
     },
     rightContainerTitle:{
         display:"flex",
-        flexDirection:"row",
+        flexDirection: { xs: "column", sm: "row" },
         justifyContent:"space-between",
         alignItems:"center",
-        padding:"2% 3% 3% 3%",
-        margin:"0% 2% 4% 1%",
+        padding: { xs: "3% 2%", md: "2% 3% 3% 3%" },
+        margin: { xs: "0% 1% 2% 1%", md: "0% 2% 4% 1%" },
         backgroundColor:"#F1EFEC",
         borderRadius:"8px",
-        position: "sticky", top: 0
+        position: "sticky",
+        top: 0,
+        gap: 1
     },
     resizer: {
         width: "6px",
+        flexShrink: 0,
         cursor: "col-resize",
         backgroundColor: "#ddd",
+        display: { xs: 'none', md: 'block' },
         "&:hover": {
             backgroundColor: "#b0bec5",
         },

@@ -111,10 +111,12 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                             src={photo?.src}
                             alt={photo?.title}
                             style={{
-                                maxWidth: "90%",
+                                width: "100%",
+                                maxWidth: "700px",
                                 maxHeight: "80vh",
+                                objectFit: "contain",
                                 borderRadius: 8,
-                                boxShadow:"0px 4px 12px rgba(0,0,0,0.2)"
+                                boxShadow: "0px 4px 12px rgba(0,0,0,0.2)"
                             }}
                         />
                     </Box>
@@ -184,7 +186,8 @@ const styles={
     linkArrowArea:{
         position:"absolute",
         left:0,top:0,bottom:0,
-        width:"5%",display:"flex",
+        width:"5%",
+        display:"flex",
         alignItems:"center",
         //border:"1px solid black",
         justifyContent:"flex-start",
@@ -203,6 +206,11 @@ const styles={
         justifyContent: "center",
         textAlign:"center",
         //border:"1px solid black",
+        "@media (max-width: 768px)": {
+            flexDirection: "column",
+            padding: "16px",
+            gap: "16px",
+        }
     },
     rightArrowArea:{
         position:"absolute",

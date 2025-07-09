@@ -15,6 +15,8 @@ import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import PhotoCarousel from "./PhotoCarousel";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import useMediaQuery from "@mui/material/useMediaQuery";
+
 import Photo  from "./PhotoGrid"
 import FavoriteBorder from "@mui/icons-material/Favorite";
 import Favorite from "@mui/icons-material/Favorite";
@@ -25,6 +27,7 @@ interface Props {
     viewAddress: string|null;
     open: boolean;
     handleDialogClose: () => void;
+
 }
 
 export interface Photo {
@@ -58,6 +61,8 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
     const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+    const isMobile = useMediaQuery("(max-width:768px)");
+
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
@@ -293,28 +298,39 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
     return(
         <>
-            <Dialog open={open}
-                    onClose={handleDialogClose}
-                    maxWidth={'lg'}
-                    fullWidth
+            <Dialog
+                open={open}
+                onClose={handleDialogClose}
+                maxWidth="lg"
+                fullWidth
             >
-                <DialogTitle sx={{
-                    backgroundColor: "#FAF6E9",
-                    padding:"1% 1% 0 1%",
-                    display:"flex",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                }}
-                > Photos Under Adresse - {viewAddress}
-                    <IconButton sx={{marginLeft:"auto"}}
-                        onClick={handleDialogClose}>
+                <DialogTitle
+                    sx={{
+                        backgroundColor: "#FAF6E9",
+                        padding: "1% 1% 0 1%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
+                    Photos Under Adresse - {viewAddress}
+                    <IconButton sx={{ marginLeft: "auto" }} onClick={handleDialogClose}>
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
-                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
-                    <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
-                        <Typography variant="h5" sx={{}}>Photos Preview</Typography>
+
+                <Box
+                    sx={{
+                        padding: "1% 1% 0 1%",
+                        backgroundColor: "#FAF6E9",
+                        fontSize: { xs: 16, sm: 18, md: 20 },
+                    }}
+                >
+                    <Box sx={{ display: "flex", mb: 1, alignItems: "center", margin: 0 }}>
+                        <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, //
+                            mb: 1, gap: 2, alignItems: "center",margin: 0}}>
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
 
                             {isSelecting && selectedPhotoIds.size > 0 && (
@@ -339,6 +355,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
                                 }}
                                 color={isSelecting ? "error" : "primary"}
+
                                 sx={{visibility: roles.includes("admin")? "visible":"hidden",}}
                             >
                                 {isSelecting ? "Cancel" : "Select"}
@@ -347,7 +364,8 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                             <PhotoOrderSelector
                                 setSelectOrder={setSelectOrder}
                                 selectOrder={selectOrder}
-                            />
+                                />
+                            </Box>
                         </Box>
                     </Box>
                     {loading ? (
@@ -358,7 +376,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
+                        <ImageList variant="masonry" cols={isMobile ? 1 : 3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
@@ -366,6 +384,9 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                     alt={photo.title}
                                     loading="lazy"
                                     style={{
+                                        width: "100%", // new
+                                        maxWidth: "100%",  //new
+                                        height: "auto", //new
                                         borderRadius: 8,
                                         cursor: 'pointer',
                                         boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
@@ -403,7 +424,18 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         //title={photo.title}
                                         sx={{borderRadius:"5px"}}
                                         subtitle={
-                                            `Upload Time: ${photo.uploadTime}`}
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    fontSize: { xs: 12, sm: 14 },
+                                                    wordBreak: "break-word"
+                                                }}
+                                            >
+                                                Upload User: {photo.uploader} | Upload Time:{" "}
+                                                {photo.uploadTime}
+                                            </Typography>
+                                        }
+
                                         actionIcon={
                                             <Box>
                                                 <Checkbox
@@ -426,6 +458,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                     }
                 </Box>
             </Dialog>
+
             {/*click Photo can bigger Photo to see */}
             <PhotoCarousel
                 open={previewOpen}

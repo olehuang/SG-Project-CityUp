@@ -90,7 +90,6 @@ const Upload: React.FC = () => {
             setLocating(false);
         }
     }, []);
-
     // 2. 反向地理编码：marker移动后刷新地址Reverse geocoding (coordinates to address)
     const reverseGeocode = async (lat: number, lng: number, fromMapClick=false) => {
         try {
@@ -114,7 +113,7 @@ const Upload: React.FC = () => {
                 .filter(Boolean)
                 .join(", ")
                 .toLowerCase();
-            // addr not in Darmstadt
+            //地址不在达姆时处理addr not in Darmstad
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
@@ -141,7 +140,6 @@ const Upload: React.FC = () => {
             setError("Address resolution failure");
         }
     };
-
     // 地图点击事件 + 光标marker拖拽 Process user map clicks, update markers and addresses.
     function LocationPicker() {
         useMapEvents({
@@ -153,7 +151,6 @@ const Upload: React.FC = () => {
         });
         return null;
     }
-
     // mapRef get current map object mapRef获取当前map对象
     function SetMapRef() {
         const map = useMap();
@@ -162,7 +159,6 @@ const Upload: React.FC = () => {
         }, [map]);
         return null;
     }
-
     // 3. 地址输入搜索地址和光标行动到指定地址 Address Input and Search
     const handleAddressSearch = async () => {
         if (!address) {
@@ -191,8 +187,10 @@ const Upload: React.FC = () => {
             setError("The address search failed. Please try again later");
         }
     };
-
-    // 4. marker光标拖拽处理
+    /* 4. marker拖拽行动用户拖动 marker 后，自动反查新位置地址并校验范围。
+     After the user drags the marker, the new location address is automatically
+     back-checked and the range is verified.
+     */
     const handleMarkerDragEnd = (e: any) => {
         const marker = e.target;
         const pos = marker.getLatLng();
@@ -204,20 +202,19 @@ const Upload: React.FC = () => {
     // camera upload
     const handleTakePhoto = () => {
         if (fileInputRef.current) {
+            // 先移除原有的capture，防止多次兼容多种浏览器
             fileInputRef.current.removeAttribute("capture");
             fileInputRef.current.setAttribute("capture", "environment");
             fileInputRef.current.click();
         }
     };
-
-    // album upload
+    // 相册上传 Album Upload
     const handleSelectFromGallery = () => {
         if (fileInputRef.current) {
             fileInputRef.current.removeAttribute("capture");
             fileInputRef.current.click();
         }
     };
-
     // 选择照片：限制上传照片的数量为五张 Select photos： Limit the number of photos uploaded to 5
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const maxPhotos = 5;
@@ -241,13 +238,12 @@ const Upload: React.FC = () => {
         }));
         setPhotos([...photos, ...newPhotos]);
     };
-
-    // delete photos
+    // delete photos 删除略缩图中选取了的照片
     const removePhoto = (id: string) => {
         setPhotos(photos.filter((p) => p.id !== id));
     };
 
-    // submit
+    // submit 提交照片本身以及其信息到后端
     const handleSubmit = async () => {
         setError(null);
         if (!auth || !user_id) {
@@ -274,12 +270,13 @@ const Upload: React.FC = () => {
         setIsSubmitting(true);
 
         try {
+            // FormData里有建筑的经纬度门牌号和照片
             const formData = new FormData();
-            formData.append("user_id", user_id);
-            formData.append("lat", latlng[0].toString());
-            formData.append("lng", latlng[1].toString());
-            formData.append("building_addr", address);
-            photos.forEach((photo) => {
+            formData.append("user_id", user_id);//用户id
+            formData.append("lat", latlng[0].toString());//纬度 Latitude
+            formData.append("lng", latlng[1].toString());//经度 Longitude
+            formData.append("building_addr", address); //门牌号作为 building_addr
+            photos.forEach((photo) => { //照片组
                 formData.append("photos", photo.file, photo.file.name);
             });
 
@@ -312,8 +309,11 @@ const Upload: React.FC = () => {
                 });
             }
         };
+        // 首次渲染和latlng变化时更新一次
         updateMapRect();
+        // 添加窗口尺寸变化时的监听
         window.addEventListener('resize', updateMapRect);
+        // 组件卸载时移除监听
         return () => window.removeEventListener('resize', updateMapRect);
     }, [latlng]);
 
@@ -321,7 +321,6 @@ const Upload: React.FC = () => {
         <div
             style={{
                 width: "100%",
-                //minHeight:"100vh",
                 height: isMobile ? "90dvh" : undefined,
                 overflowY: isMobile ? "auto" : "hidden",//手机端滚动显示，pc不动
                 background: "#FFF8E1",
@@ -335,7 +334,7 @@ const Upload: React.FC = () => {
                 paddingBottom: isMobile ? "20px" : "0"
             }}
         >
-            {/* 左侧区域 - 地图和地址输入Left Area - Map and Address Input */}
+            {/* 左侧 2/3：地址输入和地图 */}
             <div
                 ref={leftSectionRef}
                 style={{
@@ -360,8 +359,7 @@ const Upload: React.FC = () => {
                 >
                     Upload Building Photos
                 </h1>
-
-                {/* Address entry and search */}
+                {/* 地址输入和搜索 Address entry and search */}
                 <div style={{ marginBottom: 16 }}>
                     <label htmlFor="address"
                            style={{
@@ -469,6 +467,7 @@ const Upload: React.FC = () => {
                             style={{ width: "100%", height: "100%" }}
                             scrollWheelZoom={true}
                         >
+                            {/* 换来源的话改url，但这里仅是符合Leaflet的情况。属性改成来源*/}
                             <TileLayer
                                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 attribution="&copy; OpenStreetMap contributors"
@@ -510,7 +509,6 @@ const Upload: React.FC = () => {
                     Drag the marker to adjust the building location
                 </div>
             </div>
-
             {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
             <div
                 style={{
@@ -523,10 +521,6 @@ const Upload: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     background: "transparent",
-                    //paddingTop: isMobile ? 0 : (isSmallScreen ? "20px" : "119px"),
-                    //height: isMobile ? "auto" : "100%",
-                    //minHeight: isSmallScreen ? "40vh" : undefined,
-                    //flexGrow: isMobile ? 0 : 1, // 关键：手机端不要flex-grow
                 }}
             >
                 {/* 拍照/相册按钮 Photo/Album button*/}
@@ -647,7 +641,6 @@ const Upload: React.FC = () => {
                         </div>
                     ))}
                 </div>
-
                 {/* 拍摄要求说明 Explanation of filming requirements */}
                 <div
                     style={{
@@ -680,7 +673,6 @@ const Upload: React.FC = () => {
                         <li>Photographing the building as a whole</li>
                     </ul>
                 </div>
-
                 {/* 错误提示 error handle*/}
                 {error && (
                     <div
@@ -751,5 +743,4 @@ const Upload: React.FC = () => {
         </div>
     );
 };
-
 export default Upload;
