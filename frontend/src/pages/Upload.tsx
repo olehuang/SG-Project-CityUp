@@ -47,7 +47,7 @@ const Upload: React.FC = () => {
     const [houseNumberMissing, setHouseNumberMissing] = useState<boolean>(false);
     const houseNumberRef = useRef<HTMLInputElement>(null);
 
-    // 组件引用
+    // 地图组件引用
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
 
@@ -63,7 +63,7 @@ const Upload: React.FC = () => {
     // 判断是否为小屏幕
     const isSmallScreen = windowWidth < 1200;
 
-    // 1. 页面加载，请求定位，自动定位
+    // 1. 地图页面加载，请求定位，自动定位设备
     useEffect(() => {
         setLocating(true);
         if (navigator.geolocation) {
@@ -83,7 +83,7 @@ const Upload: React.FC = () => {
         }
     }, []);
 
-    // 2. 反向地理编码
+    // 2. reverse Geocode反向地址编码经纬度转地址
     const reverseGeocode = async (lat: number, lng: number, fromMapClick=false) => {
         try {
             const res = await fetch(
@@ -91,7 +91,7 @@ const Upload: React.FC = () => {
             );
             const data = await res.json();
             const addr = data.address || {};
-            // 处理地址
+            // addr handle 处理地址
             const locationString = [
                 addr.city,
                 addr.town,
@@ -106,7 +106,7 @@ const Upload: React.FC = () => {
                 .filter(Boolean)
                 .join(", ")
                 .toLowerCase();
-            // 地址不在达姆时处理
+            // addr not in Darmstadt
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
@@ -116,7 +116,7 @@ const Upload: React.FC = () => {
                 return;
             }
             setError(null);
-            // 门牌号逻辑
+            // house number
             const hn = addr.house_number ?? "";
             setHouseNumber(hn);
 
@@ -146,7 +146,7 @@ const Upload: React.FC = () => {
         return null;
     }
 
-    // mapRef获取当前map对象
+    // mapRef get current map object mapRef获取当前map对象
     function SetMapRef() {
         const map = useMap();
         useEffect(() => {
@@ -155,7 +155,7 @@ const Upload: React.FC = () => {
         return null;
     }
 
-    // 3. 地址输入搜索地址
+    // 3. Address enter and search
     const handleAddressSearch = async () => {
         if (!address) {
             setError("Please enter the address.");
@@ -184,7 +184,7 @@ const Upload: React.FC = () => {
         }
     };
 
-    // 4. marker拖拽处理
+    // 4. marker光标拖拽处理
     const handleMarkerDragEnd = (e: any) => {
         const marker = e.target;
         const pos = marker.getLatLng();
@@ -193,7 +193,7 @@ const Upload: React.FC = () => {
         setError(null);
     };
 
-    // 拍照上传
+    // camera upload
     const handleTakePhoto = () => {
         if (fileInputRef.current) {
             fileInputRef.current.removeAttribute("capture");
@@ -202,7 +202,7 @@ const Upload: React.FC = () => {
         }
     };
 
-    // 相册上传
+    // album upload
     const handleSelectFromGallery = () => {
         if (fileInputRef.current) {
             fileInputRef.current.removeAttribute("capture");
@@ -210,7 +210,7 @@ const Upload: React.FC = () => {
         }
     };
 
-    // 选择照片
+    // select photos
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const maxPhotos = 5;
         if (!e.target.files || e.target.files.length === 0) {
@@ -234,7 +234,7 @@ const Upload: React.FC = () => {
         setPhotos([...photos, ...newPhotos]);
     };
 
-    // delet
+    // delete photos
     const removePhoto = (id: string) => {
         setPhotos(photos.filter((p) => p.id !== id));
     };
@@ -361,7 +361,6 @@ const Upload: React.FC = () => {
                         Please enter the address of the building to be registered (Darmstadt only)
                     </label>
                     <div style={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: 8, alignItems: "center", width: "100%" }}>
-
                         {/* 门牌号输入框Door number input box */}
                         {houseNumberMissing && (
                             <input
@@ -389,7 +388,6 @@ const Upload: React.FC = () => {
                                 required
                             />
                         )}
-
                         {/* 地址输入框和搜索按钮 Address input box and search button*/}
                         <div style={{ display: "flex", flex: 1, width: "100%", gap: 8 }}>
                             <input
@@ -430,14 +428,12 @@ const Upload: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* 缺失门牌号提示 Missing door number alert*/}
                 {houseNumberMissing && (
                     <div style={{ color: "#e53935", fontSize: 14, marginTop: 8 }}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
-
                 {/* 地图容器Map Container */}
                 <div
                     ref={mapDivRef}
@@ -492,7 +488,6 @@ const Upload: React.FC = () => {
                         </div>
                     )}
                 </div>
-
                 {/* 地图操作提示Map operation */}
                 <div style={{
                     textAlign: "center",
@@ -502,8 +497,6 @@ const Upload: React.FC = () => {
                 }}>
                     Drag the marker to adjust the building location
                 </div>
-
-
             </div>
 
             {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
