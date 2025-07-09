@@ -1,24 +1,23 @@
 import React from "react";
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
-import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 
-interface porps{
+interface Porps{
     setSelectOrder: (selectOrder:any)=>void;
     selectOrder:any;
 }
 
-const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
+const PhotoOrderSelector:React.FC<Porps> =({setSelectOrder,selectOrder})=>{
 
 
     const handleChange=(event:SelectChangeEvent)=>{
         setSelectOrder(event.target.value as string);
     }
     return(
-        <FormControl sx={{  minWidth: 120,}}>
+        <FormControl sx={{  minWidth: 120, width: { xs: "100%", sm: 180 }, }}>
             <InputLabel id="demo-simple-select-helper-label">Order</InputLabel>
             <Select
                 labelId="demo-simple-select-helper-label"
@@ -26,7 +25,7 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
                 value={selectOrder}
                 label="Order"
                 onChange={handleChange}
-                sx={{padding:"0 0.5% 0 1%",}}
+                sx={{padding:"0 0.5% 0 1%", fontSize: { xs: 12, sm: 14 }, }}
             >
                 <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
                 <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>

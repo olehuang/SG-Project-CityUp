@@ -342,15 +342,19 @@ const PhotoReview = () => {
                                             </TableCell>
                                         )}
                                         <TableCell sx={photoReviewStyles.imageCell}>
-                                            <img
-                                                src={photo.image_url}
-                                                alt="Building Photo"
-                                                style={photoReviewStyles.image}
+                                            <Box
+                                                sx={photoReviewStyles.imageBox}
                                                 onClick={() => handleImageClick(photo)}
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = "none";
-                                                }}
-                                            />
+                                            >
+                                                <img
+                                                    src={photo.image_url}
+                                                    alt="Building Photo"
+                                                    style={photoReviewStyles.imageInner}
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = "none";
+                                                    }}
+                                                />
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Typography
@@ -470,10 +474,11 @@ const PhotoReview = () => {
                     </IconButton>
 
                     {previewImage && (
-                        <img
+                        <Box
+                            component="img"
                             src={previewImage}
                             alt="Photo Preview"
-                            style={photoReviewStyles.previewImage}
+                            sx={photoReviewStyles.previewImage}  // 改为sx而不是style
                             onError={(e) => {
                                 console.error("Preview image failed to load");
                             }}

@@ -218,22 +218,35 @@ const BuildingPhotoGallery=()=>{
     return(
         <Box sx={{
             ...pageBackgroundStyles.container,
-            justifyContent:"content",
-            display:'contents',
+            //justifyContent:"content",
+            display:'flex',
+            flexDirection: 'column',
             overflow: "hidden",
-            position: 'relative'
+            position: 'relative',
+            minHeight: '100vh',
+            width: '100%',
+            maxWidth: '100vw',
+            boxSizing: 'border-box'
         }}>
-            <Box  sx={BuildingPhotoGalleryStyles.container}>
+            <Box sx={{
+                ...BuildingPhotoGalleryStyles.container,
+                width: '100%',
+                maxWidth: '100vw',
+                margin: '0 auto',
+                padding: { xs: '8px', sm: '12px', md: '16px' },
+                boxSizing: 'border-box'
+            }}>
                 {/*Search box*/}
-                <AdressSearchField
-                    isNomatch={isNomatch}
-                    setIsNomatch={setIsNomatch}
-                    onSearch={handleSearch}
-                    onSelect={handleSelect}
-                    setSearchResult={setSearchResult}
-                    allAddresses={allAddresses}
-
-                />
+                <Box sx={{ width: '100%', marginBottom: 2,boxSizing: 'border-box'  }}>
+                    <AdressSearchField
+                        isNomatch={isNomatch}
+                        setIsNomatch={setIsNomatch}
+                        onSearch={handleSearch}
+                        onSelect={handleSelect}
+                        setSearchResult={setSearchResult}
+                        allAddresses={allAddresses}
+                    />
+                </Box>
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
                         <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
@@ -246,10 +259,13 @@ const BuildingPhotoGallery=()=>{
                      sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
                     {/*Adresse Table */}
                     <Box sx={{...BuildingPhotoGalleryStyles.leftContainer,
-                        width: `calc(${leftWidth}% - 6px)`
+                        width: { xs: '100%', md: `calc(${leftWidth}% - 6px)` }
                     }}>
                     <TableContainer component={Paper}
-                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1",
+                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1"
+                                        overflowX: 'auto',
+                                        width: '100%',
+                                        boxSizing: 'border-box',
                                     }}>
                         <Table  size="medium" aria-label="building table">
                             <TableHead sx={{backgroundColor:"#F1EFEC",//"#abd1e6",
@@ -273,7 +289,9 @@ const BuildingPhotoGallery=()=>{
                                                 }),}}
                                             onClick={() => handleSelect(addr)}
                                         >
-                                            <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi,'')}</TableCell>
+                                            <TableCell sx={{ wordBreak: 'break-word' }}>
+                                                {addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}
+                                            </TableCell>
                                             <TableCell>{photoInfoMap[addr]?.updateTime || "Loading..."}</TableCell>
                                             <TableCell>{photoInfoMap[addr]?.photoNr ?? "-"}</TableCell>
                                         </TableRow>
@@ -289,18 +307,40 @@ const BuildingPhotoGallery=()=>{
                     </TableContainer>
                     </Box>
                     {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
-                    <Box onMouseDown={handleMouseDown} sx={BuildingPhotoGalleryStyles.resizer} />
+                    <Box
+                        onMouseDown={handleMouseDown}
+                        sx={{
+                            ...BuildingPhotoGalleryStyles.resizer,
+                            display: { xs: 'none', md: 'block' }
+                        }}
+                    />
                     <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer,
                         //width: `calc(${100 - leftWidth}% - 6px)`
-                        flex: 1
+                        flex: 1,
+                        width: { xs: '100%', md: `calc(${100 - leftWidth}% - 6px)` }
                     }}>
                         <Box >
-                            <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
+                            <Box
+                                sx={{
+                                    ...BuildingPhotoGalleryStyles.rightContainerTitle,
+                                    display: 'flex',
+                                    flexWrap: 'wrap',
+                                    justifyContent: 'space-between',
+                                    alignItems: 'center',
+                                    gap: '10px'
+                                }}
+                            >
                                 <Typography ><strong>Photos Preview</strong> </Typography>
-                                <Button variant={"outlined"}
-                                        onClick={()=>setOpen(true)}
-                                            sx={{visibility:selectedAddress? "visible":"hidden" }}>
-                                            View all</Button>
+                                <Button
+                                    variant={"outlined"}
+                                    onClick={() => setOpen(true)}
+                                    sx={{
+                                        visibility: selectedAddress ? "visible" : "hidden",
+                                        minWidth: 'auto',
+                                        flexShrink: 0
+                                    }}
+                                >
+                                    View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (
@@ -314,7 +354,8 @@ const BuildingPhotoGallery=()=>{
                                         </Typography>
                                         </Box>
                                         )
-                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
+                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center",textAlign: 'center',                  // ⭐️ 小屏居中
+                                                padding: 2}}>
                                         <Typography variant="body2" color="textSecondary">
                                             Please select an address to view photos.
                                         </Typography>

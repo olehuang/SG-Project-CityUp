@@ -43,6 +43,14 @@ const Upload: React.FC = () => {
     //地图组件
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
+    // Mobile
+    const [isMobile, setIsMobile] = useState(false);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        handleResize(); // 页面加载时先判断一次
+        window.addEventListener("resize", handleResize); // 监听窗口大小变化
+        return () => window.removeEventListener("resize", handleResize); // 卸载时清除监听
+    }, []);
 
     // 1. 页面加载，请求定位，自动定位
     useEffect(() => {
@@ -290,11 +298,12 @@ const Upload: React.FC = () => {
         <div
             style={{
                 width: "100vw",
-                height: "100vh",
+                //height: "100vh",
                 minHeight: "100vh",
                 background: "#FFF8E1",
                 display: "flex",
-                flexDirection: "row",
+                flexDirection: isMobile ? "column" : "row", // 根据屏幕动态调整
+                padding: isMobile ? "0 16px" : "0 5vw", // 控制整体左右留白
                 alignItems: "flex-start",
                 justifyContent: "stretch",
                 boxSizing: "border-box",
@@ -308,8 +317,12 @@ const Upload: React.FC = () => {
                 style={{
                     flex: 2,
                     minWidth: 340,
-                    maxWidth: "68vw",
-                    padding: "44px 38px 44px 6vw",
+                    //maxWidth: "68vw",
+                    //maxWidth: '1000px',      //  限制最大宽度
+                    maxWidth: isMobile ? "100%" : "68vw", // 与右侧对称
+                    margin: '0 auto',        //  居中整个内容区域
+                    padding: isMobile ? "24px 16px" : "44px 3vw", // 与右侧一致
+                    alignItems: isMobile ? "center" : "flex-start", // 让内容居中
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -318,9 +331,13 @@ const Upload: React.FC = () => {
             >
                 <h1
                     style={{
-                        fontSize: "2rem",
+                        //fontSize: "2rem",
+                        fontSize: isMobile ? "1.4rem" : "2rem",
                         fontWeight: 700,
-                        margin: "0 0 22px 0"
+                        margin: "0 0 22px 0",
+                        whiteSpace: "nowrap", // 不换行
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
                     }}
                 >
                     Upload Building Photos
@@ -384,7 +401,7 @@ const Upload: React.FC = () => {
                         minHeight: 340,
                         borderRadius: 16,
                         overflow: "hidden",
-                        marginBottom: 8,
+                        marginBottom: isMobile ? 4 : 6,
                         border: "1px solid #eee",
                         background: "#e0e0e0",
                         transition: "height .2s"
@@ -451,17 +468,30 @@ const Upload: React.FC = () => {
                 style={{
                     flex: 1,
                     minWidth: 260,
-                    maxWidth: "32vw",
-                    padding: "44px 6vw 44px 38px",
+                    //padding: isMobile ? "24px 0" : "44px 0",
+                    //maxWidth: "32vw",
+                    //padding: "44px 6vw 44px 38px",
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     background: "transparent",
-                    marginTop: "160px" // 调整上下对齐调这里
+                    //marginTop: "160px", // 调整上下对齐调这里
+                    maxWidth: isMobile ? "100%" : "32vw",   //  移动端全宽
+                    padding: isMobile ? "24px 16px" : "44px 3vw", // 移动端 padding 减少
+                    alignItems: isMobile ? "center" : "flex-start", // 居中内容
+                    marginTop: isMobile ? 16 : 160, // 移动端不需要顶部留空
+
                 }}
             >
                 {/* 拍照/相册上传 */}
-                <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
+                <div style={{
+                    marginTop: isMobile ? 4 : 8,            //  地图与按钮之间的间距：移动端更小
+                    marginBottom: isMobile ? 12 : 24,        // 与后面内容的间距
+                    display: "flex",
+                    flexDirection: "row",
+                    flexWrap: "wrap",
+                    gap: isMobile ? 8 : 12,
+                    justifyContent: isMobile ? "center" : "flex-start", }}>
                     <button
                         onClick={handleTakePhoto}
                         style={{
@@ -471,6 +501,8 @@ const Upload: React.FC = () => {
                             border: "1px solid #888",
                             background: "#fffde7",
                             cursor: "pointer",
+                            flex: isMobile ? "1 1 45%" : "initial",   // ✅ 移动端让它们并排平分宽度
+                            maxWidth: isMobile ? "45%" : "none",
                         }}
                     >
                         <span role="img" aria-label="camera">📷</span> Camera
@@ -484,6 +516,8 @@ const Upload: React.FC = () => {
                             border: "1px solid #888",
                             background: "#fffde7",
                             cursor: "pointer",
+                            flex: isMobile ? "1 1 45%" : "initial",   //  同样处理
+                            maxWidth: isMobile ? "45%" : "none",
                         }}
                     >
                         <span role="img" aria-label="gallery">🖼️</span> Album
@@ -546,7 +580,9 @@ const Upload: React.FC = () => {
                         padding: "9px 13px",
                         marginBottom: 16,
                         border: "1px solid #f5e79e",
-                        boxSizing: "border-box"
+                        boxSizing: "border-box",
+                        width: isMobile ? "100%" : "auto",      // 移动端全宽
+                        alignSelf: isMobile ? "center" : "flex-start", //  居中
                     }}
                 >
                     <b>Photo shooting requirements：</b>
@@ -579,7 +615,8 @@ const Upload: React.FC = () => {
                     onClick={handleSubmit}
                     disabled={isSubmitting}
                     style={{
-                        width: "100%",
+                        width: isMobile ? "90%" : "100%",            //  移动端不贴边
+                        alignSelf: isMobile ? "center" : "stretch",  //  居中
                         background: isSubmitting ? "#aaa" : "#4da151",
                         color: "#fff",
                         fontSize: "1.08rem",

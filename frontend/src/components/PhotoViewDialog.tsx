@@ -15,6 +15,7 @@ import PhotoCarousel from "./PhotoCarousel";
 import qs from "qs";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
+import useMediaQuery from "@mui/material/useMediaQuery";
 
 
 
@@ -50,6 +51,8 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
 
     const { token } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+    const isMobile = useMediaQuery("(max-width:768px)");
+
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
@@ -284,11 +287,12 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     fullWidth
             >
                 <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {selectedAddress}</DialogTitle>
-                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
+                <Box sx={{padding: "1% 1% 0 1%",backgroundColor: "#FAF6E9", fontSize: { xs: 16, sm: 18, md: 20 }}}>
                     <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
                         <Typography variant="h5" sx={{}}>Photos Preview</Typography>
                         {/*Download button*/}
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
+                        <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, //
+                            mb: 1, gap: 2, alignItems: "center",margin: 0}}>
                             {isSelecting && selectedPhotoIds.size > 0 && (
                                 <Button
                                     onClick={handleDownloadSelected}
@@ -329,7 +333,7 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
+                        <ImageList variant="masonry" cols={isMobile ? 1 : 3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
@@ -337,6 +341,9 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                     alt={photo.title}
                                     loading="lazy"
                                     style={{
+                                        width: "100%", // new
+                                        maxWidth: "100%",  //new
+                                        height: "auto", //new
                                         borderRadius: 8,
                                         cursor: 'pointer',
                                         boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
@@ -356,8 +363,16 @@ const PhotoViewDialog:React.FC<Props>=({selectedAddress,open,handleDialogClose})
                                         //title={photo.title}
                                         sx={{borderRadius:"5px"}}
                                         subtitle={
-                                            `Upload User: ${photo.uploader} 
-                                            | Upload Time: ${photo.uploadTime}`}
+                                            <Typography
+                                                variant="caption"
+                                                sx={{
+                                                    fontSize: { xs: 12, sm: 14 },
+                                                    wordBreak: "break-word"
+                                                }}
+                                            >
+                                                Upload User: {photo.uploader} | Upload Time: {photo.uploadTime}
+                                            </Typography>
+                                        }
                                         actionIcon={
                                             isSelecting && (
                                                 <Checkbox

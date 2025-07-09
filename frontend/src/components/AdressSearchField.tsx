@@ -19,7 +19,6 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
     const [inputValue, setInputValue] = useState("");
     const [selectedAddress, setSelectedAddress] = useState<string|null>("");
     const [history, setHistory] = useState<string[]>([]);
-
     const [hasSearched, setHasSearched] = useState(false);
 
     const STORAGE_KEY = "address_search_history";
@@ -111,7 +110,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                             <InputAdornment position="end">
                                 <Button
                                     type="button"
-                                    size="large"
+                                    size="medium"
                                     onClick={handleSearch}>
                                     Search
                                 </Button>
@@ -120,7 +119,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                 />
             )}
         />
-            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"1% 0 0 1%",}}>
+            <Box sx={{display: "flex",gap:1,alignItems:"center",justifyContent: "space-between",margin:"1% 0 0 1%", flexWrap: "wrap", }}>
                 {(isNomatch ||hasSearched) && <Button
                     variant="outlined"
                     size="small"
