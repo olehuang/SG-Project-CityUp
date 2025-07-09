@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Typography, Dialog, DialogTitle, DialogContent, Button} from "@mui/material";
+import {Box, Typography, Dialog, DialogTitle, DialogContent, Button, IconButton} from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
@@ -7,6 +7,7 @@ import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
 import FavoriteBorder from '@mui/icons-material/Favorite';
+import CloseIcon from "@mui/icons-material/Close";
 
 interface PhotoGridProps {
     address: string;
@@ -38,7 +39,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
+
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -55,13 +56,13 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const fetchPhoto= async (address:string)=>{
         setLoading(true);
         setError(null);
-        console.log("address:",address);
+
 
         const url="http://127.0.0.1:8000/photos/get_first_9_photo"
         try{
             const response = await axios.get(url, {params: {address: address,user_id:user_id}});
             const data=response.data;
-            console.log(data);
+
 
             const formattedPhotos: Photo[] = data.map((item: any) => ({
                     id:item.photo_id,
@@ -98,7 +99,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     timeStyle:"medium",
                 }).format(new Date(timeStr));
             } catch (error) {
-                console.error(error, "updateTime:", time);
+                setError(error+"in PhotoGrid formatTime")
                 formattedTime = "Invalid Date";
             }finally {
                 return formattedTime;
@@ -115,7 +116,12 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     //close Dialog
     const handleClose = () => {
         setOpen(false);
-        setSelectedPhotoIndex(null);
+    };
+
+    //close Dialog
+    const handleDialogClose = () => {
+        setOpen(false);
+
     };
     const downloadURL = "http://localhost:8000/photos/download_photo/"
     //download photo which one in Dialog see
@@ -211,9 +217,21 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={'lg'}
-                    sx={{}}
+
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",}}>Photo Detail</DialogTitle>
+                <DialogTitle
+                    sx={{
+                    backgroundColor: "#FAF6E9",
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center",
+                    }}
+                >Photo Detail
+                    <IconButton sx={{marginLeft:"auto"}}
+                                onClick={handleDialogClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
                 <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>

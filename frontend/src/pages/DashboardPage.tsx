@@ -37,7 +37,7 @@ const DashboardPage: React.FC = () => {
         const fetchRoles = async () => {
             const userInfo= await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles||[]);
-            console.log(userInfo?.roles);
+
         }
         if (token!==null && token!==undefined) {
             fetchRoles();
