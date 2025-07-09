@@ -33,7 +33,7 @@ const Upload: React.FC = () => {
     const leftSectionRef = useRef<HTMLDivElement | null>(null);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    // 用户数据状态
+    //用户id，经纬度，地址，相片，处理错误，地址获取权限以及上传操作
     const { user_id, auth } = useAuthHook();
     const [latlng, setLatlng] = useState<[number, number] | null>(null);
     const [address, setAddress] = useState<string>("");
@@ -42,7 +42,7 @@ const Upload: React.FC = () => {
     const [locating, setLocating] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 门牌号相关状态
+    // 门牌号相关组件
     const [houseNumber, setHouseNumber] = useState<string>("");
     const [houseNumberMissing, setHouseNumberMissing] = useState<boolean>(false);
     const houseNumberRef = useRef<HTMLInputElement>(null);
@@ -51,7 +51,7 @@ const Upload: React.FC = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
 
-    // 监听窗口大小变化
+    // 1. 原有窗口宽度监听，决定isSmallScreen
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
@@ -59,9 +59,17 @@ const Upload: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-
     // 判断是否为小屏幕
     const isSmallScreen = windowWidth < 1200;
+
+    // 2. 新增 isMobile 状态
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        handleResize();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, []);
 
     // 1. 地图页面加载，请求定位，自动定位设备
     useEffect(() => {
@@ -83,7 +91,7 @@ const Upload: React.FC = () => {
         }
     }, []);
 
-    // 2. reverse Geocode反向地址编码经纬度转地址
+    // 2. 反向地理编码：marker移动后刷新地址Reverse geocoding (coordinates to address)
     const reverseGeocode = async (lat: number, lng: number, fromMapClick=false) => {
         try {
             const res = await fetch(
@@ -134,7 +142,7 @@ const Upload: React.FC = () => {
         }
     };
 
-    // 地图点击事件 + 光标marker拖拽
+    // 地图点击事件 + 光标marker拖拽 Process user map clicks, update markers and addresses.
     function LocationPicker() {
         useMapEvents({
             click(e) {
@@ -155,7 +163,7 @@ const Upload: React.FC = () => {
         return null;
     }
 
-    // 3. Address enter and search
+    // 3. 地址输入搜索地址和光标行动到指定地址 Address Input and Search
     const handleAddressSearch = async () => {
         if (!address) {
             setError("Please enter the address.");
@@ -210,7 +218,7 @@ const Upload: React.FC = () => {
         }
     };
 
-    // select photos
+    // 选择照片：限制上传照片的数量为五张 Select photos： Limit the number of photos uploaded to 5
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const maxPhotos = 5;
         if (!e.target.files || e.target.files.length === 0) {
@@ -313,16 +321,18 @@ const Upload: React.FC = () => {
         <div
             style={{
                 width: "100%",
-                height: "100vh",
-                overflowY: "auto",
+                //minHeight:"100vh",
+                height: isMobile ? "90dvh" : undefined,
+                overflowY: isMobile ? "auto" : "hidden",//手机端滚动显示，pc不动
                 background: "#FFF8E1",
                 display: "flex",
-                flexDirection: isSmallScreen ? "column" : "row",
+                flexDirection: isMobile ? "column" : "row",
                 alignItems: "flex-start",
                 justifyContent: "stretch",
                 boxSizing: "border-box",
                 position: "relative",
                 padding: isSmallScreen ? "20px" : "0",
+                paddingBottom: isMobile ? "20px" : "0"
             }}
         >
             {/* 左侧区域 - 地图和地址输入Left Area - Map and Address Input */}
@@ -331,7 +341,7 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 2,
                     width: isSmallScreen ? "100%" : "68%",
-                    padding: isSmallScreen ? "20px" : "10px 38px 44px 6vw",
+                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 44px 6vw"),
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -341,9 +351,11 @@ const Upload: React.FC = () => {
             >
                 <h1
                     style={{
-                        fontSize: "2rem",
+                        fontSize: isMobile ? "1.3rem" : "2rem",
                         fontWeight: 700,
-                        margin: "0 0 22px 0"
+                        margin: "0 0 22px 0",
+                        whiteSpace: "nowrap", // 不换行
+                        textOverflow: "ellipsis"
                     }}
                 >
                     Upload Building Photos
@@ -430,22 +442,22 @@ const Upload: React.FC = () => {
                 </div>
                 {/* 缺失门牌号提示 Missing door number alert*/}
                 {houseNumberMissing && (
-                    <div style={{ color: "#e53935", fontSize: 14, marginTop: 8 }}>
+                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8 }}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
-                {/* 地图容器Map Container */}
+                {/* 地图Map */}
                 <div
                     ref={mapDivRef}
                     style={{
                         width: "100%",
-                        height: isSmallScreen ? "60vh" : "60vh",
+                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "60vh"),
                         maxHeight: 500,
-                        minHeight: isSmallScreen ? 300 : 350,
+                        minHeight: isMobile ? 150 : (isSmallScreen ? 300 : 350),
                         borderRadius: 16,
                         overflow: "hidden",
                         marginBottom: 8,
-                        border: "1px solid #eee",
+                        border: "0.6px solid #eee",
                         background: "#e0e0e0",
                         boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
                     }}
@@ -492,7 +504,7 @@ const Upload: React.FC = () => {
                 <div style={{
                     textAlign: "center",
                     marginTop: "10px",
-                    fontSize: "0.9rem",
+                    fontSize: isMobile?"0.5rem":"0.9rem",
                     color: "#666"
                 }}>
                     Drag the marker to adjust the building location
@@ -504,18 +516,21 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 1,
                     width: isSmallScreen ? "100%" : "32%",
-                    overflowY:"auto",
-                    padding: isSmallScreen ? "20px"
-                        : `119px 6vw 44px 38px`,
+                    overflowY:isMobile? "visible":"auto",
+                    padding: isMobile ? "6px"
+                        : (isSmallScreen ? "20px" : `119px 6vw 44px 38px`), // ← 用isMobile微调padding
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
                     background: "transparent",
-                    paddingTop: isSmallScreen ? "20px" : "119px"
+                    //paddingTop: isMobile ? 0 : (isSmallScreen ? "20px" : "119px"),
+                    //height: isMobile ? "auto" : "100%",
+                    //minHeight: isSmallScreen ? "40vh" : undefined,
+                    //flexGrow: isMobile ? 0 : 1, // 关键：手机端不要flex-grow
                 }}
             >
                 {/* 拍照/相册按钮 Photo/Album button*/}
-                <div style={{ marginBottom: 16, display: "flex", flexWrap: "wrap", gap: 10 }}>
+                <div style={{ marginBottom: isMobile? "opx" : 16, display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     <button
                         onClick={handleTakePhoto}
                         style={{
@@ -589,10 +604,9 @@ const Upload: React.FC = () => {
                     display: "flex",
                     gap: 10,
                     flexWrap: "wrap",
-                    marginBottom: 0,
-                    minHeight: 90,
-                    maxHeight: "25vh",
-                    overflowY: "auto"
+                    minHeight: isMobile? 60 : 90,
+                    //overflow: "auto",
+                    paddingBottom:isMobile ? "5px" : undefined,
                 }}>
                     {photos.map((photo) => (
                         <div key={photo.id} style={{ position: "relative" }}>
@@ -637,23 +651,23 @@ const Upload: React.FC = () => {
                 {/* 拍摄要求说明 Explanation of filming requirements */}
                 <div
                     style={{
-                        fontSize: "0.98rem",
+                        fontSize:  isMobile ? "0.7rem" : "0.98rem",
                         background: "#fffde7",
                         borderRadius: 12,
-                        padding: "16px",
-                        marginBottom: 5,
+                        padding: isMobile ? "10px" : "16px",
+                        marginBottom: "16px",
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                        flexGrow: 1
+                        flexGrow: isMobile ? 0 : 1
                     }}
                 >
                     <h3 style={{
                         margin: "0 0 12px 0",
-                        fontSize: "1.1rem",
+                        fontSize: isMobile?"0.9rem":"1.1rem",
                         display: "flex",
                         alignItems: "center",
-                        gap: "8px"
+                        gap: isMobile?"3px":"8px",
                     }}>
                         <span>📋</span> Photo shooting requirements：
                     </h3>
@@ -707,7 +721,8 @@ const Upload: React.FC = () => {
                         display: "flex",
                         justifyContent: "center",
                         alignItems: "center",
-                        gap: "10px"
+                        gap: "10px",
+                        marginTop:isMobile?"12px":"16px",
                     }}
                 >
                     {isSubmitting ? (
