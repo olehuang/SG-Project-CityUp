@@ -298,29 +298,36 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
     return(
         <>
-            <Dialog open={open}
-                    onClose={handleDialogClose}
-                    maxWidth={'lg'}
-                    fullWidth
+            <Dialog
+                open={open}
+                onClose={handleDialogClose}
+                maxWidth="lg"
+                fullWidth
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",padding:"1% 1% 0 1%"}}> Photos Under Adresse - {viewAddress}</DialogTitle>
-                <Box sx={{padding: "1% 1% 0 1%",backgroundColor: "#FAF6E9", fontSize: { xs: 16, sm: 18, md: 20 }}}>
-                <DialogTitle sx={{
-                    backgroundColor: "#FAF6E9",
-                    padding:"1% 1% 0 1%",
-                    display:"flex",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                }}
-                > Photos Under Adresse - {viewAddress}
-                    <IconButton sx={{marginLeft:"auto"}}
-                        onClick={handleDialogClose}>
+                <DialogTitle
+                    sx={{
+                        backgroundColor: "#FAF6E9",
+                        padding: "1% 1% 0 1%",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                    }}
+                >
+                    Photos Under Adresse - {viewAddress}
+                    <IconButton sx={{ marginLeft: "auto" }} onClick={handleDialogClose}>
                         <CloseIcon />
                     </IconButton>
                 </DialogTitle>
-                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
-                    <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
-                        <Typography variant="h5" sx={{}}>Photos Preview</Typography>
+
+                <Box
+                    sx={{
+                        padding: "1% 1% 0 1%",
+                        backgroundColor: "#FAF6E9",
+                        fontSize: { xs: 16, sm: 18, md: 20 },
+                    }}
+                >
+                    <Box sx={{ display: "flex", mb: 1, alignItems: "center", margin: 0 }}>
+                        <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, //
                             mb: 1, gap: 2, alignItems: "center",margin: 0}}>
@@ -347,7 +354,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                     setSelectedPhotoIds(new Set());
 
                                 }}
-                                color={isSelecting ? "error" : "primary" as "error" | "primary"}
+                                color={isSelecting ? "error" : "primary"}
 
                                 sx={{visibility: roles.includes("admin")? "visible":"hidden",}}
                             >
@@ -357,7 +364,8 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                             <PhotoOrderSelector
                                 setSelectOrder={setSelectOrder}
                                 selectOrder={selectOrder}
-                            />
+                                />
+                            </Box>
                         </Box>
                     </Box>
                     {loading ? (
@@ -423,10 +431,11 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                                     wordBreak: "break-word"
                                                 }}
                                             >
-                                                Upload User: {photo.uploader} | Upload Time: {photo.uploadTime}
+                                                Upload User: {photo.uploader} | Upload Time:{" "}
+                                                {photo.uploadTime}
                                             </Typography>
                                         }
-                                            `Upload Time: ${photo.uploadTime}`}
+
                                         actionIcon={
                                             <Box>
                                                 <Checkbox
@@ -449,6 +458,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                     }
                 </Box>
             </Dialog>
+
             {/*click Photo can bigger Photo to see */}
             <PhotoCarousel
                 open={previewOpen}

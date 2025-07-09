@@ -447,22 +447,7 @@ const Upload: React.FC = () => {
                     )}
                 </div>
             </div>
-            {/* 悬浮分割线 */}
-            <div
-                style={{
-                    position: "absolute",
-                    left: "66.7%",  // 正好在2:1栏之间
-                    top: mapRect.top + "px",     // 和地图上沿对齐
-                    height: mapRect.height + "px",// 和地图等高
-                    width: "2px",
-                    background: "#e6dfcc",
-                    borderRadius: 2,
-                    zIndex: 10,
-                    pointerEvents: "none",
-                    boxShadow: "0 2px 10px rgba(200,180,140,0.07)",
-                    transition: "top .2s, height .2s",
-                }}
-            />
+
             {/* 右侧 1/3：上传区 */}
             <div
                 style={{
