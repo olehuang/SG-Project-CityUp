@@ -19,21 +19,21 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
     }
     return(
         <FormControl sx={{  minWidth: 120,}}>
-            <InputLabel id="demo-simple-select-helper-label">Order</InputLabel>
+            <InputLabel >Order</InputLabel>
             <Select
-                labelId="demo-simple-select-helper-label"
-                id="demo-simple-select-helper"
+
+
                 value={selectOrder}
                 label="Order"
                 onChange={handleChange}
                 sx={{padding:"0 0.5% 0 1%",}}
             >
-                <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
-                <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>
-                <MenuItem value={"Name Asc"}>Sort by Name A-Z</MenuItem>
-                <MenuItem value={"Name Desc"}>Sort by Name Z-A</MenuItem>
-                <MenuItem value={"Like Asc"}>Sort by most favorite</MenuItem>
-                <MenuItem value={"Like Desc"}>Sort by least favorite</MenuItem>
+                <MenuItem value={"Time Asc"}>Upload Time Ascending</MenuItem>
+                <MenuItem value={"Time Desc"}>Upload Time Descending</MenuItem>
+                <MenuItem value={"Name Asc"}>Name A-Z</MenuItem>
+                <MenuItem value={"Name Desc"}>Name Z-A</MenuItem>
+                <MenuItem value={"Like Asc"}>Most favorite</MenuItem>
+                <MenuItem value={"Like Desc"}>Least favorite</MenuItem>
             </Select>
         </FormControl>
     )

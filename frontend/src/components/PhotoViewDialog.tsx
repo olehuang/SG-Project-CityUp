@@ -19,7 +19,9 @@ import Photo  from "./PhotoGrid"
 import FavoriteBorder from "@mui/icons-material/Favorite";
 import Favorite from "@mui/icons-material/Favorite";
 import CloseIcon from '@mui/icons-material/Close';
+import { useMediaQuery, useTheme } from "@mui/material";
 
+import styles from "./PhotoViewDialogStyles";
 
 interface Props {
     viewAddress: string|null;
@@ -291,58 +293,60 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+
     return(
         <>
             <Dialog open={open}
                     onClose={handleDialogClose}
                     maxWidth={'lg'}
-                    fullWidth
+                    fullWidth={isMobile}
             >
-                <DialogTitle sx={{
-                    backgroundColor: "#FAF6E9",
-                    padding:"1% 1% 0 1%",
-                    display:"flex",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                }}
-                > Photos Under Adresse - {viewAddress}
-                    <IconButton sx={{marginLeft:"auto"}}
-                        onClick={handleDialogClose}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
-                    <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
-                        <Typography variant="h5" sx={{}}>Photos Preview</Typography>
+
+                    <DialogTitle sx={styles.dialogTitle}>
+                        {!isMobile? `Photos Under Adresse - ${viewAddress}`:"Photos"}
+                        <IconButton sx={{ marginLeft: "auto" }} onClick={handleDialogClose}>
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+
+                <Box sx={styles.mainZoneBackground}>
+                    <Box sx={styles.mainZone}>
+                        {!isMobile && <Typography variant="h5">Photos Preview</Typography>}
                         {/*Download button*/}
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
+                        <Box sx={styles.downloadButton}>
 
-                            {isSelecting && selectedPhotoIds.size > 0 && (
-                                <Button
-                                    onClick={downloadPhotos}
-                                    variant="contained"
-                                    color="success"
-                                >
-                                    Download ({selectedPhotoIds.size})
-                                </Button>
+                            {!isMobile && (<>
+                                    {isSelecting && selectedPhotoIds.size > 0 && (
+                                        <Button
+                                            onClick={downloadPhotos}
+                                            variant="contained"
+                                            color="success"
+                                        >
+                                            Download ({selectedPhotoIds.size})
+                                        </Button>
+                                    )}
+                                    {/*Select Button*/}
+                                    {isSelecting && <Button
+                                        variant="contained"
+                                        color="info"
+                                        onClick={handleAllSelect}>Select All</Button>}
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => {
+                                            setIsSelecting(!isSelecting);
+                                            setSelectedPhotoIds(new Set());
+
+                                        }}
+                                        color={isSelecting ? "error" : "primary"}
+                                        sx={{visibility: roles.includes("admin") ? "visible" : "hidden",}}
+                                    >
+                                        {isSelecting ? "Cancel" : "Select"}
+                                    </Button>
+                                </>
                             )}
-                            {/*Select Button*/}
-                            {isSelecting && <Button
-                                variant="contained"
-                                color="info"
-                                onClick={handleAllSelect}>Select All</Button>}
-                            <Button
-                                variant="contained"
-                                onClick={() => {
-                                    setIsSelecting(!isSelecting);
-                                    setSelectedPhotoIds(new Set());
-
-                                }}
-                                color={isSelecting ? "error" : "primary"}
-                                sx={{visibility: roles.includes("admin")? "visible":"hidden",}}
-                            >
-                                {isSelecting ? "Cancel" : "Select"}
-                            </Button>
                             {/*Order Selector */}
                             <PhotoOrderSelector
                                 setSelectOrder={setSelectOrder}
@@ -351,25 +355,24 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                         </Box>
                     </Box>
                     {loading ? (
-                        <Box sx={{display: "flex", alignItems: "center", gap: 2}}>
+                        <Box sx={styles.loading}>
                             <CircularProgress/>
                             <Typography>Loading photos...</Typography>
                         </Box>
                     ) : error ? (
                         <Typography color="error">Error: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
+                        <ImageList variant="masonry"
+                                   cols={isMobile ? 1 : 3}
+                                   gap={12}
+                                   sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
                                     src={photo.src}
                                     alt={photo.title}
                                     loading="lazy"
-                                    style={{
-                                        borderRadius: 8,
-                                        cursor: 'pointer',
-                                        boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
-                                    }}
+                                    style={styles.image}
                                     onClick={() => handlePreview(photo)}
                                 />
                                 {/*Favorite Button in top right corner*/}
@@ -379,13 +382,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         handleLikeToggle(photo)
                                     }}
                                     sx={{
-                                        position: "absolute",
-                                        top: "1%", right: "1%",
-                                        backgroundColor: "rgba(255,255,255,0.8)",
-                                        '&:hover': {
-                                            backgroundColor: "rgba(255,255,255,0.9)",
-                                        },
-                                        zIndex: 2,
+                                        ...styles.favoriteIcon,
                                         visibility: photo.canLike ? "visible" : "hidden"
                                     }}
                                 >{photo.is_like ? <Favorite sx={{color: "red"}} /> : <FavoriteBorder />}

@@ -24,8 +24,9 @@ import PhotoGrid from "../components/PhotoGrid";
 import {hover} from "@testing-library/user-event/dist/hover";
 import axios from "axios";
 import PhotoViewDialog from "../components/PhotoViewDialog";
-import BuildingPhotoGalleryStyles from "./PhotoGarlleryStyles";
+import PhotoGalleryStyles from "./PhotoGarlleryStyles";
 import {useNavigate} from "react-router-dom";
+import { useMediaQuery, useTheme } from "@mui/material";
 import {photoReviewStyles} from "./PhotoReviewStyles";
 import {useAuthHook} from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
@@ -61,6 +62,7 @@ const PhotoGallery=()=>{
     const [open,setOpen]=useState(false);//Photo dialog
     const [viewAddress,setViewAddress] = useState<string | null>(null)
     const [isNomatch,setIsNomatch]=useState(false);
+    const [isViewAll,setIsViewAll] =useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
 
@@ -147,7 +149,7 @@ const PhotoGallery=()=>{
 
     const handleDialogOpen = () => {
         setOpen(true);
-        setViewAddress(selectedAddress)
+        setViewAddress(selectedAddress)//view all photo address
     };
 
     const handleDialogClose = () => {
@@ -189,10 +191,14 @@ const PhotoGallery=()=>{
 
 
     const handleSelect = (selected: string) => {
-        //handleSearch(selected);
         setSelectedAddress(selected);
-
     };
+
+    //Mobile end can click address to see the photo dialog
+    const handleMobildClick = (selected: string)=>{
+        setViewAddress(selected);
+        setOpen(true);
+    }
 
     useEffect(()=>{
         if (searchResult.length>0) return;
@@ -203,17 +209,18 @@ const PhotoGallery=()=>{
     },[searchResult])
 
 
-
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
     return(
         <Box sx={{
             ...pageBackgroundStyles.container,
-            justifyContent:"content",
-            display:'contents',
-            overflow: "hidden",
-            position: 'relative'
+            ...PhotoGalleryStyles.page
         }}>
-            <Box  sx={BuildingPhotoGalleryStyles.container}>
+            <Box  sx={{...PhotoGalleryStyles.container,
+
+            }}>
                 {/*Search box*/}
                 <AdressSearchField
                     isNomatch={isNomatch}
@@ -226,96 +233,133 @@ const PhotoGallery=()=>{
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
                         <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
-                        <Typography sx={{}}>Loading...</Typography>
+                        <Typography >Loading...</Typography>
                     </Box>
                 )}
                 {error && <Alert severity="error">{error}</Alert>}
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container"
-                     sx={{...BuildingPhotoGalleryStyles.innerContainer}}>
+                     sx={{
+                         ...PhotoGalleryStyles.innerContainer,
+
+                }}>
                     {/*Adresse Table */}
-                    <Box sx={{...BuildingPhotoGalleryStyles.leftContainer,
-                        width: `calc(${leftWidth}% - 6px)`
+                    <Box sx={{...PhotoGalleryStyles.leftContainer,
+                        width: isMobile ? "100%" : `calc(${leftWidth}% - 6px)`,
                     }}>
                     <TableContainer component={Paper}
-                                    style={{backgroundColor:"#FAF6E9",//"#d9e7f1",
-                                    }}>
-                        <Table  size="medium" aria-label="building table">
-                            <TableHead sx={{backgroundColor:"#F1EFEC",//"#abd1e6",
-                                position: "sticky", top: 0}}>
-                                <TableRow >
-                                    <TableCell><strong>Address</strong></TableCell>
-                                    <TableCell><strong>Last Update Time</strong></TableCell>
-                                    <TableCell><strong>Photo Count</strong></TableCell>
-                                </TableRow>
-                            </TableHead>
+                                    style={{backgroundColor:"#FAF6E9"}}>
+                        <Table size="medium" aria-label="building table">
+                            {!isMobile && (
+                                <TableHead sx={{...PhotoGalleryStyles.tableHeader}}>
+                                    <TableRow>
+                                        <TableCell><strong>Address</strong></TableCell>
+                                        <TableCell><strong>Last Update Time</strong></TableCell>
+                                        <TableCell><strong>Photo Count</strong></TableCell>
+                                    </TableRow>
+                                </TableHead>
+                            )}
                             <TableBody>
                                 {searchResult.length > 0 ? (
                                     searchResult.filter(addr => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
-                                        .map((addr, idx) => (
-                                        <TableRow
-                                            key={idx}
-                                            hover
-                                            sx={{...BuildingPhotoGalleryStyles.serachResault,
-                                                ...(addr === selectedAddress && {
-                                                    backgroundColor: "#bbdefb",//"#e3eaed",  // click address highlight
-                                                }),}}
-                                            onClick={() => handleSelect(addr)}
-                                        >
-                                            <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi,'')}</TableCell>
-                                            <TableCell>{photoInfoMap[addr]?.updateTime || "Loading..."}</TableCell>
-                                            <TableCell>{photoInfoMap[addr]?.photoNr ?? "-"}</TableCell>
-                                        </TableRow>
-                                    ))
+                                        .map((addr, idx) => {
+                                            const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
+                                            const isSelected = addr === selectedAddress;
+
+                                            return isMobile ? (
+                                                // Mobil-end Box format
+                                                <>
+                                                <Box
+                                                    key={idx}
+                                                    onClick={() => handleMobildClick(addr)}
+                                                    sx={{...PhotoGalleryStyles.serachResault,
+                                                        ...PhotoGalleryStyles.searchResultMobile,
+                                                    }}
+                                                >
+                                                    <Typography variant="subtitle1"><strong>Address: </strong>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}</Typography>
+                                                    <Typography variant="body2" color="text.secondary"><strong>Last Update Time:</strong>{info.updateTime}</Typography>
+                                                    <Typography variant="body2" color="text.secondary"><strong>Photo Count: </strong>{info.photoNr}</Typography>
+                                                </Box>
+                                                </>
+                                            ) : (
+                                                // Desktop-End TableRow
+                                                <TableRow
+                                                    key={idx}
+                                                    hover
+                                                    sx={{
+                                                        ...PhotoGalleryStyles.serachResault,
+                                                        ...(isSelected && { backgroundColor: "#bbdefb" })
+                                                    }}
+                                                    onClick={() => {
+                                                        handleSelect(addr);
+                                                        setIsViewAll(true)
+                                                    }}
+                                                >
+                                                    <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}</TableCell>
+                                                    <TableCell>{info.updateTime}</TableCell>
+                                                    <TableCell>{info.photoNr}</TableCell>
+                                                </TableRow>
+                                            );
+                                        })
                                 ) : (
                                     <TableRow>
-                                        <TableCell colSpan={3} >No Match</TableCell>
+                                        <TableCell colSpan={3}>No Match</TableCell>
                                     </TableRow>
                                 )}
                             </TableBody>
-
                         </Table>
                     </TableContainer>
                     </Box>
-                    {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
-                    <Box onMouseDown={handleMouseDown} sx={BuildingPhotoGalleryStyles.resizer} />
-                    <Box sx={{ ...BuildingPhotoGalleryStyles.rightContainer,
+
+                    {!isMobile && (
+                        <>
+                        {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
+                        <Box onMouseDown={handleMouseDown} sx={PhotoGalleryStyles.resizer} />
+                        <Box sx={{ ...PhotoGalleryStyles.rightContainer,
                         //width: `calc(${100 - leftWidth}% - 6px)`
-                        flex: 1
-                    }}>
+                        flex: 1}}>
                         <Box >
-                            <Box sx={BuildingPhotoGalleryStyles.rightContainerTitle}>
+                            <Box sx={PhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>
                                 <Button variant={"outlined"}
                                         onClick={handleDialogOpen}
-                                            sx={{visibility:selectedAddress? "visible":"hidden" }}>
+                                            sx={{visibility:isViewAll ? "visible":"hidden" }}>
                                             View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (
-                                    <PhotoGrid address={selectedAddress}/>
-                                ) :
+                                        <PhotoGrid address={selectedAddress}/>
+                                    ) :
                                     isNomatch ? (
-                                        <Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Please enter a valid address to view photos.
+                                            <Box sx={{
+                                                ...PhotoGalleryStyles.nomatchBox
+                                            }}>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    Please enter a valid address to view photos.
 
-                                        </Typography>
-                                        </Box>
+                                                </Typography>
+                                            </Box>
                                         )
-                                    : (<Box sx={{minWidth:"100%", minHeight: "300px", display: "flex", alignItems: "center", justifyContent: "center"}}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Please select an address to view photos.
-                                        </Typography>
-                                     </Box>
-                                    )}
+                                        : (<Box sx={{
+                                                ...PhotoGalleryStyles.nomatchBox
+                                            }}>
+                                                <Typography variant="body2" color="textSecondary">
+                                                    Please select an address to view photos.
+                                                </Typography>
+                                            </Box>
+                                        )}
                             </Box>
                         </Box>
                     </Box>
+                        </>)}
                 </Box>
             </Box>
             {/*All photo Dialog */}
-            <PhotoViewDialog viewAddress={viewAddress} open={open} handleDialogClose={handleDialogClose}/>
+            <PhotoViewDialog
+                viewAddress={viewAddress}
+                open={open}
+                handleDialogClose={handleDialogClose}
+            />
 
         </Box>
     )
