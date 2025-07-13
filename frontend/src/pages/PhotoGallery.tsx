@@ -54,14 +54,14 @@ type BuildingInfo = {
 const PhotoGallery=()=>{
 
 
-    const [leftWidth, setLeftWidth] = useState(70);
-    const [selectedAddress, setSelectedAddress] = useState<string | null>(null);
-    const [allAddresses, setAllAddresses] = useState<string[]>([]);
+    const [leftWidth, setLeftWidth] = useState(70);//Bei Desktop left address-zone inital width
+    const [selectedAddress, setSelectedAddress] = useState<string | null>(null);// which user selected
+    const [allAddresses, setAllAddresses] = useState<string[]>([]);// all Address
     const [searchResult, setSearchResult] = useState<string[]>([...mockResults]);
 
     const [open,setOpen]=useState(false);//Photo dialog
-    const [viewAddress,setViewAddress] = useState<string | null>(null)
-    const [isNomatch,setIsNomatch]=useState(false);
+    const [viewAddress,setViewAddress] = useState<string | null>(null)// which address user choose to view all photos
+    const [isNomatch,setIsNomatch]=useState(false);// if not result by user search ==true
     const [isViewAll,setIsViewAll] =useState(false);
 
     const [photoInfoMap, setPhotoInfoMap] = useState<Record<string, { updateTime: string, photoNr: number }>>({});
@@ -180,16 +180,15 @@ const PhotoGallery=()=>{
     };
 
 
+    //show rearch result
     const handleSearch = (query: string) => {
-
         const result = allAddresses.filter((addr) =>
             addr.toLowerCase().includes(query.toLowerCase())
         );
         setSearchResult(result);
-
     };
 
-
+    // which Address user select
     const handleSelect = (selected: string) => {
         setSelectedAddress(selected);
     };
@@ -200,9 +199,9 @@ const PhotoGallery=()=>{
         setOpen(true);
     }
 
+    //if not exist result in address array
     useEffect(()=>{
         if (searchResult.length>0) return;
-
         if (searchResult.length===0){
             setIsNomatch(true);
         }
@@ -211,7 +210,7 @@ const PhotoGallery=()=>{
 
     //Mobil-End
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px  Screen width <900px
 
     return(
         <Box sx={{
@@ -341,9 +340,7 @@ const PhotoGallery=()=>{
                         <>
                         {/*Photo Preview Area include 9 Photos follow upload time 1. Photo is the neu*/}
                         <Box onMouseDown={handleMouseDown} sx={PhotoGalleryStyles.resizer} />
-                        <Box sx={{ ...PhotoGalleryStyles.rightContainer,
-                        //width: `calc(${100 - leftWidth}% - 6px)`
-                        flex: 1}}>
+                        <Box sx={{ ...PhotoGalleryStyles.rightContainer, flex: 1}}>
                         <Box >
                             <Box sx={PhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>

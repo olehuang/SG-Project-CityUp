@@ -1,19 +1,21 @@
 const PhotoGarlleryStyles={
     page:{
         justifyContent:"content",
-        display:'contents',
+        display:'flex',
         overflow: "hidden",
         position: 'relative',
+        backgroundColor: "#FFF8E1"
     },
     container:{
         width: '95%',
         position: "absolute",
         left:"2%",
+        top:"0.5%",
         marginRight:"2%",
         paddingTop: "0.5%",
-        height:"87%",//`calc(100vh - ${70}px)`,
+        height:"90%",//`calc(100vh - ${70}px)`,
         '@media (min-width:900px)': {
-            height: "85%"
+            height: "85%",
         },
         //border:"1px solid skyblue",
         borderRadius:"5px",

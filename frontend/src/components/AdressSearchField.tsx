@@ -7,18 +7,21 @@ import SearchIcon from "@mui/icons-material/Search";
 interface Props {
     onSearch: (query: string) => void;//return search result
     onSelect?: (selected: string) => void;//clearn search field
-    isNomatch: boolean;
-    setIsNomatch: (isNomatch: boolean) => void;
-    setSearchResult: (searchResult: string[]) => void;
+    isNomatch: boolean; //if no result find
+    setIsNomatch: (isNomatch: boolean) => void; //function to set match or not
+    setSearchResult: (searchResult: string[]) => void; // function to set result
     allAddresses: string[];
-
 
 }
 
+/*
+* Search field box include: add address button, clearn history button
+* user input address, show to user which result hat
+* */
 const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNomatch,setSearchResult,allAddresses}) => {
-    const [inputValue, setInputValue] = useState("");
-    const [selectedAddress, setSelectedAddress] = useState<string|null>("");
-    const [history, setHistory] = useState<string[]>([]);
+    const [inputValue, setInputValue] = useState(""); //user input
+    const [selectedAddress, setSelectedAddress] = useState<string|null>("");// whiche address select
+    const [history, setHistory] = useState<string[]>([]); //storage which address has been research
 
     const [hasSearched, setHasSearched] = useState(false);
 
@@ -37,6 +40,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         }
     }, []);
 
+    //if user something input will add to history
     const updateHistory = (newEntry: string) => {
         const trimmed = newEntry.trim();
         if (!trimmed) return;
@@ -46,6 +50,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     };
 
+    //storage and  search  user input
     const handleSearch = () => {
         const trimmedInput = inputValue.trim();
         if (trimmedInput !== "") {
@@ -66,6 +71,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         }
     };
 
+    //clear user History:which uer has inputed
     const clearHistory = () => {
         localStorage.removeItem(STORAGE_KEY);
         setHistory([]);
