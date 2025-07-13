@@ -241,74 +241,100 @@ const PhotoGallery=()=>{
                 <Box id="resizable-container"
                      sx={{
                          ...PhotoGalleryStyles.innerContainer,
-
                 }}>
                     {/*Adresse Table */}
                     <Box sx={{...PhotoGalleryStyles.leftContainer,
                         width: isMobile ? "100%" : `calc(${leftWidth}% - 6px)`,
                     }}>
-                    <TableContainer component={Paper}
-                                    style={{backgroundColor:"#FAF6E9"}}>
-                        <Table size="medium" aria-label="building table">
-                            {!isMobile && (
-                                <TableHead sx={{...PhotoGalleryStyles.tableHeader}}>
-                                    <TableRow>
-                                        <TableCell><strong>Address</strong></TableCell>
-                                        <TableCell><strong>Last Update Time</strong></TableCell>
-                                        <TableCell><strong>Photo Count</strong></TableCell>
-                                    </TableRow>
-                                </TableHead>
-                            )}
-                            <TableBody>
-                                {searchResult.length > 0 ? (
-                                    searchResult.filter(addr => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
-                                        .map((addr, idx) => {
-                                            const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
-                                            const isSelected = addr === selectedAddress;
+                        {isMobile ? (
+                            //MobileEnd
+                            <Box>
+                                {searchResult
+                                    .filter((addr) => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
+                                    .map((addr, idx) => {
+                                        const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
 
-                                            return isMobile ? (
-                                                // Mobil-end Box format
-                                                <>
-                                                <Box
-                                                    key={idx}
-                                                    onClick={() => handleMobildClick(addr)}
-                                                    sx={{...PhotoGalleryStyles.serachResault,
-                                                        ...PhotoGalleryStyles.searchResultMobile,
-                                                    }}
-                                                >
-                                                    <Typography variant="subtitle1"><strong>Address: </strong>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}</Typography>
-                                                    <Typography variant="body2" color="text.secondary"><strong>Last Update Time:</strong>{info.updateTime}</Typography>
-                                                    <Typography variant="body2" color="text.secondary"><strong>Photo Count: </strong>{info.photoNr}</Typography>
-                                                </Box>
-                                                </>
-                                            ) : (
-                                                // Desktop-End TableRow
-                                                <TableRow
-                                                    key={idx}
-                                                    hover
-                                                    sx={{
-                                                        ...PhotoGalleryStyles.serachResault,
-                                                        ...(isSelected && { backgroundColor: "#bbdefb" })
-                                                    }}
-                                                    onClick={() => {
-                                                        handleSelect(addr);
-                                                        setIsViewAll(true)
-                                                    }}
-                                                >
-                                                    <TableCell>{addr.replace(/,/g, '').replace(/Deutschland/gi, '').replace(/Hessen/gi, '')}</TableCell>
-                                                    <TableCell>{info.updateTime}</TableCell>
-                                                    <TableCell>{info.photoNr}</TableCell>
-                                                </TableRow>
-                                            );
-                                        })
-                                ) : (
-                                    <TableRow>
-                                        <TableCell colSpan={3}>No Match</TableCell>
-                                    </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                        return (
+                                            <Box
+                                                key={idx}
+                                                onClick={() => handleMobildClick(addr)}
+                                                sx={{
+                                                    ...PhotoGalleryStyles.serachResault,
+                                                    ...PhotoGalleryStyles.searchResultMobile,
+                                                }}
+                                            >
+                                                <Typography variant="subtitle1">
+                                                    <strong>Address: </strong>
+                                                    {addr
+                                                        .replace(/,/g, '')
+                                                        .replace(/Deutschland/gi, '')
+                                                        .replace(/Hessen/gi, '')}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Last Update Time: </strong>
+                                                    {info.updateTime}
+                                                </Typography>
+                                                <Typography variant="body2" color="text.secondary">
+                                                    <strong>Photo Count: </strong>
+                                                    {info.photoNr}
+                                                </Typography>
+                                            </Box>
+                                        );
+                                    })}
+                            </Box>
+                        ) : (
+                            // Desktop end
+                            <TableContainer>
+                                <Table size="medium" aria-label="address table">
+                                    <TableHead sx={{...PhotoGalleryStyles.tableHeader}}>
+                                        <TableRow>
+                                            <TableCell><strong>Address</strong></TableCell>
+                                            <TableCell><strong>Last Update Time</strong></TableCell>
+                                            <TableCell><strong>Photo Count</strong></TableCell>
+                                        </TableRow>
+                                    </TableHead>
+                                    <TableBody>
+                                        {searchResult.length > 0 ? (
+                                            searchResult
+                                                .filter((addr) => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
+                                                .map((addr, idx) => {
+                                                    const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
+                                                    const isSelected = addr === selectedAddress;
+
+                                                    return (
+                                                        <TableRow
+                                                            key={idx}
+                                                            hover
+                                                            sx={{
+                                                                ...PhotoGalleryStyles.serachResault,
+                                                                ...(isSelected && { backgroundColor: "#bbdefb" }),
+                                                            }}
+                                                            onClick={() => {
+                                                                handleSelect(addr);
+                                                                setIsViewAll(true);
+                                                            }}
+                                                        >
+                                                            <TableCell>
+                                                                {addr
+                                                                    .replace(/,/g, '')
+                                                                    .replace(/Deutschland/gi, '')
+                                                                    .replace(/Hessen/gi, '')}
+                                                            </TableCell>
+                                                            <TableCell>{info.updateTime}</TableCell>
+                                                            <TableCell>{info.photoNr}</TableCell>
+                                                        </TableRow>
+                                                    );
+                                                })
+                                        ) : (
+                                            <TableRow>
+                                                <TableCell colSpan={3}>No Match</TableCell>
+                                            </TableRow>
+                                        )}
+                                    </TableBody>
+                                </Table>
+                            </TableContainer>
+                        )}
+
                     </Box>
 
                     {!isMobile && (

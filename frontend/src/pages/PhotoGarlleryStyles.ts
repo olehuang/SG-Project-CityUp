@@ -1,5 +1,6 @@
 const PhotoGarlleryStyles={
-    page:{justifyContent:"content",
+    page:{
+        justifyContent:"content",
         display:'contents',
         overflow: "hidden",
         position: 'relative',
@@ -10,7 +11,7 @@ const PhotoGarlleryStyles={
         left:"2%",
         marginRight:"2%",
         paddingTop: "0.5%",
-        height:"90%",//`calc(100vh - ${70}px)`,
+        height:"87%",//`calc(100vh - ${70}px)`,
         '@media (min-width:900px)': {
             height: "85%"
         },
@@ -32,7 +33,7 @@ const PhotoGarlleryStyles={
         gap: "6px",// space between resualt
         height: "100%",
         '@media (min-width:900px)': {
-            height:"95%"
+            height:"90%"
         },
         // border:"1px solid red",
         backgroundColor: "#FAF6E9",
