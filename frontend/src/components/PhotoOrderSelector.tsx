@@ -5,6 +5,7 @@ import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import {useMediaQuery, useTheme} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 
 interface porps{
@@ -17,6 +18,8 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+    const { t } = useTranslation();//double language
+
 
     const handleChange=(event:SelectChangeEvent)=>{
         setSelectOrder(event.target.value as string);
@@ -24,10 +27,10 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
     return(
         <FormControl
             sx={{
-                minWidth: 120,
+                minWidth:120,
             }}
         >
-            <InputLabel >Order</InputLabel>
+            <InputLabel >{t("photoGallery.orderLabel")}</InputLabel>
             <Select
                 value={selectOrder}
                 label="Order"
@@ -37,12 +40,12 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
                     marginBottom:"2%",
                 }}
             >
-                <MenuItem value={"Time Asc"}>Upload Time Ascending</MenuItem>
-                <MenuItem value={"Time Desc"}>Upload Time Descending</MenuItem>
-                <MenuItem value={"Name Asc"}>Name A-Z</MenuItem>
-                <MenuItem value={"Name Desc"}>Name Z-A</MenuItem>
-                <MenuItem value={"Like Asc"}>Most favorite</MenuItem>
-                <MenuItem value={"Like Desc"}>Least favorite</MenuItem>
+                <MenuItem value={"Time Asc"}>{t("photoGallery.updateTimeAcs")}</MenuItem>
+                <MenuItem value={"Time Desc"}>{t("photoGallery.updateTimeDecs")}</MenuItem>
+                <MenuItem value={"Name Asc"}>{t("photoGallery.nameAZ")}</MenuItem>
+                <MenuItem value={"Name Desc"}>{t("photoGallery.nameZA")}</MenuItem>
+                <MenuItem value={"Like Asc"}>{t("photoGallery.mostFavorite")}</MenuItem>
+                <MenuItem value={"Like Desc"}>{t("photoGallery.leastFavorite")}</MenuItem>
             </Select>
         </FormControl>
     )

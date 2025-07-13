@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { useMediaQuery, useTheme } from "@mui/material";
 
 import styles from "./PhotoViewDialogStyles";
+import {useTranslation} from "react-i18next";
 
 interface Props {
     viewAddress: string|null;
@@ -60,6 +61,10 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
     const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+    const { t } = useTranslation();//double language
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
@@ -197,7 +202,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     // download selected photo,single Photo will be direct download, more will as Zip download
     const downloadPhotos = ()=>{
         const selectedPhotosIds = Array.from(selectedPhotoIds);
-        if (selectedPhotosIds.length===0){setError("muss choose minimal one Photos");}
+        if (selectedPhotosIds.length===0){setError(t("photoGallery.errorCollection.PhotoNumber"));}
 
         let url = "";
         try{
@@ -214,7 +219,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
             a.click();
             document.body.removeChild(a);
         }catch (error: any) {
-            setError("Failed to download photo.");
+            setError(t("photoGallery.errorCollection.download"));
         }
     }
 
@@ -293,9 +298,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
-    //Mobil-End
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+
 
     return(
         <>
@@ -306,7 +309,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
             >
 
                     <DialogTitle sx={styles.dialogTitle}>
-                        {!isMobile? `Photos Under Adresse - ${viewAddress}`:"Photos"}
+                        {!isMobile? `${t("photoGallery.photoViewDialogeTitel")} - ${viewAddress}`:`${t("photoGallery.photoViewDialogeTitelMobi")}`}
                         <IconButton sx={{ marginLeft: "auto" }}
                                     autoFocus
                                     onClick={handleDialogClose}>
@@ -316,7 +319,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
                 <Box sx={styles.mainZoneBackground}>
                     <Box sx={styles.mainZone}>
-                        {!isMobile && <Typography variant="h5">Photos Preview</Typography>}
+                        {!isMobile && <Typography variant="h5">{t("photoGallery.photoPreview.title")}</Typography>}
                         {/*Download button*/}
                         <Box sx={styles.downloadButton}>
 
@@ -327,14 +330,14 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                             variant="contained"
                                             color="success"
                                         >
-                                            Download ({selectedPhotoIds.size})
+                                            {t("photoGallery.downloadButton")} ({selectedPhotoIds.size})
                                         </Button>
                                     )}
                                     {/*Select Button*/}
                                     {isSelecting && <Button
                                         variant="contained"
                                         color="info"
-                                        onClick={handleAllSelect}>Select All</Button>}
+                                        onClick={handleAllSelect}>{t("photoGallery.selectAllButton")}</Button>}
                                     <Button
                                         variant="contained"
                                         onClick={() => {
@@ -345,7 +348,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         color={isSelecting ? "error" : "primary"}
                                         sx={{visibility: roles.includes("admin") ? "visible" : "hidden",}}
                                     >
-                                        {isSelecting ? "Cancel" : "Select"}
+                                        {isSelecting ? t("photoGallery.Abbrechen") : t("photoGallery.selectButton")}
                                     </Button>
                                 </>
                             )}
@@ -359,10 +362,10 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                     {loading ? (
                         <Box sx={styles.loading}>
                             <CircularProgress/>
-                            <Typography>Loading photos...</Typography>
+                            <Typography>{t("photoGallery.loading")}</Typography>
                         </Box>
                     ) : error ? (
-                        <Typography color="error">Error: {error}</Typography>
+                        <Typography color="error">{t("photoGallery.error")}: {error}</Typography>
                     ) : (
                         <ImageList variant="masonry"
                                    cols={isMobile ? 1 : 3}
@@ -402,7 +405,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         //title={photo.title}
                                         sx={{borderRadius:"5px"}}
                                         subtitle={
-                                            `Upload Time: ${photo.uploadTime}`}
+                                            `${t("photoGallery.photoDetails.uploadTime")}: ${photo.uploadTime}`}
                                         actionIcon={
                                             <Box>
                                                 <Checkbox

@@ -16,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 import styles from "./PhotoCarouselStyles";
+import {useTranslation} from "react-i18next";
 
 export interface Photo {
     id: string;
@@ -57,6 +58,8 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
+    const { t } = useTranslation();//double language
+
     const { user_id } = useAuthHook();
     const [error, setError] = useState<string | null>(null); // error
     if(!photo) return null;
@@ -95,7 +98,6 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
             PaperProps={{
                 sx: isMobile ? styles.dialogMobilPopers : {}
             }}
-
         >
             <Box sx={styles.mainBox}>
                 {!isMobile && (
@@ -125,9 +127,9 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     {/* info Area：only in Desktop  */}
                     {!isMobile && (
                         <Box sx={{ textAlign: "left" }}>
-                            <Typography variant="body2">Upload User: {photo?.uploader}</Typography>
-                            <Typography variant="body2">Upload Time: {photo?.uploadTime}</Typography>
-                            <Typography variant="body2">Favorite Number: {photo.likeCount}</Typography>
+                            <Typography variant="body2">{t("photoGallery.photoDetails.uploadUser")}: {photo?.uploader}</Typography>
+                            <Typography variant="body2">{t("photoGallery.photoDetails.uploadTime")}: {photo?.uploadTime}</Typography>
+                            <Typography variant="body2">{t("photoGallery.photoDetails.favoriteNr")}: {photo.likeCount}</Typography>
                             <Button
                                 startIcon={<FavoriteBorder sx={{ color: photo.is_like ? "red" : "gray" }} />}
                                 onClick={() => handleLikeToggle(photo)}
@@ -153,7 +155,6 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     <IconButton
                         sx={styles.closeIcon}
                         onClick={onClose}
-
                         autoFocus
                     >
                         <CloseIcon />

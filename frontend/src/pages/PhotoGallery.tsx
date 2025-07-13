@@ -32,6 +32,7 @@ import {useAuthHook} from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
 
 import CircularProgress from '@mui/material/CircularProgress';
+import {useTranslation} from "react-i18next";
 
 const mockResults = [
     "Karolinenpl. 5, 64289 Darmstadt ",
@@ -73,6 +74,11 @@ const PhotoGallery=()=>{
 
     const [error,setError] = useState<string>("")
     const [isError,setIsError] = useState<false>(false)
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px  Screen width <900px
+
+    const { t } = useTranslation();//double language
 
     const url="http://127.0.0.1:8000"
     useEffect(() => {
@@ -207,9 +213,7 @@ const PhotoGallery=()=>{
     },[searchResult])
 
 
-    //Mobil-End
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px  Screen width <900px
+
 
     return(
         <Box sx={{
@@ -231,10 +235,10 @@ const PhotoGallery=()=>{
                 {isLoading && (
                     <Box sx={{ width: '100%' }}>
                         <LinearProgress color={"success"}  variant="indeterminate" value={progress} />
-                        <Typography >Loading...</Typography>
+                        <Typography >{t("photoGallery.loading")}</Typography>
                     </Box>
                 )}
-                {error && <Alert severity="error">{error}</Alert>}
+                {error && <Alert severity="error">{t("photoGallery.error")}:{error}</Alert>}
                 {/*under Big Box/Container include Address Table Area and Photo Preview Area*/}
                 <Box id="resizable-container"
                      sx={{
@@ -250,7 +254,7 @@ const PhotoGallery=()=>{
                                 {searchResult
                                     .filter((addr) => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
                                     .map((addr, idx) => {
-                                        const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
+                                        const info = photoInfoMap[addr] || { updateTime:t("photoGallery.loading"), photoNr: "-" };
 
                                         return (
                                             <Box
@@ -262,18 +266,18 @@ const PhotoGallery=()=>{
                                                 }}
                                             >
                                                 <Typography variant="subtitle1">
-                                                    <strong>Address: </strong>
+                                                    <strong>{t("photoGallery.tabelHeader.address")}: </strong>
                                                     {addr
                                                         .replace(/,/g, '')
                                                         .replace(/Deutschland/gi, '')
                                                         .replace(/Hessen/gi, '')}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Last Update Time: </strong>
+                                                    <strong>{t("photoGallery.tabelHeader.lastUpdateTime")}: </strong>
                                                     {info.updateTime}
                                                 </Typography>
                                                 <Typography variant="body2" color="text.secondary">
-                                                    <strong>Photo Count: </strong>
+                                                    <strong>{t("photoGallery.tabelHeader.photoCount")}: </strong>
                                                     {info.photoNr}
                                                 </Typography>
                                             </Box>
@@ -286,9 +290,9 @@ const PhotoGallery=()=>{
                                 <Table size="medium" aria-label="address table">
                                     <TableHead sx={{...PhotoGalleryStyles.tableHeader}}>
                                         <TableRow>
-                                            <TableCell><strong>Address</strong></TableCell>
-                                            <TableCell><strong>Last Update Time</strong></TableCell>
-                                            <TableCell><strong>Photo Count</strong></TableCell>
+                                            <TableCell><strong>{t("photoGallery.tabelHeader.address")}</strong></TableCell>
+                                            <TableCell><strong>{t("photoGallery.tabelHeader.lastUpdateTime")}</strong></TableCell>
+                                            <TableCell><strong>{t("photoGallery.tabelHeader.photoCount")}</strong></TableCell>
                                         </TableRow>
                                     </TableHead>
                                     <TableBody>
@@ -296,7 +300,7 @@ const PhotoGallery=()=>{
                                             searchResult
                                                 .filter((addr) => (photoInfoMap[addr]?.photoNr ?? 0) > 0)
                                                 .map((addr, idx) => {
-                                                    const info = photoInfoMap[addr] || { updateTime: "Loading...", photoNr: "-" };
+                                                    const info = photoInfoMap[addr] || { updateTime: t("photoGallery.loading"), photoNr: "-" };
                                                     const isSelected = addr === selectedAddress;
 
                                                     return (
@@ -325,7 +329,7 @@ const PhotoGallery=()=>{
                                                 })
                                         ) : (
                                             <TableRow>
-                                                <TableCell colSpan={3}>No Match</TableCell>
+                                                <TableCell colSpan={3}>{t("photoGallery.noMatch")}</TableCell>
                                             </TableRow>
                                         )}
                                     </TableBody>
@@ -342,7 +346,7 @@ const PhotoGallery=()=>{
                         <Box sx={{ ...PhotoGalleryStyles.rightContainer, flex: 1}}>
                         <Box >
                             <Box sx={PhotoGalleryStyles.rightContainerTitle}>
-                                <Typography ><strong>Photos Preview</strong> </Typography>
+                                <Typography ><strong>{t("photoGallery.photoPreview.titel")}</strong> </Typography>
                                 <Button variant={"outlined"}
                                         tabIndex={-1}
                                         onClick={handleDialogOpen}
@@ -350,7 +354,7 @@ const PhotoGallery=()=>{
                                                 visibility:isViewAll ? "visible":"hidden",
                                                 pointerEvents: isViewAll ? "auto" : "none",// protect mouse interactive
                                 }}>
-                                            View all</Button>
+                                    {t("photoGallery.viewAllButton")}</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
                                 {selectedAddress && (photoInfoMap[selectedAddress]?.photoNr ?? 0) > 0 ? (
@@ -361,8 +365,7 @@ const PhotoGallery=()=>{
                                                 ...PhotoGalleryStyles.nomatchBox
                                             }}>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    Please enter a valid address to view photos.
-
+                                                    {t("photoGallery.photoPreview.tipValid")}
                                                 </Typography>
                                             </Box>
                                         )
@@ -370,7 +373,7 @@ const PhotoGallery=()=>{
                                                 ...PhotoGalleryStyles.nomatchBox
                                             }}>
                                                 <Typography variant="body2" color="textSecondary">
-                                                    Please select an address to view photos.
+                                                    {t("photoGallery.photoPreview.tip")}
                                                 </Typography>
                                             </Box>
                                         )}

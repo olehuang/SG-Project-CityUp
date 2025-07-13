@@ -2,6 +2,7 @@ import React, { useState ,useEffect} from "react";
 import {Autocomplete, Button, TextField,Box} from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
+import {useTranslation} from "react-i18next";
 
 
 interface Props {
@@ -24,6 +25,8 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
     const [history, setHistory] = useState<string[]>([]); //storage which address has been research
 
     const [hasSearched, setHasSearched] = useState(false);
+
+    const { t } = useTranslation();
 
     const STORAGE_KEY = "address_search_history";
     useEffect(() => {
@@ -94,7 +97,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                 <TextField
                     sx={{}}
                     {...params}
-                    label="Input Adress"
+                    label={t("photoGallery.inputBoxLabel")}
                     variant="outlined"
                     type="search"
                     fullWidth
@@ -110,7 +113,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         ...params.InputProps,
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon/>
+                                <SearchIcon  />
                             </InputAdornment>
                         ),
                         endAdornment: (
@@ -119,7 +122,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                                     type="button"
                                     size="large"
                                     onClick={handleSearch}>
-                                    Search
+                                    Search={t("photoGallery.searchButton")}
                                 </Button>
                             </InputAdornment>)
                     }}
@@ -134,7 +137,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         setSearchResult([...allAddresses])
                         setIsNomatch(false)
                         setHasSearched(false)
-                }}> All Address </Button>}
+                }}> {t("photoGallery.allAddress")} </Button>}
                 {history.length > 0 && (
                     <Button
                         sx={{marginRight:"auto"}}
@@ -146,7 +149,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         color="secondary"
                         size="small"
                     >
-                        Clear History
+                        {t("photoGallery.clearHistory")}
                     </Button>
                 )}
             </Box>
