@@ -144,55 +144,7 @@ async def get_user_rank(user_id:str):
         print("Exception while getting user",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
-# @router.get("/get_all_user_after_order")
-# async def get_all_user_after_order(
-#         page:int = Query(1,ge=1),
-#         limit:int = Query(10,ge=1,le=50)
-# ):
-#     try:
-#         skip = (page-1)*limit
-#         users = MongoDB.get_instance().get_collection('users')
-#         print("total")
-#         total= await users.count_documents({}) #total user to show
-#         total_page=math.ceil(total/limit)
-#         all_users_cursor=users.find({},{"_id":0,"user_id":1,"username":1,"point":1}).sort("point",-1)
-#         all_users = await all_users_cursor.to_list(length=None)
-#
-#
-#         result_user =[]
-#
-#         last_point=None
-#         last_rank= 0
-#         aktual_rank=0
-#
-#         for idx, user in enumerate(all_users):
-#             point = user.get("point")
-#             if point==0: continue
-#             if point != last_point:
-#                 aktual_rank = idx + 1
-#                 last_point = point
-#                 last_rank = aktual_rank
-#             result_user.append({
-#                 "user_id": user.get("user_id"),
-#                 "username": user.get("username"),
-#                 "point": point,
-#                 "rank": last_rank
-#             })
-#
-#         start = (page-1)*limit
-#         end = (page)*limit
-#         paged_users = result_user[start:end]
-#
-#         return{
-#             "total":total,
-#             "page":page,
-#             "limit":limit,
-#             "total_page":total_page,
-#             "users":paged_users,
-#         }
-#     except Exception as e:
-#         print("Exception while getting all_user_after_order",traceback.format_exc())
-#         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
 @router.get("/get_all_user_after_order")
 async def get_all_user_after_order(
         page: int = Query(1, ge=1),

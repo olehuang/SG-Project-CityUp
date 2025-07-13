@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, Marker, useMap, useMapEvents } from "react-lea
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
-
+import { useTranslation } from 'react-i18next';
 // 默认达姆施塔特市中心 Default Darmstadt city centre
 const DEFAULT_CENTER: [number, number] = [49.8728, 8.6512];
 const VIEWBOX = [8.570, 49.810, 8.720, 49.930];
@@ -43,7 +43,7 @@ const Upload: React.FC = () => {
     //地图组件
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
-
+    const { t } = useTranslation();
     // 1. 页面加载，请求定位，自动定位
     useEffect(() => {
         setLocating(true);
@@ -90,7 +90,7 @@ const Upload: React.FC = () => {
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
-                setError("Current location is not in Darmstadt");
+                setError(t('uploadMessages.locationNotInDarmstadt'));
                 return;
             }
             setError(null);
@@ -106,7 +106,7 @@ const Upload: React.FC = () => {
             setAddress(parts.join(", "));
 
         } catch {
-            setError("Address resolution failure");
+            setError(t('uploadMessages.addressResolutionFailure'));
         }
 
     };
@@ -132,7 +132,7 @@ const Upload: React.FC = () => {
     // 3. 地址输入并且搜索和光标行动 Address Input and Search
     const handleAddressSearch = async () => {
         if (!address) {
-            setError("Please enter the address.");
+            setError(t('uploadMessages.enterAddress'));
             return;
         }
         setError(null);
@@ -151,10 +151,10 @@ const Upload: React.FC = () => {
                 }
                 setError(null);
             } else {
-                setError("The address was not found");
+                setError(t('uploadMessages.addressNotFound'));
             }
         } catch {
-            setError("The address search failed. Please try again later");
+            setError(t('uploadMessages.addressSearchFailed'));
         }
     };
     /* 4. marker拖拽行动用户拖动 marker 后，自动反查新位置地址并校验范围。
@@ -190,16 +190,13 @@ const Upload: React.FC = () => {
                   const maxPhotos = 5;
             // 1. 没选照片（权限拒绝/操作取消/系统异常），直接报错
             if (!e.target.files || e.target.files.length === 0) {
-                setError(
-                    "No photo detected. This may be due to camera permission being denied or the operation being canceled. " +
-                    "If this happens repeatedly, please check your phone settings to allow the browser to access the camera or gallery."
-                );
+                setError(t('uploadMessages.noPhotoDetected'));
                 return;
             }
             // 2. Limit the number of photos uploaded to 5
             const selectedFiles = Array.from(e.target.files).slice(0, maxPhotos - photos.length);
             if (selectedFiles.length + photos.length > maxPhotos) {
-                setError("Up to 5 photos can be uploaded.");
+                setError(t('uploadMessages.maxPhotosLimit'));
                 return;
             }
             // 3. 正常处理，清除之前的错误
@@ -221,19 +218,19 @@ const Upload: React.FC = () => {
     const handleSubmit = async () => {
         setError(null);
         if (!auth || !user_id) {
-            setError("You must be logged in to upload photos.");
+            setError(t('uploadMessages.loginRequired'));
             return;
         }
         if (!latlng) {
-            setError("Please select the location of the building on the map");
+            setError(t('uploadMessages.selectLocation'));
             return;
         }
         if (!address) {
-            setError("Please enter the building address");
+            setError(t('uploadMessages.enterBuildingAddress'));
             return;
         }
         if (photos.length === 0) {
-            setError("Please upload at least one photo");
+            setError(t('uploadMessages.uploadAtLeastOnePhoto'));
             return;
         }
         setIsSubmitting(true);
@@ -258,10 +255,10 @@ const Upload: React.FC = () => {
                 throw new Error(err);
             }
             const data = await res.json();
-            setError("Upload successful! " + data.message);
+            setError(t('uploadMessages.uploadSuccessful') + data.message);
             setPhotos([]);
         } catch (e:any) {
-            setError("Upload failed: " + (e?.message || "Unknown error"));
+            setError(t('uploadMessages.uploadFailed') + (e?.message || t('uploadMessages.unknownError')));
         }
         setIsSubmitting(false);
     };
@@ -323,7 +320,7 @@ const Upload: React.FC = () => {
                         margin: "0 0 22px 0"
                     }}
                 >
-                    Upload Building Photos
+                    {t('UploadPhoto')}
                 </h1>
                 {/* 地址输入和搜索 */}
                 <div style={{ marginBottom: 16 }}>
@@ -334,7 +331,7 @@ const Upload: React.FC = () => {
                                fontSize: "0.8rem",
                                marginBottom: 4,
                            }}>
-                        Please enter the address of the building to be registered (Darmstadt only)
+                        {t('Uploaddesc')}
                     </label>
                     <div style={{ display: "flex", gap: 8, alignItems: "center", width: "100%" }}>
                         <input
@@ -342,7 +339,7 @@ const Upload: React.FC = () => {
                             type="text"
                             value={address}
                             onChange={(e) => setAddress(e.target.value)}
-                            placeholder="Type the address or click on the map to select."
+                            placeholder={t('AddAddress')}
                             style={{
                                 width: "100%",
                                 fontSize: "0.8rem",
@@ -370,7 +367,7 @@ const Upload: React.FC = () => {
                                 flexShrink: 0,
                             }}
                         >
-                            Search
+                            {t('Search')}
                         </button>
                     </div>
                 </div>
@@ -425,7 +422,7 @@ const Upload: React.FC = () => {
                                 fontSize: 20,
                             }}
                         >
-                            {locating ? "Locating..." : "Map loading failed."}
+                            {locating ? t('uploadMessages.locating') : t('uploadMessages.mapLoadingFailed')}
                         </div>
                     )}
                 </div>
@@ -473,7 +470,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="camera">📷</span> Camera
+                        <span role="img" aria-label="camera">📷</span> {t('Camera')}
                     </button>
                     <button
                         onClick={handleSelectFromGallery}
@@ -486,7 +483,7 @@ const Upload: React.FC = () => {
                             cursor: "pointer",
                         }}
                     >
-                        <span role="img" aria-label="gallery">🖼️</span> Album
+                        <span role="img" aria-label="gallery">🖼️</span> {t('Album')}
                     </button>
                     <input
                         type="file"
@@ -530,7 +527,7 @@ const Upload: React.FC = () => {
                                     lineHeight: "20px",
                                     zIndex: 2,
                                 }}
-                                title="delete photo"
+                                title={t('uploadMessages.deletePhoto')}
                             >
                                 ×
                             </button>
@@ -549,14 +546,14 @@ const Upload: React.FC = () => {
                         boxSizing: "border-box"
                     }}
                 >
-                    <b>Photo shooting requirements：</b>
-                    <ul style={{ paddingLeft: 22, margin: 0 }}>
-                        <li>NO! Face and Licence Plate</li>
-                        <li>NO! Obstructions</li>
-                        <li>NO! Shadows on the building</li>
-                        <li>NO! Distortion, ensuring parallelism!</li>
-                        <li>Make sure pictures are clear</li>
-                        <li>Photographing the building as a whole</li>
+                    <b>{t('photoRequirements.title')}</b>
+                    <ul style={{paddingLeft: 22, margin: 0}}>
+                        <li>{t('photoRequirements.noFaces')}</li>
+                        <li>{t('photoRequirements.noObstructions')}</li>
+                        <li>{t('photoRequirements.noShadows')}</li>
+                        <li>{t('photoRequirements.noDistortion')}</li>
+                        <li>{t('photoRequirements.clear')}</li>
+                        <li>{t('photoRequirements.wholeBuilding')}</li>
                     </ul>
                 </div>
                 {/* 错误和提示 */}
@@ -591,7 +588,7 @@ const Upload: React.FC = () => {
                         marginTop: "auto"
                     }}
                 >
-                    {isSubmitting ? "submitting..." : "Submit"}
+                    {isSubmitting ? t('uploadMessages.submitting') : t('uploadMessages.submit')}
                 </button>
             </div>
         </div>
