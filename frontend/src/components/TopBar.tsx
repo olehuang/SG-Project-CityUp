@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState}from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -7,7 +7,8 @@ import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
 import {useNavigate,useLocation,Link} from "react-router-dom";
-
+import LanguageSelector from "../LanguageSelector";
+import { useTranslation } from 'react-i18next';
 interface TopBarProps {
     onMenuClick: () => void;
 }
@@ -19,6 +20,12 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         navigate("/");
     }
     const location = useLocation();
+    //setLanguage accept language from <LanguageSelector/>
+    const [language,setLanguage]=useState("en");
+
+    //user language to accept from backend default value EN(language) and light(theme)
+    const [giveLanguage,setGiveLanguage]=useState("en");
+    const { t } = useTranslation();
 
     const getPageTitle = () => {
         switch (location.pathname) {
@@ -80,14 +87,24 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         {getPageTitle()}
                     </Typography>
                 </Box>
-                <Button
-                    onClick={()=>{navigate("/dashboard")}}
-                    sx={{...styles.extiButton,
-                        visibility:location.pathname ===("/dashboard")?"hidden":"visible"
-                    }}
-                    variant="outlined"
-                >
-                    Exit</Button>
+                <Box sx={{ display: 'flex', alignItems: 'center', mr: 4  }}>
+                    <LanguageSelector
+                        setLanguage={setLanguage}
+                        giveLanguage={giveLanguage}
+                    />
+                    <Button
+                        onClick={() => {
+                            navigate('/dashboard');
+                        }}
+                        sx={{
+                            ...styles.extiButton,
+                            visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
+                        }}
+                        variant="outlined"
+                    >
+                        Exit
+                    </Button>
+                </Box>
             </Toolbar>
         </AppBar>
     );
@@ -100,7 +117,7 @@ const styles = {
         margin:"auto 5% auto auto",
         color:"white",
         fontWeight: "bold",
-
+        ml:2,
     }
 }
 export default TopBar;

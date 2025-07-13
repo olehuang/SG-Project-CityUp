@@ -23,6 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuthHook } from "../components/AuthProvider";
 import { photoReviewStyles } from "./PhotoReviewStyles";
 import axios from "axios"
+import { useTranslation } from 'react-i18next';
 
 interface PhotoItem {
     photo_id: string;
@@ -52,7 +53,7 @@ const PhotoReview = () => {
 
     const navigate = useNavigate();
     const { auth, user_id } = useAuthHook();
-
+    const { t } = useTranslation();
 
     const handleImageClick = (photo: PhotoItem) => {
         setPreviewImage(photo.image_url);
@@ -73,7 +74,7 @@ const PhotoReview = () => {
             const res = await fetch(`http://127.0.0.1:8000/photos/review/batch_fetch?reviewer_id=${user_id}`, { method: "GET" });
             if (!res.ok) {
                 if (res.status === 404) {
-                    setError("No photos pending review");
+                    setError(t('photoReview.noPhotosPendingReview'));
                     setPhotos([]);
                     return;
                 }
@@ -89,10 +90,10 @@ const PhotoReview = () => {
                 selected: false
             }));
             setPhotos(photosWithSelected);
-            setSuccess(`Successfully fetched ${data.length} Photos`);
+            setSuccess(t('photoReview.photosFetchedSuccess', { count: data.length }));
         } catch (err) {
             console.error("Failed to fetch photos", err);
-            setError("Failed to fetch photos. Please check your network connection or server status.");
+            setError(t('photoReview.fetchPhotosFailed'));
             setPhotos([]);
         } finally {
             setLoading(false);
@@ -126,10 +127,10 @@ const PhotoReview = () => {
 
             // Remove reviewed photos from list
             setPhotos((prev) => prev.filter((photo) => photo.photo_id !== photo_id));
-            setSuccess(`Photo review${result === "success" ? "approved" : "rejected"}, and removed from the list`);
+            setSuccess(result === "success" ? t('photoReview.photoReviewedSuccess') : t('photoReview.photoReviewedRejected'));
         } catch (err) {
             console.error("Single review failed", err);
-            setError("Review failed. Please try again.");
+            setError(t('photoReview.singleReviewFailed'));
         } finally {
             setLoading(false);
         }
@@ -167,13 +168,15 @@ const PhotoReview = () => {
             }
 
             setPhotos((prev) => prev.filter((p) => !p.selected));
-            setSuccess(`Batch review ${result === "success" ? "approved" : "rejected"} for ${selectedIds.length} photos`);
+            setSuccess(result === "success"
+                ? t('photoReview.batchReviewApprovedSuccess', { count: selectedIds.length })
+                : t('photoReview.batchReviewRejectedSuccess', { count: selectedIds.length }));
 
             setSelectAll(false);
             setSelectMode(false);
         } catch (err) {
             console.error("Batch review failed", err);
-            setError("Batch review failed. Please try again.");
+            setError(t('photoReview.batchReviewFailed'));
         } finally {
             setLoading(false);
         }
@@ -251,7 +254,7 @@ const PhotoReview = () => {
                             startIcon={loading ? <CircularProgress size={20} /> : null}
                             sx={photoReviewStyles.fetchButton}
                         >
-                            {loading ? "Fetching..." : "Fetch Photos"}
+                            {loading ? t("photoReview.fetching") : t("photoReview.fetch")}
                         </Button>
 
                         {(error || success) && (
@@ -270,7 +273,7 @@ const PhotoReview = () => {
                         disabled={photos.length === 0}
                         sx={photoReviewStyles.selectButton}
                     >
-                        {selectMode ? "Cancel Selection" : "Select"}
+                        {selectMode ? t("photoReview.cancelSelection") : t("photoReview.select")}
                     </Button>
                 </Box>
 
@@ -299,19 +302,19 @@ const PhotoReview = () => {
                                     </TableCell>
                                 )}
                                 <TableCell sx={photoReviewStyles.headerCell(120)}>
-                                    Photo
+                                    {t('photoReview.photo')}
                                 </TableCell>
                                 <TableCell sx={photoReviewStyles.headerCell(180)}>
-                                    Building Address
+                                    {t('photoReview.address')}
                                 </TableCell>
                                 <TableCell sx={photoReviewStyles.headerCell(150)}>
-                                    Upload User
+                                    {t('photoReview.user')}
                                 </TableCell>
                                 <TableCell sx={photoReviewStyles.headerCell(180)}>
-                                    Upload Time
+                                    {t('photoReview.time')}
                                 </TableCell>
                                 <TableCell sx={photoReviewStyles.headerCell(150)}>
-                                    Review Result
+                                    {t('photoReview.result')}
                                 </TableCell>
                             </TableRow>
                         </TableHead>
@@ -322,7 +325,7 @@ const PhotoReview = () => {
                                         {...photoReviewStyles.noDataCell(selectMode)}
                                     >
                                         <Typography sx={photoReviewStyles.noDataText}>
-                                            No pending photos for review, click 'Fetch Photos' to get data
+                                            {t('photoReview.noData')}
                                         </Typography>
                                     </TableCell>
                                 </TableRow>
@@ -393,7 +396,7 @@ const PhotoReview = () => {
                                                     disabled={loading}
                                                     sx={photoReviewStyles.approveButton}
                                                 >
-                                                    Approve
+                                                    {t('photoReview.approve')}
                                                 </Button>
                                                 <Button
                                                     variant="contained"
@@ -404,7 +407,7 @@ const PhotoReview = () => {
                                                     disabled={loading}
                                                     sx={photoReviewStyles.rejectButton}
                                                 >
-                                                    Reject
+                                                    {t('photoReview.reject')}
                                                 </Button>
                                             </Box>
                                         </TableCell>
@@ -422,8 +425,8 @@ const PhotoReview = () => {
                         sx={photoReviewStyles.statsText}
                     >
                         {photos.length > 0
-                            ? `Currently showing ${photos.length} pending photos for review`
-                            : "No photos loaded"
+                            ? t('photoReview.currentPhotos', { count: photos.length })
+                            : t('photoReview.noPhotos')
                         }
                     </Typography>
                     <Box sx={photoReviewStyles.bottomActionGroup}>
@@ -436,7 +439,7 @@ const PhotoReview = () => {
                                     size="small"
                                     sx={photoReviewStyles.batchApproveButton}
                                 >
-                                    Batch Approve ({photos.filter((p) => p.selected).length})
+                                    {t('photoReview.batchApprove', { count: photos.filter((p) => p.selected).length })}
                                 </Button>
                                 <Button
                                     variant="contained"
@@ -445,7 +448,7 @@ const PhotoReview = () => {
                                     size="small"
                                     sx={photoReviewStyles.batchRejectButton}
                                 >
-                                    Batch Reject ({photos.filter((p) => p.selected).length})
+                                    {t('photoReview.batchReject', { count: photos.filter((p) => p.selected).length })}
                                 </Button>
                             </>
                         )}

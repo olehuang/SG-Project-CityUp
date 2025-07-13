@@ -29,7 +29,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
-
+import { useTranslation } from 'react-i18next';
 const PAGE_SIZE = 10;
 const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
 const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
@@ -78,7 +78,7 @@ const UploadHistory: React.FC = () => {
     const [originalUploads, setOriginalUploads] = useState<UploadItem[]>([]);
     const [searchResults, setSearchResults] = useState<UploadItem[]>([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
-
+    const { t } = useTranslation();
     // Debounce search term - 【修改】增加自动搜索触发
     useEffect(() => {
         const timer = setTimeout(() => {

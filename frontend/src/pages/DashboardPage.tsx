@@ -17,7 +17,7 @@ import { useNavigate } from "react-router-dom";
 import pageBackgroundStyles from "./pageBackgroundStyles";
 import { useAuthHook } from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
-
+import { useTranslation } from 'react-i18next';
 const iconMap: Record<string, React.ReactNode> = {
     "Upload": <UploadFile fontSize="large" />,
     "Product Introduction": <Info fontSize="large" />,
@@ -32,6 +32,7 @@ const DashboardPage: React.FC = () => {
     const navigate = useNavigate();
     const { token } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+    const { t } = useTranslation();
 
     useEffect(() => {
         const fetchRoles = async () => {
@@ -45,15 +46,15 @@ const DashboardPage: React.FC = () => {
     },[token]);
 
     const topItems = [
-        { label: "Tutorial", desc: "Step-by-step guide" },
-        { label: "Upload", desc: "Add your photos here" },
-        { label: "Photo Gallery", desc: "Browse building photos" },
+        { label: "Tutorial", desc: t("dashboard.tutorialDesc") },
+        { label: "Upload", desc: t("dashboard.uploadDesc") },
+        { label: "Photo Gallery", desc: t("dashboard.galleryDesc") },
     ];
 
     const bottomItems = [
-        { label: "Product Introduction", desc: "Overview of the project" },
-        { label: "Upload History", desc: "See your past uploads" },
-        { label: "Photo Review", desc: "Review uploaded photos" },
+        { label: "Product Introduction", desc: t("dashboard.productIntroDesc") },
+        { label: "Upload History", desc: t("dashboard.historyDesc") },
+        { label: "Photo Review", desc: t("dashboard.reviewDesc") },
     ].filter((item) => item.label !== "Photo Review" || roles.includes("admin"));
 
     const labelMap = (label: string) => {
@@ -92,7 +93,7 @@ const DashboardPage: React.FC = () => {
                                 }}
                             >
                                 {iconMap[label]}
-                                <Typography sx={styles.buttonTitle}>{label}</Typography>
+                                <Typography sx={styles.buttonTitle}>{t(`dashboard.${labelMap(label)}Title`)}</Typography>
                                 <Typography sx={styles.buttonDesc}>{desc}</Typography>
                             </Button>
                         </Box>
@@ -106,10 +107,9 @@ const DashboardPage: React.FC = () => {
                     >
                         <Checklist sx={styles.rankingButtonIcon} />
                         <Box>
-                            <Typography sx={styles.rankingButtonTitle}>Rankings</Typography>
-                            <Typography sx={styles.rankingButtonDesc}>
-                                View user upload contribution ranking
-                            </Typography>
+                            <Typography sx={styles.rankingButtonTitle}>{t("dashboard.rankingTitle")}</Typography>
+                            <Typography sx={styles.rankingButtonDesc}>{t("dashboard.rankingDesc")}</Typography>
+
                         </Box>
                     </Button>
                 </Box>

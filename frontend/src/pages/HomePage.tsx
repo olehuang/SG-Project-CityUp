@@ -5,10 +5,12 @@ import {Button, Box, Typography} from "@mui/material";
 
 import { AuthProvider,useAuthHook} from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
-
+import LanguageSelector from "../LanguageSelector";
+import { useTranslation } from 'react-i18next';
 const HomePage = () => {
     const {auth,setAuth,setAuthLoading}=useAuthHook();
     const [clicked, setClicked] = useState(false);
+    const { t } = useTranslation();
     const hanldeLogin= async ()=>{
         setClicked(true);
         //click Get Start translat to keycloak webseite
@@ -96,7 +98,7 @@ const HomePage = () => {
                 </Typography>
 
                 <Button onClick={hanldeLogin} variant="contained" sx={styles.button}>
-                    Get Start
+                    {t('getStart')}
                     {clicked && <Box component="span" sx={styles.bubble} />}
                 </Button>
             </Box>

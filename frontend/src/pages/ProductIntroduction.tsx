@@ -2,7 +2,7 @@ import { Box, Typography, Button, List, ListItem, ListItemIcon, ListItemText, Li
 import { Link } from "react-router-dom";
 import pageBackgroundStyles from "./pageBackgroundStyles";
 import React from "react";
-
+import { useTranslation } from 'react-i18next';
 /**
  * 产品介绍组件（ProductIntroduction）
  * 用于展示CityUp项目简介、用户参与流程及操作入口，适配多端显示。
@@ -10,6 +10,7 @@ import React from "react";
  * Component for showing CityUp project introduction, participation steps, and main entry buttons. Responsive layout.
  */
 const ProductIntroduction=()=>{
+    const { t } = useTranslation();
     return(
         <Box sx={pageBackgroundStyles.container}>
             <Box sx={pageBackgroundStyles.wrapper}>
@@ -18,14 +19,11 @@ const ProductIntroduction=()=>{
                     fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
                     mb: 3,
                 }}>
-                    CityUp
+                    {t('productIntro.title')}
                 </Typography>
 
                 <Typography variant="body1" paragraph sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.6 }}>
-                    CityUP is a student project on innovative urban digitization at Technical University of Darmstadt.
-                    It aims to continuously optimize Darmstadt's 3D city digital model through community participation.
-                    Your photos will be intelligently matched to corresponding buildings, enhancing the texture details and realism of the current 3D city model.
-                    As a reward, you can earn points. We invite citizens to participate in optimizing the city model and become contributors to urban digitization!
+                    {t('productIntro.description')}
                 </Typography>
 
                 <Typography variant="h2" component="h2" id="process-section" sx={{
@@ -34,19 +32,19 @@ const ProductIntroduction=()=>{
                     fontWeight: 400,
                     color: 'primary.main'
                 }}>
-                    Participation Process
+                    {t('productIntro.participationTitle')}
                 </Typography>
 
                 <List sx={{ mb: 0 }}>
                     {[
                         {
-                            text: 'Upload building photos',
-                            secondary: 'Photographing the architecture of Darmstadt\'s city centre',
+                            text: t('productIntro.step1.title'),
+                            secondary: t('productIntro.step1.desc'),
                             path: null,
-                            action: <Button variant="text" size="small" component={Link} to="/dashboard/tutorial" sx={{ ml: 1 }}>View Tutorial</Button>
+                            action: <Button variant="text" size="small" component={Link} to="/dashboard/tutorial" sx={{ ml: 1 }}>{t('productIntro.viewTutorial')}</Button>
                         },
-                        { text: 'Smart Matching Process', secondary: 'The system automatically recognises and matches to the corresponding building model.' },
-                        { text: 'Audit', secondary: 'After approval, your photo may become part of the official 3D model.' }
+                        { text: t('productIntro.step2.title'), secondary: t('productIntro.step2.desc') },
+                        { text: t('productIntro.step3.title'), secondary: t('productIntro.step3.desc') }
                     ].map((item, index) => (
                         <ListItem key={index} disablePadding>
                             <ListItemButton
@@ -83,7 +81,7 @@ const ProductIntroduction=()=>{
                         to="/dashboard/upload"
                         sx={{ px: 4, minWidth: 160 }}
                     >
-                        Participate immediately
+                        {t('productIntro.participateNow')}
                     </Button>
                     <Button
                         variant="outlined"
@@ -92,11 +90,12 @@ const ProductIntroduction=()=>{
                         to="/dashboard/tutorial"
                         sx={{ minWidth: 160 }}
                     >
-                        View Example
+                        {t('productIntro.viewExample')}
                     </Button>
                 </Box>
             </Box>
         </Box>
     )
 }
+
 export default ProductIntroduction;

@@ -19,7 +19,7 @@ import ProductIntroduction from "./pages/ProductIntroduction";
 import PhotoReview from "./pages/PhotoReview";
 import axios from "axios";
 import RankingPage from "./pages/RankingPage";
-
+import './i18n';
 
 function App() {
   return (
