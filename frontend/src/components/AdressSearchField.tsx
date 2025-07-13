@@ -61,7 +61,6 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         if (newValue) {
             setInputValue("");
             setSelectedAddress("");
-            //onSelect?.(newValue);// tell the parent Component choose already
             onSearch?.(newValue);
             setHasSearched(true);
         }
