@@ -121,8 +121,9 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                                 <Button
                                     type="button"
                                     size="large"
-                                    onClick={handleSearch}>
-                                    Search={t("photoGallery.searchButton")}
+                                    onClick={handleSearch}
+                                >
+                                    {t("photoGallery.searchButton")}
                                 </Button>
                             </InputAdornment>)
                     }}
