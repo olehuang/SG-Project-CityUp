@@ -307,7 +307,9 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
                     <DialogTitle sx={styles.dialogTitle}>
                         {!isMobile? `Photos Under Adresse - ${viewAddress}`:"Photos"}
-                        <IconButton sx={{ marginLeft: "auto" }} onClick={handleDialogClose}>
+                        <IconButton sx={{ marginLeft: "auto" }}
+                                    autoFocus
+                                    onClick={handleDialogClose}>
                             <CloseIcon />
                         </IconButton>
                     </DialogTitle>

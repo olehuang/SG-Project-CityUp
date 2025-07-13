@@ -4,6 +4,7 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import {useMediaQuery, useTheme} from "@mui/material";
 
 
 interface porps{
@@ -14,19 +15,27 @@ interface porps{
 const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
 
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+
     const handleChange=(event:SelectChangeEvent)=>{
         setSelectOrder(event.target.value as string);
     }
     return(
-        <FormControl sx={{  minWidth: 120,}}>
+        <FormControl
+            sx={{
+                minWidth: 120,
+            }}
+        >
             <InputLabel >Order</InputLabel>
             <Select
-
-
                 value={selectOrder}
                 label="Order"
                 onChange={handleChange}
-                sx={{padding:"0 0.5% 0 1%",}}
+                sx={{
+                    padding:"0 0.5% 0.5% 1%",
+                    marginBottom:"2%",
+                }}
             >
                 <MenuItem value={"Time Asc"}>Upload Time Ascending</MenuItem>
                 <MenuItem value={"Time Desc"}>Upload Time Descending</MenuItem>

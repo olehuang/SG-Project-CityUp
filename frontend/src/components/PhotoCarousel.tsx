@@ -153,6 +153,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     <IconButton
                         sx={styles.closeIcon}
                         onClick={onClose}
+
                         autoFocus
                     >
                         <CloseIcon />
@@ -164,6 +165,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                         onClick={onNext}
                         sx={styles.rightArrow}
                         autoFocus
+                        tabIndex={-1}
                     >
                         <ArrowForwardIos/>
                     </IconButton>

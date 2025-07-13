@@ -106,7 +106,6 @@ const PhotoGallery=()=>{
                         updateTime:item.updateTime,
                         photoNr:item.photoNr
                     }
-
                 })
 
                 setPhotoInfoMap(infoMap);
@@ -345,8 +344,12 @@ const PhotoGallery=()=>{
                             <Box sx={PhotoGalleryStyles.rightContainerTitle}>
                                 <Typography ><strong>Photos Preview</strong> </Typography>
                                 <Button variant={"outlined"}
+                                        tabIndex={-1}
                                         onClick={handleDialogOpen}
-                                            sx={{visibility:isViewAll ? "visible":"hidden" }}>
+                                            sx={{
+                                                visibility:isViewAll ? "visible":"hidden",
+                                                pointerEvents: isViewAll ? "auto" : "none",// protect mouse interactive
+                                }}>
                                             View all</Button>
                             </Box>
                             <Box sx={{marginTop: "1%"}}>
