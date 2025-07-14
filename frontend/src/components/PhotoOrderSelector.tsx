@@ -33,19 +33,19 @@ const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
             <InputLabel >{t("photoGallery.orderLabel")}</InputLabel>
             <Select
                 value={selectOrder}
-                label="Order"
+                label={t("photoGallery.orderLabel")}
                 onChange={handleChange}
                 sx={{
                     padding:"0 0.5% 0.5% 1%",
                     marginBottom:"2%",
                 }}
             >
-                <MenuItem value={"Time Asc"}>{t("photoGallery.updateTimeAcs")}</MenuItem>
-                <MenuItem value={"Time Desc"}>{t("photoGallery.updateTimeDecs")}</MenuItem>
-                <MenuItem value={"Name Asc"}>{t("photoGallery.nameAZ")}</MenuItem>
-                <MenuItem value={"Name Desc"}>{t("photoGallery.nameZA")}</MenuItem>
-                <MenuItem value={"Like Asc"}>{t("photoGallery.mostFavorite")}</MenuItem>
-                <MenuItem value={"Like Desc"}>{t("photoGallery.leastFavorite")}</MenuItem>
+                <MenuItem value={"Time Asc"}>{t("photoGallery.order.updateTimeAcs")}</MenuItem>
+                <MenuItem value={"Time Desc"}>{t("photoGallery.order.updateTimeDecs")}</MenuItem>
+                <MenuItem value={"Name Asc"}>{t("photoGallery.order.nameAZ")}</MenuItem>
+                <MenuItem value={"Name Desc"}>{t("photoGallery.order.nameZA")}</MenuItem>
+                <MenuItem value={"Like Asc"}>{t("photoGallery.order.mostFavorite")}</MenuItem>
+                <MenuItem value={"Like Desc"}>{t("photoGallery.order.leastFavorite")}</MenuItem>
             </Select>
         </FormControl>
     )

@@ -48,7 +48,7 @@ const DashboardPage: React.FC = () => {
     const topItems = [
         { label: "Tutorial", desc: t("dashboard.tutorialDesc") },
         { label: "Upload", desc: t("dashboard.uploadDesc") },
-        { label: "Photo Gallery", desc: t("dashboard.galleryDesc") },
+        { label: "Photo Gallery", desc: t("dashboard.buildingPhotoDesc")},
     ];
 
     const bottomItems = [

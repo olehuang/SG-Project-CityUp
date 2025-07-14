@@ -346,7 +346,7 @@ const PhotoGallery=()=>{
                         <Box sx={{ ...PhotoGalleryStyles.rightContainer, flex: 1}}>
                         <Box >
                             <Box sx={PhotoGalleryStyles.rightContainerTitle}>
-                                <Typography ><strong>{t("photoGallery.photoPreview.titel")}</strong> </Typography>
+                                <Typography ><strong>{t("photoGallery.photoPreview.title")}</strong> </Typography>
                                 <Button variant={"outlined"}
                                         tabIndex={-1}
                                         onClick={handleDialogOpen}

@@ -4,7 +4,7 @@ const PhotoGarlleryStyles={
         display:'flex',
         overflow: "hidden",
         position: 'relative',
-        backgroundColor: "#FFF8E1"
+        //backgroundColor: "#FFF8E1"
     },
     container:{
         width: '95%',
