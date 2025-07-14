@@ -75,12 +75,14 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
             await axios.post(likeUrl,{},{
                 params:{photo_id:photo.id,user_id:user_id}
             })
-            //update photo
-            setPhoto((prevPhoto:any) =>
-                prevPhoto.map((p:any) =>
-                    p.id === photo.id ? { ...p, is_like: !photo.is_like } : p
-                )
-            );
+            //update photo like status
+            setPhoto((prevPhoto: Photo | null) => {
+                if (!prevPhoto) return prevPhoto;
+                return {
+                    ...prevPhoto,
+                    is_like: !prevPhoto.is_like,
+                };
+            });
 
         }catch (err: any) {
             setError(err.message || "Unknown error in PhotoCarousel");
@@ -126,7 +128,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
 
                     {/* info Area：only in Desktop  */}
                     {!isMobile && (
-                        <Box sx={{ textAlign: "left" }}>
+                        <Box sx={styles.infoArea}>
                             <Typography variant="body2">{t("photoGallery.photoDetails.uploadUser")}: {photo?.uploader}</Typography>
                             <Typography variant="body2">{t("photoGallery.photoDetails.uploadTime")}: {photo?.uploadTime}</Typography>
                             <Typography variant="body2">{t("photoGallery.photoDetails.favoriteNr")}: {photo.likeCount}</Typography>
@@ -135,7 +137,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                                 onClick={() => handleLikeToggle(photo)}
                                 sx={{ visibility: photo.canLike ? "visible" : "hidden" }}
                             >
-                                {photo.is_like ? "Dislike" : "Favorite"}
+                                {photo.is_like ? t("photoGallery.dislikeButton") : t("photoGallery.favoriteButton")}
                             </Button>
                             {isSelecting && photo && (
                                 <FormControlLabel

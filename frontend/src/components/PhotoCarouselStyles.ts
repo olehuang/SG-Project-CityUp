@@ -50,7 +50,7 @@ const styles={
         marginTop: 0,
         '@media (min-width:900px)': {
             height:"80%",
-            margin:"0 1% 0 3%",
+            margin:"0 1% 0 5%",
         },
         display: "flex",
         justifyContent: "center",
@@ -70,6 +70,10 @@ const styles={
         borderRadius: 8,
         backgroundColor: "transparent",
         overflow: "hidden",
+    },
+    infoArea:{ //only Desktop work
+        textAlign: "left",
+        marginRight:"5%",
     },
     closeIcon:{
         position: "absolute",
