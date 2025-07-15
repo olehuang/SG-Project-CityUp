@@ -149,7 +149,7 @@ const UploadHistory: React.FC = () => {
 
         } catch (err) {
             console.error("Failed to fetch upload history:", err);
-            setError("Failed to load upload history. Please try again.");
+            setError(t('failedLoadMessage'));
             setUploads([]);
             setOriginalUploads([]);
             setTotal(0);
@@ -281,8 +281,9 @@ const UploadHistory: React.FC = () => {
     };
     //Status Display Formatting
     const getStatusDisplayName = (status: string) => {
-        return status.charAt(0).toUpperCase() + status.slice(1);
+        return t(`uploadHistory.statusOptions.${status}`);
     };
+
 
     // 【新增】获取当前显示的数据 - 根据是否在搜索状态决定显示哪些数据
     const getCurrentDisplayData = () => {
@@ -310,6 +311,8 @@ const UploadHistory: React.FC = () => {
     const currentDisplayData = getCurrentDisplayData();
     const currentTotal = getCurrentTotal();
 
+
+
     return (
         <Box
             sx={{
@@ -329,7 +332,7 @@ const UploadHistory: React.FC = () => {
             {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
             <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0 }}>
                 <TextField
-                    label="Search by building address"
+                    label={t('uploadHistory.searchLabel')}
                     variant="outlined"
                     size="small"
                     fullWidth
@@ -340,7 +343,7 @@ const UploadHistory: React.FC = () => {
                             handleSearch();
                         }
                     }}
-                    placeholder="Enter search term..."
+                    placeholder={t('uploadHistory.searchPlaceholder')}
                     InputProps={{
                         startAdornment: (
                             <InputAdornment position="start">
@@ -358,7 +361,7 @@ const UploadHistory: React.FC = () => {
                                             sx={{ mr: 0.5 }}
                                         >
                                             <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
-                                                Clear
+                                                {t('uploadHistory.clear')}
                                             </Typography>
                                         </IconButton>
                                         <IconButton
@@ -367,7 +370,7 @@ const UploadHistory: React.FC = () => {
                                             edge="end"
                                         >
                                             <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
-                                                Search
+                                                {t('uploadHistory.search')}
                                             </Typography>
                                         </IconButton>
                                     </>
@@ -384,10 +387,10 @@ const UploadHistory: React.FC = () => {
 
                 {/* Status filter drop-down menu */}
                 <FormControl size="small" sx={{ minWidth: 160 }}>
-                    <InputLabel>Status</InputLabel>
+                    <InputLabel>{t('uploadHistory.filterLabel')}</InputLabel>
                     <Select
                         value={statusFilter}
-                        label="Status"
+                        label={t('uploadHistory.filterLabel')}
                         onChange={handleStatusFilterChange}
                     >
                         {statusOptions.map((status) => (
@@ -403,10 +406,10 @@ const UploadHistory: React.FC = () => {
             {isSearchActive && (
                 <Box sx={{ mb: 2 }}>
                     <Alert severity="info" sx={{ py: 1 }}>
-                        Found {currentDisplayData.length} result{currentDisplayData.length !== 1 ? 's' : ''} for "{searchTerm}"
+                        {t('uploadHistory.resultPrefix')} {currentDisplayData.length} {t('uploadHistory.resultSuffix')} "{searchTerm}"
                         {/* {statusFilter !== "all" && ` with status "${getStatusDisplayName(statusFilter)}"`}*/}
                         {statusFilter !== "all" && (
-                            <> with status "<strong>{getStatusDisplayName(statusFilter)}</strong>"</>
+                            <> {t('uploadHistory.statusPrefix')} "<strong>{getStatusDisplayName(statusFilter)}</strong>"</>
                         )}
 
                     </Alert>
@@ -431,11 +434,11 @@ const UploadHistory: React.FC = () => {
                         <Table stickyHeader>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Image</TableCell>
-                                    <TableCell>Building Address</TableCell>
-                                    <TableCell>Status</TableCell>
-                                    <TableCell>Uploaded At</TableCell>
-                                    <TableCell>Action</TableCell>
+                                    <TableCell>{t('uploadHistory.image')}</TableCell>
+                                    <TableCell>{t('uploadHistory.buildingAddress')}</TableCell>
+                                    <TableCell>{t('uploadHistory.filterLabel')}</TableCell>
+                                    <TableCell>{t('uploadHistory.uploadedAt')}</TableCell>
+                                    <TableCell>{t('uploadHistory.action')}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -470,7 +473,7 @@ const UploadHistory: React.FC = () => {
                                                         border: "1px solid #ddd"
                                                     }}
                                                 >
-                                                    No Image
+                                                    {t('uploadHistory.noImage')}
                                                 </Box>
                                             )}
                                         </TableCell>
@@ -496,7 +499,7 @@ const UploadHistory: React.FC = () => {
                                                 variant="outlined"
                                                 onClick={() => handleDetailOpen(item)}
                                             >
-                                                View Details
+                                                {t('uploadHistory.viewDetails')}
                                             </Button>
                                         </TableCell>
                                     </TableRow>
@@ -506,8 +509,8 @@ const UploadHistory: React.FC = () => {
                                         <TableCell colSpan={5} align="center">
                                             <Typography variant="body2" color="textSecondary">
                                                 {isSearchActive ?
-                                                    `No records found matching "<strong>{searchTerm}</strong>".` :
-                                                    "No records found."
+                                                    t('uploadHistory.noRecordFoundWithTerm', { searchTerm })
+                                                    : t('uploadHistory.noRecordFound')
                                                 }
                                             </Typography>
                                         </TableCell>
@@ -537,7 +540,7 @@ const UploadHistory: React.FC = () => {
                     {isSearchActive && currentDisplayData.length > 0 && (
                         <Box mt={2} display="flex" justifyContent="center">
                             <Typography variant="body2" color="textSecondary">
-                                Showing all {currentDisplayData.length} search results
+                                {t('uploadHistory.detailDialog.showingSearchResults', { count: currentDisplayData.length })}
                             </Typography>
                         </Box>
                     )}
@@ -557,21 +560,21 @@ const UploadHistory: React.FC = () => {
                     }
                 }}
             >
-                <DialogTitle>Upload Details</DialogTitle>
+                <DialogTitle>{t('uploadHistory.detailDialog.title')}</DialogTitle>
                 <DialogContent>
                     {selectedItem && (
                         <Box>
                             <Box mb={2}>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Photo ID:</strong> {highlightText(selectedItem.photo_id, searchTerm)}
+                                    <strong>{t('uploadHistory.detailDialog.photoId')}:</strong> {highlightText(selectedItem.photo_id, searchTerm)}
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Building Address:</strong> {selectedItem.building_addr ?
+                                    <strong>{t('uploadHistory.buildingAddress')}:</strong> {selectedItem.building_addr ?
                                     highlightText(selectedItem.building_addr, searchTerm) : "N/A"
                                 }
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Status:</strong> {" "}
+                                    <strong>{t('uploadHistory.filterLabel')}:</strong> {" "}
                                     <Chip
                                         label={highlightText(getStatusDisplayName(selectedItem.status), searchTerm)}
                                         color={statusColorMap[selectedItem.status] || "default"}
@@ -579,21 +582,21 @@ const UploadHistory: React.FC = () => {
                                     />
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Uploaded At:</strong> {formatDate(selectedItem.upload_time)}
+                                    <strong>{t('uploadHistory.uploadedAt')}:</strong> {formatDate(selectedItem.upload_time)}
                                 </Typography>
                                 {selectedItem.lat && selectedItem.lng && (
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Location:</strong> {selectedItem.lat.toFixed(6)}, {selectedItem.lng.toFixed(6)}
+                                        <strong>{t('uploadHistory.detailDialog.location')}:</strong> {selectedItem.lat.toFixed(6)}, {selectedItem.lng.toFixed(6)}
                                     </Typography>
                                 )}
                                 {selectedItem.feedback && (
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Feedback:</strong> {highlightText(selectedItem.feedback, searchTerm)}
+                                        <strong>{t('uploadHistory.detailDialog.feedback')}:</strong> {highlightText(selectedItem.feedback, searchTerm)}
                                     </Typography>
                                 )}
                                 {selectedItem.review_time && (
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Review Time:</strong> {formatDate(selectedItem.review_time)}
+                                        <strong>{t('uploadHistory.detailDialog.reviewTime')}:</strong> {formatDate(selectedItem.review_time)}
                                     </Typography>
                                 )}
                             </Box>
@@ -601,7 +604,7 @@ const UploadHistory: React.FC = () => {
                             {selectedItem.image_url && (
                                 <Box mt={2}>
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Image:</strong>
+                                        <strong>{t('uploadHistory.image')}:</strong>
                                     </Typography>
                                     <img
                                         src={selectedItem.image_url}
@@ -624,7 +627,7 @@ const UploadHistory: React.FC = () => {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleDetailClose} variant="contained">
-                        Close
+                        {t('uploadHistory.detailDialog.closeButton')}
                     </Button>
 
                 </DialogActions>

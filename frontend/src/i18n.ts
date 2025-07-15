@@ -101,7 +101,58 @@ declare module 'i18next' {
                     participateNow: string;
                     viewExample: string;
                 };
-
+                uploadHistory: {
+                    searchPlaceholder:string;
+                    searchLabel:string;
+                    clear: string;
+                    search: string;
+                    filterLabel:string;
+                    resultPrefix:string;
+                    resultSuffix: string;
+                    statusPrefix:string;
+                    image: string;
+                    buildingAddress: string;
+                    uploadedAt: string;
+                    action:string;
+                    imageAlt: string;
+                    noImage: string;
+                    viewDetails: string;
+                    noRecordFound:string;
+                    noRecordFoundWithTerm: string;
+                    detailDialog: {
+                        title: string;
+                        photoId:string;
+                        location: string;
+                        feedback: string;
+                        reviewTime:string;
+                        closeButton: string;
+                        showingSearchResults: string;
+                    },
+                    statusOptions: {
+                        all: string;
+                        pending:string;
+                        reviewing:string;
+                        approved:string;
+                        rejected:string;
+                    },
+                    failedLoadMessage:string;
+                };
+                ranking:{
+                    title:string;
+                    userName:string;
+                    myRanking:string;
+                    myPoint:string;
+                    notInRanking: string;
+                    myPosition:string;
+                    top:string;
+                    ranking: string;
+                    username: string;
+                    points:string;
+                    loading:string;
+                    getRankingError:string;
+                    getUserError:string;
+                    unknownError:string;
+                };
             };
         };
     }
@@ -213,7 +264,58 @@ const resources: Resource = {
                 participateNow: "Participate immediately",
                 viewExample: "View Example"
             },
-
+            uploadHistory: {
+                searchPlaceholder: "Enter search term...",
+                searchLabel: "Search by building address",
+                clear: "Clear",
+                search: "Search",
+                filterLabel: "Status",
+                resultPrefix: "Found",
+                resultSuffix: "result(s)",
+                statusPrefix: "with status",
+                image: "Image",
+                buildingAddress: "Building Address",
+                uploadedAt: "Uploaded At",
+                action: "Action",
+                imageAlt: "Uploaded building photo",
+                noImage: "No Image",
+                viewDetails: "View Details",
+                noRecordFound: "No records found.",
+                noRecordFoundWithTerm: 'No records found matching "<strong>{{searchTerm}}</strong>".',
+                detailDialog: {
+                    title: "Upload Details",
+                    photoId: "Photo ID",
+                    location: "Location",
+                    feedback: "Feedback",
+                    reviewTime: "Review Time",
+                    closeButton: "Close",
+                    showingSearchResults: "Showing all {{count}} search results"
+                },
+                statusOptions: {
+                    all: "All",
+                    pending: "Pending",
+                    reviewing: "Reviewing",
+                    approved: "Approved",
+                    rejected: "Rejected"
+                },
+                failedLoadMessage:"Failed to load upload history. Please try again."
+            },
+            ranking:{
+                title: "User Ranking",
+                userName: "User Name",
+                myRanking: "My Ranking",
+                myPoint: "My Point",
+                notInRanking: "Not in Ranking",
+                myPosition: "My Position",
+                top: "Top",
+                ranking: "Ranking",
+                username: "Username",
+                points: "Points",
+                loading: "Loading...",
+                getRankingError: "Failed to get ranking",
+                getUserError: "Failed to get user info",
+                unknownError: "Unknown error",
+            }
         }
     },
     de: {
@@ -319,8 +421,60 @@ const resources: Resource = {
                 viewTutorial: "Anleitung anzeigen",
                 participateNow: "Jetzt mitmachen",
                 viewExample: "Beispiel ansehen"
+            },
+            uploadHistory: {
+                searchPlaceholder: "Suchbegriff eingeben...",
+                searchLabel: "Nach Gebäudeadresse suchen",
+                clear: "Löschen",
+                search: "Suchen",
+                filterLabel: "Status",
+                resultPrefix: "Gefunden",
+                resultSuffix: "Ergebnis(se)",
+                statusPrefix: "mit Status",
+                image: "Bild",
+                buildingAddress: "Gebäudeadresse",
+                status: "Status",
+                uploadedAt: "Hochgeladen am",
+                action: "Aktion",
+                imageAlt: "Hochgeladenes Gebäudefoto",
+                noImage: "Kein Bild",
+                viewDetails: "Details ansehen",
+                noRecordFound: "Keine Einträge gefunden.",
+                noRecordFoundWithTerm: 'Keine Einträge gefunden, die "<strong>{{searchTerm}}</strong>" entsprechen.',
+                detailDialog: {
+                    title: "Upload-Details",
+                    photoId: "Foto-ID",
+                    location: "Standort",
+                    feedback: "Feedback",
+                    reviewTime: "Überprüfungszeit",
+                    closeButton: "Schließen",
+                    showingSearchResults: "Es werden alle {{count}} Suchergebnisse angezeigt"
+                },
+                statusOptions: {
+                    all: "Alle",
+                    pending: "Ausstehend",
+                    reviewing: "In Prüfung",
+                    approved: "Genehmigt",
+                    rejected: "Abgelehnt"
+                },
+                failedLoadMessage:"Der Upload-Verlauf konnte nicht geladen werden. Bitte versuchen Sie es erneut."
+            },
+            ranking:{
+                title: "Benutzerrangliste",
+                userName: "Benutzername",
+                myRanking: "Mein Rang",
+                myPoint: "Meine Punkte",
+                notInRanking: "Nicht in der Rangliste",
+                myPosition: "Meine Position",
+                top: "Top",
+                ranking: "Rang",
+                username: "Benutzername",
+                points: "Punkte",
+                loading: "Wird geladen...",
+                getRankingError: "Fehler beim Abrufen der Rangliste",
+                getUserError: "Fehler beim Abrufen des Benutzers",
+                unknownError: "Unbekannter Fehler",
             }
-
         }
     }
 };

@@ -16,7 +16,7 @@ import {useNavigate} from "react-router-dom";
 import CircularProgress from "@mui/material/CircularProgress";
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import Pagination from '@mui/material/Pagination';
-
+import { useTranslation } from 'react-i18next';
 /**
  * a class form user, because user ranking in DBMS storage
  * */
@@ -67,7 +67,7 @@ const RankingPage =()=>{
     const [showingMyPosition,setShowingMyPosition]=useState(false);
     const navigat = useNavigate();
     const url="http://127.0.0.1:8000"
-
+    const { t } = useTranslation();
     useEffect(() => {
 
         get_users(page,limit)
@@ -97,7 +97,7 @@ const RankingPage =()=>{
             setUserRanking(usersR);
             console.log("totalpages:",usersR.total_page);
         }catch(error:any){
-            setGetRankingError("get Ranking Error: "+(error.message || "Unknown error"))
+            setGetRankingError(t("ranking.getRankingError")+(error.message || t("ranking.unknownError")))
         } finally {
             setUsersLoading(false);
         }
@@ -125,7 +125,7 @@ const RankingPage =()=>{
             setRanking(re.data)
 
         }catch (e:any) {
-            setPrivateUserError("get private User Error: "+(e.message || "Unknown error"));
+            setPrivateUserError(t("ranking.getUserError")+(e.message || t("ranking.unknownError")));
         }finally {
             setUserLoading(false)
         }
@@ -183,17 +183,17 @@ const RankingPage =()=>{
     return (
         <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",overflowY: "auto",}}>
             <Box sx={styles.personInfo}>
-                <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>User
-                    Name: {user.username }</Typography>
-                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Ranking: {user.rank!== -1 && +user.point !== 0 ? user.rank : "not in Ranking " }</Typography>
-                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>My
-                    Point: {user.point}</Typography>
+                <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>
+                    {t('ranking.userName')}: {user.username }</Typography>
+                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>
+                    {t('ranking.myRanking')}: {user.rank!== -1 && +user.point !== 0 ? user.rank : t("ranking.notInRanking") }</Typography>
+                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>
+                    {t("ranking.myPoint")}: {user.point}</Typography>
                 <Button sx={{margin: "auto 2% 0.5% auto", visibility: totalPages > 1 ? "visible" : "hidden",}}
                         size="large"
                         variant={"outlined"}
                         onClick={toMyPosition}
-                > {showingMyPosition ? "Top" : "My Position"}
+                > {showingMyPosition ? t("ranking.top") : t("ranking.myPosition")}
                 </Button>
             </Box>
             <TableContainer component={Paper}
@@ -203,9 +203,9 @@ const RankingPage =()=>{
                     <TableHead >
                         <TableRow sx={{ backgroundColor: "#F1EFEC",//"#abd1e6",
                         }}>
-                            <TableCell sx={styles.headerCell(25)}>Ranking</TableCell>
-                            <TableCell sx={styles.headerCell(30)}>Username</TableCell>
-                            <TableCell sx={styles.headerCell(25)}>Points</TableCell>
+                            <TableCell sx={styles.headerCell(25)}>{t("ranking.ranking")}</TableCell>
+                            <TableCell sx={styles.headerCell(30)}>{t("ranking.username")}</TableCell>
+                            <TableCell sx={styles.headerCell(25)}>{t("ranking.points")}</TableCell>
                         </TableRow>
                     </TableHead>
 
@@ -216,7 +216,7 @@ const RankingPage =()=>{
                                 <Box sx={{margin:"auto",textAlign: "center"}}>
                                     <CircularProgress color={"primary"}></CircularProgress>
                                     <Typography variant="h6" sx={{ fontWeight: "bold"}}>
-                                        Loading...
+                                        {t("ranking.loading")}
                                     </Typography>
                                     {getRankingError  &&
                                         <Alert variant={"filled"} severity="error">{getRankingError}</Alert>
