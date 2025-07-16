@@ -31,23 +31,23 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     const getPageTitle = () => {
         switch (location.pathname) {
             case '/dashboard':
-                return 'Dashboard';
+                return t('bar.dashboard');
             case '/dashboard/upload':
-                return 'Upload';
+                return t('bar.upload');
             case '/dashboard/tutorial':
-                return 'Tutorial';
+                return t('bar.tutorial');
             case '/dashboard/photoGallery':
-                return 'Photo Gallery';
+                return t('bar.photoGallery');
             case '/dashboard/uploadHistory':
-                return 'Upload History';
+                return t('bar.uploadHistory');
             case '/dashboard/productIntroduction':
-                return 'Product Introduction';
+                return t('bar.productIntroduction');
             case '/dashboard/photoReview':
-                return 'Photo Review';
+                return t('bar.photoReview');
             case '/dashboard/ranking':
-                return 'Rankings';
+                return t('bar.ranking');
             default:
-                return 'Loading...';
+                return t('bar.loading');
         }
     };
 
@@ -108,7 +108,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         }}
                         variant="outlined"
                     >
-                        Exit
+                        {t('bar.exit')}
                     </Button>
                 </Box>
             </Toolbar>

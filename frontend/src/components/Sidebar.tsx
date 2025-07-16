@@ -19,9 +19,10 @@ import ProductIntroduction from "../pages/ProductIntroduction";
 import PhotoGallery from "../pages/PhotoGallery";
 import {useEffect, useState} from "react";
 import KeycloakClient from "./keycloak";
-import {Checklist, History, Info, MenuBook, PhotoLibrary, RateReview} from "@mui/icons-material";
+import {Checklist, History, Info, MenuBook, PhotoLibrary, RateReview, Language} from "@mui/icons-material";
 import LogoutIcon from '@mui/icons-material/Logout';
-
+import LanguageSelector from "../LanguageSelector";
+import { useTranslation } from 'react-i18next';
 interface SidebarProps {
     open: boolean;
     onClose: () => void;
@@ -32,8 +33,15 @@ interface SidebarProps {
 const Sidebar = ({ open, onClose }: SidebarProps) => {
     const {token}=useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
-
-
+    const { i18n,t } = useTranslation()
+    const [language, setLanguage] = useState("en");
+    const [giveLanguage, setGiveLanguage] = useState("en");
+    const toggleLanguage = () => {
+        const currentLang = i18n.language;
+        const newLang = currentLang === 'en' ? 'de' : 'en';
+        i18n.changeLanguage(newLang);
+        setLanguage(newLang);
+    };
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo= await KeycloakClient.extractUserInfo(token);
@@ -59,40 +67,40 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
                                 <ListItemIcon><UploadIcon/></ListItemIcon>
-                                <ListItemText primary="Upload" />
+                                <ListItemText primary={t('bar.upload')} />
                             </ListItemButton>
                         </ListItem>
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/tutorial">
                                 <ListItemIcon><MenuBook  /></ListItemIcon>
-                                <ListItemText primary="Tutorial" />
+                                <ListItemText primary={t('bar.tutorial')} />
                             </ListItemButton>
                         </ListItem>
 
                         <ListItemButton  component={Link} to="/dashboard/photoGallery">
                             <ListItemIcon><PhotoLibrary /></ListItemIcon>
-                            <ListItemText primary="Photo Gallery" />
+                            <ListItemText primary={t('bar.photoGallery')}/>
                         </ListItemButton>
                         <ListItemButton component={Link} to="/dashboard/uploadHistory" >
                             <ListItemIcon><History  />
                             </ListItemIcon>
-                            <ListItemText primary="History" />
+                            <ListItemText primary={t('bar.uploadHistory')} />
                         </ListItemButton>
                         <ListItemButton  component={Link} to="/dashboard/productIntroduction">
                             <ListItemIcon><Info/>
                             </ListItemIcon>
-                            <ListItemText primary="Product Introduction" />
+                            <ListItemText primary={t('bar.productIntroduction')} />
                         </ListItemButton>
                         {roles.includes('admin') &&
                             <ListItemButton component={Link} to="/dashboard/photoReview">
                                 <ListItemIcon><RateReview  />
                                 </ListItemIcon>
-                                <ListItemText primary="Photo Review " />
+                                <ListItemText primary={t('bar.photoReview')} />
                             </ListItemButton>}
                         <ListItemButton  component={Link} to="/dashboard/ranking">
                             <ListItemIcon><Checklist />
                             </ListItemIcon>
-                            <ListItemText primary="Rankings" />
+                            <ListItemText primary={t('bar.ranking')} />
                         </ListItemButton>
 
                     </List>
@@ -101,6 +109,15 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                 <Box>
                     <Divider />
                     <List>
+                        {/* 添加语言选择器 */}
+                        <ListItem disablePadding>
+                            <ListItemButton onClick={toggleLanguage}>
+                                <ListItemIcon><Language /></ListItemIcon>
+                                <ListItemText
+                                    primary={i18n.language === 'en' ? 'English' : 'Deutsch'}
+                                />
+                            </ListItemButton>
+                        </ListItem>
                         <LogOut />
                     </List>
                 </Box>

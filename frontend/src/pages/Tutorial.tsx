@@ -15,6 +15,7 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
+import { useTranslation } from 'react-i18next';
 
 const Tutorial = () => {
     const drawerWidth = 240;
@@ -23,7 +24,7 @@ const Tutorial = () => {
     const [selectedSection, setSelectedSection] = useState("Tutorial");
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState<string[]>([]);
-
+    const {t} = useTranslation();
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
@@ -1533,7 +1534,7 @@ const Tutorial = () => {
                         <TextField
                             fullWidth
                             size="small"
-                            placeholder="Search..."
+                            placeholder={t('Search')+"..."}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             onKeyDown={(e) => {
@@ -1555,7 +1556,7 @@ const Tutorial = () => {
                                             edge="end"
                                         >
                                             <Typography variant="caption" sx={{ fontSize: '0.7rem' }}>
-                                                Search
+                                                {t('Search')}
                                             </Typography>
                                         </IconButton>
                                     </InputAdornment>

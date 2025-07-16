@@ -15,6 +15,22 @@ declare module 'i18next' {
                 Camera:string;
                 Album:string;
                 Search:string;
+                dashboard: {
+                    tutorialTitle: string;
+                    tutorialDesc: string;
+                    uploadTitle: string;
+                    uploadDesc: string;
+                    buildingPhotoTitle: string;
+                    buildingPhotoDesc: string;
+                    productIntroductionTitle: string;
+                    productIntroDesc: string;
+                    uploadHistoryTitle: string;
+                    historyDesc:string;
+                    photoReviewTitle: string;
+                    reviewDesc: string;
+                    rankingTitle:string;
+                    rankingDesc: string;
+                };
                 photoRequirements: {
                     title:  string;
                     noFaces:  string;
@@ -45,22 +61,6 @@ declare module 'i18next' {
                     submit: string;
                     deletePhoto: string;
                     thumbnailImage: string;
-                };
-                dashboard: {
-                    tutorialTitle: string;
-                    tutorialDesc: string;
-                    uploadTitle: string;
-                    uploadDesc: string;
-                    buildingPhotoTitle: string;
-                    buildingPhotoDesc: string;
-                    productIntroductionTitle: string;
-                    productIntroDesc: string;
-                    uploadHistoryTitle: string;
-                    historyDesc:string;
-                    photoReviewTitle: string;
-                    reviewDesc: string;
-                    rankingTitle:string;
-                    rankingDesc: string;
                 };
                 photoReview: {
                     fetch: string;
@@ -204,7 +204,25 @@ declare module 'i18next' {
 
 
                 };
+                bar: {
+                    profile: string;
+                    userInformation: string;
+                    adminPanel: string;
+                    dashboard: string;
+                    upload: string;
+                    tutorial: string;
+                    photoGallery: string;
+                    uploadHistory: string;
+                    productIntroduction: string;
+                    photoReview: string;
+                    ranking: string;
+                    loading: string;
+                    exit: string;
+                    logOut:string;
+                };
+                tutorial:{
 
+                }
             };
         };
     }
@@ -215,6 +233,12 @@ const resources: Resource = {
     en: {
         translation: {
             getStart: "Get Started",
+            UploadPhoto:"Upload Building Photos",
+            Uploaddesc:"Please enter the address of the building to be registered (Darmstadt only)",
+            AddAddress:"Type the address or click on the map to select.",
+            Camera:"Camera",
+            Album:"Album",
+            Search:"Search",
             dashboard: {
                 tutorialTitle: "Tutorial",
                 tutorialDesc: "Step-by-step guide",
@@ -231,12 +255,22 @@ const resources: Resource = {
                 rankingTitle: "Rankings",
                 rankingDesc: "View user upload contribution ranking"
             },
-            UploadPhoto:"Upload Building Photos",
-            Uploaddesc:"Please enter the address of the building to be registered (Darmstadt only)",
-            AddAddress:"Type the address or click on the map to select.",
-            Camera:"Camera",
-            Album:"Album",
-            Search:"Search",
+            bar:{
+                profile: "Profile",
+                userInformation: "User Information",
+                adminPanel: "Admin Panel",
+                dashboard: "Dashboard",
+                upload: "Upload",
+                tutorial: "Tutorial",
+                photoGallery: "Photo Gallery",
+                uploadHistory: "Upload History",
+                productIntroduction: "Product Introduction",
+                photoReview: "Photo Review",
+                ranking: "Rankings",
+                loading: "Loading...",
+                exit: "Exit",
+                logOut:"Logout",
+            },
             photoRequirements: {
                 title: "Photo shooting requirements:",
                 noFaces: "NO! Face and Licence Plate",
@@ -416,15 +450,21 @@ const resources: Resource = {
                     PhotoNumber:"muss choose minimal one Photos",
                     download:"Failed to download photo.",
                 },
-
-
             },
+            tutorial:{
 
+            }
         }
     },
     de: {
         translation: {
             getStart: "Loslegen",
+            UploadPhoto:"Gebäudefotos hochladen",
+            Uploaddesc:"Bitte geben Sie die Adresse des anzumeldenden Gebäudes ein (nur Darmstadt)",
+            AddAddress:"Geben Sie die Adresse ein oder klicken Sie zur Auswahl auf die Karte.",
+            Camera:"Kamera",
+            Album:"Album",
+            Search:"Suchen",
             dashboard: {
                 tutorialTitle: "Anleitung",
                 tutorialDesc: "Schritt-für-Schritt Anleitung",
@@ -441,12 +481,22 @@ const resources: Resource = {
                 rankingTitle: "Rangliste",
                 rankingDesc: "Beitragsbasierte Benutzer-Rangliste ansehen"
             },
-            UploadPhoto:"Gebäudefotos hochladen",
-            Uploaddesc:"Bitte geben Sie die Adresse des anzumeldenden Gebäudes ein (nur Darmstadt)",
-            AddAddress:"Geben Sie die Adresse ein oder klicken Sie zur Auswahl auf die Karte.",
-            Camera:"Kamera",
-            Album:"Album",
-            Search:"Suchen",
+            bar:{
+                profile: "Profil",
+                userInformation: "Benutzerinformationen",
+                adminPanel: "Admin-Panel",
+                dashboard: "Dashboard",
+                upload: "Hochladen",
+                tutorial: "Anleitung",
+                photoGallery: "Fotogalerie",
+                uploadHistory: "Upload-Verlauf",
+                productIntroduction: "Produktvorstellung",
+                photoReview: "Fotoüberprüfung",
+                ranking: "Rangliste",
+                loading: "Lädt...",
+                exit: "Beenden",
+                logOut:"Ausloggen",
+            },
             photoRequirements: {
                 title: "Fotografierichtlinien:",
                 noFaces: "KEINE! Gesichter und Kennzeichen",
@@ -578,7 +628,6 @@ const resources: Resource = {
                 getRankingError: "Fehler beim Abrufen der Rangliste",
                 getUserError: "Fehler beim Abrufen des Benutzers",
                 unknownError: "Unbekannter Fehler",
-            }
             },
             photoGallery: {
                 inputBoxLabel: "Adresse Eingeben",
@@ -630,7 +679,9 @@ const resources: Resource = {
                     download:"Herunterladen des Fotos fehlgeschlagen.",
                 },
             },
+            tutorial:{
 
+            }
         }
     }
 };
