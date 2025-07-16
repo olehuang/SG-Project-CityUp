@@ -149,7 +149,7 @@ const UploadHistory: React.FC = () => {
 
         } catch (err) {
             console.error("Failed to fetch upload history:", err);
-            setError(t('failedLoadMessage'));
+            setError(t('uploadHistory.failedLoadMessage'));
             setUploads([]);
             setOriginalUploads([]);
             setTotal(0);
@@ -390,7 +390,7 @@ const UploadHistory: React.FC = () => {
                     <InputLabel>{t('uploadHistory.filterLabel')}</InputLabel>
                     <Select
                         value={statusFilter}
-                        label={t('uploadHistory.filterLabel')}
+                        label="Status"
                         onChange={handleStatusFilterChange}
                     >
                         {statusOptions.map((status) => (
