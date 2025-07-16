@@ -1,11 +1,22 @@
-const BuildingPhotoStyles={
+const PhotoGarlleryStyles={
+    page:{
+        justifyContent:"content",
+        display:'flex',
+        overflow: "hidden",
+        position: 'relative',
+        //backgroundColor: "#FFF8E1"
+    },
     container:{
         width: '95%',
         position: "absolute",
         left:"2%",
+        top:"0.5%",
         marginRight:"2%",
         paddingTop: "0.5%",
-        height:"79%",//`calc(100vh - ${70}px)`,
+        height:"90%",//`calc(100vh - ${70}px)`,
+        '@media (min-width:900px)': {
+            height: "85%",
+        },
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
@@ -22,7 +33,10 @@ const BuildingPhotoStyles={
         display:"flex",
         flexDirection: "row",//  Direction of all result
         gap: "6px",// space between resualt
-        height:"95%",
+        height: "100%",
+        '@media (min-width:900px)': {
+            height:"90%"
+        },
         // border:"1px solid red",
         backgroundColor: "#FAF6E9",
         borderRadius:"5px",
@@ -37,9 +51,12 @@ const BuildingPhotoStyles={
         gap: "8px",// space between resualt
         width:"60%",
         height:"100%",
-
         borderRadius:"5px",
         overflowY: "auto",
+    },
+    tableHeader:{
+        backgroundColor: "#F1EFEC",
+        position: "sticky", top: 0
     },
     searchTitle:{
         position: "absolut",
@@ -60,6 +77,12 @@ const BuildingPhotoStyles={
             transform: "scale(0.98)",
             backgroundColor: "#bbdefb",//"#b2ebf2",
         },
+    },
+    searchResultMobile:{
+        p: 2,
+        mb: 2,
+        borderRadius: "8px",
+        boxShadow: "0px 2px 4px rgba(0,0,0,0.1)",
     },
 
     rightContainer:{
@@ -93,7 +116,15 @@ const BuildingPhotoStyles={
         "&:hover": {
             backgroundColor: "#b0bec5",
         },
-    }
+    },
+    nomatchBox: {
+        minWidth: "100%",
+        minHeight: "300px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+
 }
 
-export default BuildingPhotoStyles
+export default PhotoGarlleryStyles

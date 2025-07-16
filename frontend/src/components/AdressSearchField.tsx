@@ -2,25 +2,31 @@ import React, { useState ,useEffect} from "react";
 import {Autocomplete, Button, TextField,Box} from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
+import {useTranslation} from "react-i18next";
 
 
 interface Props {
     onSearch: (query: string) => void;//return search result
     onSelect?: (selected: string) => void;//clearn search field
-    isNomatch: boolean;
-    setIsNomatch: (isNomatch: boolean) => void;
-    setSearchResult: (searchResult: string[]) => void;
+    isNomatch: boolean; //if no result find
+    setIsNomatch: (isNomatch: boolean) => void; //function to set match or not
+    setSearchResult: (searchResult: string[]) => void; // function to set result
     allAddresses: string[];
-
 
 }
 
+/*
+* Search field box include: add address button, clearn history button
+* user input address, show to user which result hat
+* */
 const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNomatch,setSearchResult,allAddresses}) => {
-    const [inputValue, setInputValue] = useState("");
-    const [selectedAddress, setSelectedAddress] = useState<string|null>("");
-    const [history, setHistory] = useState<string[]>([]);
+    const [inputValue, setInputValue] = useState(""); //user input
+    const [selectedAddress, setSelectedAddress] = useState<string|null>("");// whiche address select
+    const [history, setHistory] = useState<string[]>([]); //storage which address has been research
 
     const [hasSearched, setHasSearched] = useState(false);
+
+    const { t } = useTranslation();
 
     const STORAGE_KEY = "address_search_history";
     useEffect(() => {
@@ -37,6 +43,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         }
     }, []);
 
+    //if user something input will add to history
     const updateHistory = (newEntry: string) => {
         const trimmed = newEntry.trim();
         if (!trimmed) return;
@@ -46,6 +53,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updated));
     };
 
+    //storage and  search  user input
     const handleSearch = () => {
         const trimmedInput = inputValue.trim();
         if (trimmedInput !== "") {
@@ -61,11 +69,12 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         if (newValue) {
             setInputValue("");
             setSelectedAddress("");
-            onSelect?.(newValue);// tell the parent Component choose already
             onSearch?.(newValue);
+            setHasSearched(true);
         }
     };
 
+    //clear user History:which uer has inputed
     const clearHistory = () => {
         localStorage.removeItem(STORAGE_KEY);
         setHistory([]);
@@ -88,7 +97,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                 <TextField
                     sx={{}}
                     {...params}
-                    label="Input Adress"
+                    label={t("photoGallery.inputBoxLabel")}
                     variant="outlined"
                     type="search"
                     fullWidth
@@ -104,7 +113,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         ...params.InputProps,
                         startAdornment: (
                             <InputAdornment position="start">
-                                <SearchIcon/>
+                                <SearchIcon  />
                             </InputAdornment>
                         ),
                         endAdornment: (
@@ -112,8 +121,9 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                                 <Button
                                     type="button"
                                     size="large"
-                                    onClick={handleSearch}>
-                                    Search
+                                    onClick={handleSearch}
+                                >
+                                    {t("photoGallery.searchButton")}
                                 </Button>
                             </InputAdornment>)
                     }}
@@ -128,7 +138,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         setSearchResult([...allAddresses])
                         setIsNomatch(false)
                         setHasSearched(false)
-                }}> All Address </Button>}
+                }}> {t("photoGallery.allAddress")} </Button>}
                 {history.length > 0 && (
                     <Button
                         sx={{marginRight:"auto"}}
@@ -140,7 +150,7 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
                         color="secondary"
                         size="small"
                     >
-                        Clear History
+                        {t("photoGallery.clearHistory")}
                     </Button>
                 )}
             </Box>

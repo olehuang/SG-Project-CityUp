@@ -27,6 +27,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     const [giveLanguage,setGiveLanguage]=useState("en");
     const { t } = useTranslation();
 
+
     const getPageTitle = () => {
         switch (location.pathname) {
             case '/dashboard':
@@ -35,8 +36,8 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 return 'Upload';
             case '/dashboard/tutorial':
                 return 'Tutorial';
-            case '/dashboard/buildingPhoto':
-                return 'Building Photo Gallery';
+            case '/dashboard/photoGallery':
+                return 'Photo Gallery';
             case '/dashboard/uploadHistory':
                 return 'Upload History';
             case '/dashboard/productIntroduction':
@@ -49,6 +50,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 return 'Loading...';
         }
     };
+
     return (
         <AppBar position="static" sx={{
             // backgroundColor: '#1976d2',
@@ -87,7 +89,11 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         {getPageTitle()}
                     </Typography>
                 </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', mr: 4  }}>
+                <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    mr: "6%",//margin right
+                }}>
                     <LanguageSelector
                         setLanguage={setLanguage}
                         giveLanguage={giveLanguage}

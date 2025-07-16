@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Box, Typography, Dialog, DialogTitle, DialogContent, Button} from "@mui/material";
+import {Box, Typography, Dialog, DialogTitle, DialogContent, Button, IconButton} from "@mui/material";
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
@@ -7,6 +7,8 @@ import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
 import FavoriteBorder from '@mui/icons-material/Favorite';
+import CloseIcon from "@mui/icons-material/Close";
+import {useTranslation} from "react-i18next";
 
 interface PhotoGridProps {
     address: string;
@@ -33,12 +35,16 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+
+
+    const { t } = useTranslation();//double language
+
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
+
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -55,13 +61,13 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     const fetchPhoto= async (address:string)=>{
         setLoading(true);
         setError(null);
-        console.log("address:",address);
+
 
         const url="http://127.0.0.1:8000/photos/get_first_9_photo"
         try{
             const response = await axios.get(url, {params: {address: address,user_id:user_id}});
             const data=response.data;
-            console.log(data);
+
 
             const formattedPhotos: Photo[] = data.map((item: any) => ({
                     id:item.photo_id,
@@ -98,7 +104,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                     timeStyle:"medium",
                 }).format(new Date(timeStr));
             } catch (error) {
-                console.error(error, "updateTime:", time);
+                setError(error+"in PhotoGrid formatTime")
                 formattedTime = "Invalid Date";
             }finally {
                 return formattedTime;
@@ -115,7 +121,12 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
     //close Dialog
     const handleClose = () => {
         setOpen(false);
-        setSelectedPhotoIndex(null);
+    };
+
+    //close Dialog
+    const handleDialogClose = () => {
+        setOpen(false);
+
     };
     const downloadURL = "http://localhost:8000/photos/download_photo/"
     //download photo which one in Dialog see
@@ -149,15 +160,15 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                 alignItems: 'center'
             }}>
                 <CircularProgress size="3rem"/>
-                <Typography>Loading photos...</Typography>
+                <Typography>{t("photoGallery.loading")}</Typography>
             </Box>
         );
     }
 
-    if(error)return(<Alert variant="filled" severity="error">Error by Fetch Photo, Detail: {error}</Alert>)
+    if(error)return(<Alert variant="filled" severity="error">{t("photoGallery.alertFetchPhoto")} {error}</Alert>)
 
     if (!photos || !Array.isArray(photos)) {
-        return <Typography color="error">Error loading photos.</Typography>;
+        return <Typography color="error">{t("photoGallery.errorFetchPhoto")}</Typography>;
     }
 
     const handleLikeToggle =async (photo:Photo)=>{
@@ -211,9 +222,21 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             <Dialog open={open}
                     onClose={handleClose}
                     maxWidth={'lg'}
-                    sx={{}}
+
             >
-                <DialogTitle sx={{backgroundColor: "#FAF6E9",}}>Photo Detail</DialogTitle>
+                <DialogTitle
+                    sx={{
+                    backgroundColor: "#FAF6E9",
+                    display:"flex",
+                    justifyContent:"space-between",
+                    alignItems:"center",
+                    }}
+                >{t("photoGallery.photoDetailTitle")}
+                    <IconButton sx={{marginLeft:"auto"}}
+                                onClick={handleDialogClose}>
+                        <CloseIcon />
+                    </IconButton>
+                </DialogTitle>
                 <Box>
                     {selectedPhotoIndex !== null && (
                         <DialogContent sx={styles.dialogContainer}>
@@ -231,11 +254,11 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                 <Box sx={styles.dialogInfoArea}><Box sx={{mb: 2, textAlign: "left"}}>
                                     <Typography variant="h6">{photos[selectedPhotoIndex].title}</Typography>
                                     <Typography variant="body1">
-                                        Upload Time: {photos[selectedPhotoIndex].uploadTime}</Typography>
+                                        {t("photoGallery.photoDetails.uploadTime")}: {photos[selectedPhotoIndex].uploadTime}</Typography>
                                     <Typography variant="body1">
-                                        Upload User: {photos[selectedPhotoIndex].uploader}</Typography>
+                                        {t("photoGallery.photoDetails.uploadUser")}: {photos[selectedPhotoIndex].uploader}</Typography>
                                     <Typography variant="body1">
-                                        Favorite Number: {photos[selectedPhotoIndex].likeCount}</Typography>
+                                        {t("photoGallery.photoDetails.favoriteNr")}: {photos[selectedPhotoIndex].likeCount}</Typography>
                                 </Box>
                                     <Box sx={{
                                         display: "flex",
@@ -247,7 +270,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                             sx={{color: photos[selectedPhotoIndex].is_like ? "red": "gray"}} />}
                                                 onClick={()=>handleLikeToggle(photos[selectedPhotoIndex])}
                                                  sx={{visibility: photos[selectedPhotoIndex].canLike ?  "visible" : "hidden"}}
-                                        > {photos[selectedPhotoIndex].is_like ?   "Dislike":"Favorite"}</Button>
+                                        > {photos[selectedPhotoIndex].is_like ? t("photoGallery.dislikeButton")
+                                            : t("photoGallery.favoriteButton")}</Button>
                                         <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
                                            download
                                            style={{textDecoration: "none"}}
@@ -259,7 +283,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                                     }}
                                                 //onClick={() => handleOfDownload(photos[selectedPhotoIndex])}
                                             >
-                                                Download
+                                                {t("photoGallery.downloadButton")}
                                             </Button></a>
                                     </Box>
                                 </Box>

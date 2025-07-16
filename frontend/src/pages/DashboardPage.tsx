@@ -22,7 +22,7 @@ const iconMap: Record<string, React.ReactNode> = {
     "Upload": <UploadFile fontSize="large" />,
     "Product Introduction": <Info fontSize="large" />,
     "Upload History": <History fontSize="large" />,
-    "Building Photo Gallery": <PhotoLibrary fontSize="large" />,
+    "Photo Gallery": <PhotoLibrary fontSize="large" />,
     "Tutorial": <MenuBook fontSize="large" />,
     "Photo Review": <RateReview fontSize="large" />,
 };
@@ -38,7 +38,7 @@ const DashboardPage: React.FC = () => {
         const fetchRoles = async () => {
             const userInfo= await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles||[]);
-            console.log(userInfo?.roles);
+
         }
         if (token!==null && token!==undefined) {
             fetchRoles();
@@ -48,7 +48,7 @@ const DashboardPage: React.FC = () => {
     const topItems = [
         { label: "Tutorial", desc: t("dashboard.tutorialDesc") },
         { label: "Upload", desc: t("dashboard.uploadDesc") },
-        { label: "Building Photo Gallery", desc: t("dashboard.galleryDesc") },
+        { label: "Photo Gallery", desc: t("dashboard.buildingPhotoDesc")},
     ];
 
     const bottomItems = [
@@ -61,7 +61,7 @@ const DashboardPage: React.FC = () => {
         switch (label) {
             case "Tutorial": return "tutorial";
             case "Upload": return "upload";
-            case "Building Photo Gallery": return "buildingPhoto";
+            case "Photo Gallery": return "photoGallery";
             case "Product Introduction": return "productIntroduction";
             case "Upload History": return "uploadHistory";
             case "Photo Review": return "photoReview";
@@ -95,7 +95,6 @@ const DashboardPage: React.FC = () => {
                                 {iconMap[label]}
                                 <Typography sx={styles.buttonTitle}>{t(`dashboard.${labelMap(label)}Title`)}</Typography>
                                 <Typography sx={styles.buttonDesc}>{desc}</Typography>
-
                             </Button>
                         </Box>
                     ))}

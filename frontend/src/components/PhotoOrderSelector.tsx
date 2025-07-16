@@ -4,6 +4,8 @@ import MenuItem from '@mui/material/MenuItem';
 import FormHelperText from '@mui/material/FormHelperText';
 import FormControl from '@mui/material/FormControl';
 import Select, { SelectChangeEvent } from '@mui/material/Select';
+import {useMediaQuery, useTheme} from "@mui/material";
+import {useTranslation} from "react-i18next";
 
 
 interface porps{
@@ -14,26 +16,36 @@ interface porps{
 const PhotoOrderSelector:React.FC<porps> =({setSelectOrder,selectOrder})=>{
 
 
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+    const { t } = useTranslation();//double language
+
+
     const handleChange=(event:SelectChangeEvent)=>{
         setSelectOrder(event.target.value as string);
     }
     return(
-        <FormControl sx={{  minWidth: 120,}}>
-            <InputLabel id="demo-simple-select-helper-label">Order</InputLabel>
+        <FormControl
+            sx={{
+                minWidth:120,
+            }}
+        >
+            <InputLabel >{t("photoGallery.orderLabel")}</InputLabel>
             <Select
-                labelId="demo-simple-select-helper-label"
-                id="demo-simple-select-helper"
                 value={selectOrder}
-                label="Order"
+                label={t("photoGallery.orderLabel")}
                 onChange={handleChange}
-                sx={{padding:"0 0.5% 0 1%",}}
+                sx={{
+                    padding:"0 0.5% 0.5% 1%",
+                    marginBottom:"2%",
+                }}
             >
-                <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
-                <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>
-                <MenuItem value={"Name Asc"}>Sort by Name A-Z</MenuItem>
-                <MenuItem value={"Name Desc"}>Sort by Name Z-A</MenuItem>
-                <MenuItem value={"Like Asc"}>Sort by most favorite</MenuItem>
-                <MenuItem value={"Like Desc"}>Sort by least favorite</MenuItem>
+                <MenuItem value={"Time Asc"}>{t("photoGallery.order.updateTimeAcs")}</MenuItem>
+                <MenuItem value={"Time Desc"}>{t("photoGallery.order.updateTimeDecs")}</MenuItem>
+                <MenuItem value={"Name Asc"}>{t("photoGallery.order.nameAZ")}</MenuItem>
+                <MenuItem value={"Name Desc"}>{t("photoGallery.order.nameZA")}</MenuItem>
+                <MenuItem value={"Like Asc"}>{t("photoGallery.order.mostFavorite")}</MenuItem>
+                <MenuItem value={"Like Desc"}>{t("photoGallery.order.leastFavorite")}</MenuItem>
             </Select>
         </FormControl>
     )

@@ -153,6 +153,58 @@ declare module 'i18next' {
                     getUserError:string;
                     unknownError:string;
                 };
+                photoGallery: {
+                    inputBoxLabel: string;
+                    searchButton: string;
+                    allAddress:string;
+                    clearHistory:string;
+                    loading:string;
+                    error:string;
+                    tabelHeader:{
+                        address: string;
+                        lastUpdateTime: string;
+                        photoCount: string;
+                    };
+                    noMatch:string;
+                    photoPreview: {
+                        title:string;
+                        tipValid: string;
+                        tip:string;
+                    };
+                    viewAllButton:string;
+                    alertFetchPhoto:string;
+                    errorFetchPhoto:string;
+                    photoDetailTitle:string;
+                    photoDetails: {
+                        uploadTime:string;
+                        uploadUser:string;
+                        favoriteNr:string;
+                    };
+                    favoriteButton:string;
+                    dislikeButton:string;
+                    downloadButton:string;
+                    photoViewDialogeTitel:string;
+                    photoViewDialogeTitelMobi:string;
+                    selectButton:string;
+                    cancelButton:string;
+                    selectAllButton:string;
+                    orderLabel:string;
+                    order:{
+                        updateTimeAcs:string;
+                        updateTimeDecs:string;
+                        nameAZ:string;
+                        nameZA:string;
+                        mostFavorite:string;
+                        leastFavorite:string;
+                    };
+                    errorCollection:{
+                        PhotoNumber:string;
+                        download:string;
+                    };
+
+
+                };
+
             };
         };
     }
@@ -168,7 +220,7 @@ const resources: Resource = {
                 tutorialDesc: "Step-by-step guide",
                 uploadTitle: "Upload",
                 uploadDesc: "Add your photos here",
-                buildingPhotoTitle: "Building Photo Gallery",
+                photoGalleryTitle: "Photo Gallery",
                 buildingPhotoDesc: "Browse building photos",
                 productIntroductionTitle: "Product Introduction",
                 productIntroDesc: "Overview of the project",
@@ -315,7 +367,59 @@ const resources: Resource = {
                 getRankingError: "Failed to get ranking",
                 getUserError: "Failed to get user info",
                 unknownError: "Unknown error",
-            }
+            },
+            photoGallery: {
+                inputBoxLabel: "Input Adress",
+                searchButton: "Search",
+                allAddress:"All Address",
+                clearHistory:"Clear History",
+                loading:"Loading...",
+                error:"Error",
+                tabelHeader:{
+                    address: "Address",
+                    lastUpdateTime: "Last Update Time",
+                    photoCount: "Photo Count",
+                },
+                noMatch:"No Match",
+                photoPreview: {
+                    title:"Photos Preview",
+                    tip:"Please select an address to view photos.",
+                    tipValid: "Please enter a valid address to view photos.",
+                },
+                viewAllButton:"View all",
+                alertFetchPhoto:"Error by Fetch Photo, Detail:",
+                errorFetchPhoto:"Error loading photos.",
+                photoDetailTitle:"Photo Detail",
+                photoDetails: {
+                    uploadTime:"Upload Time",
+                    uploadUser:"Upload User",
+                    favoriteNr:"Favorite Number",
+                },
+                favoriteButton:"Favorite",
+                dislikeButton:"Dislike",
+                downloadButton:"Download",
+                photoViewDialogeTitel:"Photos Under Adresse",
+                photoViewDialogeTitelMobi:"Photos",
+                selectButton:"Select",
+                cancelButton:"Cancel",
+                selectAllButton:"Select All",
+                orderLabel:"Sort after",
+                order:{
+                    updateTimeAcs:"Upload Time Ascending",
+                    updateTimeDecs:"Upload Time Descending",
+                    nameAZ:"Name A-Z",
+                    nameZA:"Name Z-A",
+                    mostFavorite:"Most favorite",
+                    leastFavorite:"Least favorite",
+                },
+                errorCollection:{
+                    PhotoNumber:"muss choose minimal one Photos",
+                    download:"Failed to download photo.",
+                },
+
+
+            },
+
         }
     },
     de: {
@@ -326,7 +430,7 @@ const resources: Resource = {
                 tutorialDesc: "Schritt-für-Schritt Anleitung",
                 uploadTitle: "Hochladen",
                 uploadDesc: "Füge hier deine Fotos hinzu",
-                buildingPhotoTitle: "Gebäudefotogalerie",
+                photoGalleryTitle: "Fotogalerie",
                 buildingPhotoDesc: "Durchsuche Gebäudefotos",
                 productIntroductionTitle: "Produktvorstellung",
                 productIntroDesc: "Projektübersicht",
@@ -475,6 +579,58 @@ const resources: Resource = {
                 getUserError: "Fehler beim Abrufen des Benutzers",
                 unknownError: "Unbekannter Fehler",
             }
+            },
+            photoGallery: {
+                inputBoxLabel: "Adresse Eingeben",
+                searchButton: "Suchen",
+                allAddress:"Alle Adressen",
+                clearHistory:"Verlauf löschen",
+                loading:"Laden...",
+                error:"Fehler",
+
+                tabelHeader:{
+                    address: "Adresse",
+                    lastUpdateTime:"Letzte Aktualisierungszeit",
+                    photoCount: "Anzahl der Fotos",
+                },
+                noMatch:"Keine Übereinstimmung",
+                photoPreview: {
+                    title: "Fotovorschau",
+                    tip:"Bitte wählen Sie eine Adresse aus, um Fotos anzuzeigen.",
+                    tipValid: "Bitte geben Sie eine gültige Adresse ein, um Fotos anzuzeigen.",
+                },
+                viewAllButton:"Alle anzeigen",
+                alertFetchPhoto:"Fehler beim Abrufen von Fotos, Detail:",
+                errorFetchPhoto:"Fehler beim Laden der Fotos.",
+                photoDetailTitle:"Fotodetail",
+                photoDetails: {
+                    uploadTime:"Upload-Zeit",
+                    uploadUser:"Upload-Benutzer",
+                    favoriteNr:"Favoritennummer",
+                },
+                favoriteButton:"Gefällt mir",
+                dislikeButton:"Gefällt mir nicht",
+                downloadButton:"Herunterladen",
+                photoViewDialogeTitel:"Fotos unter Adresse",
+                photoViewDialogeTitelMobi:"Fotos",
+                selectButton:"Auswählen",
+                cancelButton:"Abbrechen",
+                selectAllButton:"Alle auswählen",
+                orderLabel:"Sortieren nach",
+                order:{
+                    updateTimeAcs:"Uploadzeit aufsteigend",
+                    updateTimeDecs:"Uploadzeit absteigend",
+                    nameAZ:"Name A–Z",
+                    nameZA:"Name Z–A",
+                    mostFavorite:"Beliebteste",
+                    leastFavorite:"Unbeliebteste",
+                },
+                errorCollection:{
+                    PhotoNumber:"muss minimal ein Foto auswählen",
+                    download:"Herunterladen des Fotos fehlgeschlagen.",
+                },
+            },
+
         }
     }
 };

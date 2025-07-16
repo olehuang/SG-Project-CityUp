@@ -13,7 +13,7 @@ import Keycloakinit from "./components/Keycloakinit";
 import ProtectedRouter from "./components/ProtectedRouter";
 import Upload from "./pages/Upload";
 import Tutorial from "./pages/Tutorial";
-import BuildingPhotoGallery from "./pages/BuildingPhotoGallery";
+import PhotoGallery from "./pages/PhotoGallery";
 import UploadHistory from "./pages/UploadHistory";
 import ProductIntroduction from "./pages/ProductIntroduction";
 import PhotoReview from "./pages/PhotoReview";
@@ -33,7 +33,7 @@ function App() {
                             <Route element={<DashboardPage/>} path="/dashboard" />{/*DashboardPage*/}
                             <Route element={<Upload/>} path="/dashboard/upload" />{/*UploadPage*/}
                             <Route element={<Tutorial/>} path="/dashboard/tutorial" />{/*Tutorial*/}
-                            <Route element={<BuildingPhotoGallery/>} path="/dashboard/buildingPhoto" />{/*Building Infomation*/}
+                            <Route element={<PhotoGallery/>} path="/dashboard/photoGallery" />{/*Building Infomation*/}
                             <Route element={<UploadHistory/>} path="/dashboard/uploadHistory" />{/*Upload History*/}
                             <Route element={<ProductIntroduction/>} path="/dashboard/productIntroduction" />{/*Product Introduction*/}
                             <Route element={<PhotoReview/>} path="/dashboard/photoReview" />{/*Product Introduction*/}

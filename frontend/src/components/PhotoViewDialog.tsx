@@ -19,7 +19,10 @@ import Photo  from "./PhotoGrid"
 import FavoriteBorder from "@mui/icons-material/Favorite";
 import Favorite from "@mui/icons-material/Favorite";
 import CloseIcon from '@mui/icons-material/Close';
+import { useMediaQuery, useTheme } from "@mui/material";
 
+import styles from "./PhotoViewDialogStyles";
+import {useTranslation} from "react-i18next";
 
 interface Props {
     viewAddress: string|null;
@@ -58,12 +61,15 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
     const { token,user_id } = useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+    const { t } = useTranslation();//double language
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles || []);
-            console.log(userInfo?.roles);
         };
         if (token !== null && token !== undefined) {
             fetchRoles();
@@ -80,9 +86,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     }, [viewAddress]);
 
     useEffect(() => {
-        console.log("open:",open);
-        console.log("isSelecting:",isSelecting);
-        console.log("selectedAddress:",viewAddress);
         if (!open || !viewAddress){
             setIsSelecting(false)
             setSelectedPhotoIds(new Set())
@@ -93,13 +96,12 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     const fetchPhoto = async (address: string) => {
         setLoading(true);
         setError(null);
-        console.log("address:", address);
+
 
         const url = "http://127.0.0.1:8000/photos/get_photo_list"
         try {
             const response = await axios.get(url, {params: {address: address,user_id:user_id}});
             const data = response.data;
-            console.log(data);
 
             const formattedPhotos: Photo[] = data.map((item: any) => ({
                 id:item.photo_id,
@@ -200,7 +202,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     // download selected photo,single Photo will be direct download, more will as Zip download
     const downloadPhotos = ()=>{
         const selectedPhotosIds = Array.from(selectedPhotoIds);
-        if (selectedPhotosIds.length===0){setError("muss choose minimal one Photos");}
+        if (selectedPhotosIds.length===0){setError(t("photoGallery.errorCollection.PhotoNumber"));}
 
         let url = "";
         try{
@@ -217,8 +219,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
             a.click();
             document.body.removeChild(a);
         }catch (error: any) {
-            console.error("Download failed", error);
-            setError("Failed to download photo.");
+            setError(t("photoGallery.errorCollection.download"));
         }
     }
 
@@ -297,58 +298,60 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
+
+
     return(
         <>
             <Dialog open={open}
                     onClose={handleDialogClose}
                     maxWidth={'lg'}
-                    fullWidth
+                    fullWidth={isMobile}
             >
-                <DialogTitle sx={{
-                    backgroundColor: "#FAF6E9",
-                    padding:"1% 1% 0 1%",
-                    display:"flex",
-                    justifyContent:"space-between",
-                    alignItems:"center",
-                }}
-                > Photos Under Adresse - {viewAddress}
-                    <IconButton sx={{marginLeft:"auto"}}
-                        onClick={handleDialogClose}>
-                        <CloseIcon />
-                    </IconButton>
-                </DialogTitle>
-                <Box sx={{padding: 2,backgroundColor: "#FAF6E9",}}>
-                    <Box sx={{display: "flex", mb: 1, alignItems: "center",margin:0}}>
-                        <Typography variant="h5" sx={{}}>Photos Preview</Typography>
+
+                    <DialogTitle sx={styles.dialogTitle}>
+                        {!isMobile? `${t("photoGallery.photoViewDialogeTitel")} - ${viewAddress}`:`${t("photoGallery.photoViewDialogeTitelMobi")}`}
+                        <IconButton sx={{ marginLeft: "auto" }}
+                                    autoFocus
+                                    onClick={handleDialogClose}>
+                            <CloseIcon />
+                        </IconButton>
+                    </DialogTitle>
+
+                <Box sx={styles.mainZoneBackground}>
+                    <Box sx={styles.mainZone}>
+                        {!isMobile && <Typography variant="h5">{t("photoGallery.photoPreview.title")}</Typography>}
                         {/*Download button*/}
-                        <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
+                        <Box sx={styles.downloadButton}>
 
-                            {isSelecting && selectedPhotoIds.size > 0 && (
-                                <Button
-                                    onClick={downloadPhotos}
-                                    variant="contained"
-                                    color="success"
-                                >
-                                    Download ({selectedPhotoIds.size})
-                                </Button>
+                            {!isMobile && (<>
+                                    {isSelecting && selectedPhotoIds.size > 0 && (
+                                        <Button
+                                            onClick={downloadPhotos}
+                                            variant="contained"
+                                            color="success"
+                                        >
+                                            {t("photoGallery.downloadButton")} ({selectedPhotoIds.size})
+                                        </Button>
+                                    )}
+                                    {/*Select Button*/}
+                                    {isSelecting && <Button
+                                        variant="contained"
+                                        color="info"
+                                        onClick={handleAllSelect}>{t("photoGallery.selectAllButton")}</Button>}
+                                    <Button
+                                        variant="contained"
+                                        onClick={() => {
+                                            setIsSelecting(!isSelecting);
+                                            setSelectedPhotoIds(new Set());
+
+                                        }}
+                                        color={isSelecting ? "error" : "primary"}
+                                        sx={{visibility: roles.includes("admin") ? "visible" : "hidden",}}
+                                    >
+                                        {isSelecting ? t("photoGallery.Abbrechen") : t("photoGallery.selectButton")}
+                                    </Button>
+                                </>
                             )}
-                            {/*Select Button*/}
-                            {isSelecting && <Button
-                                variant="contained"
-                                color="info"
-                                onClick={handleAllSelect}>Select All</Button>}
-                            <Button
-                                variant="contained"
-                                onClick={() => {
-                                    setIsSelecting(!isSelecting);
-                                    setSelectedPhotoIds(new Set());
-
-                                }}
-                                color={isSelecting ? "error" : "primary"}
-                                sx={{visibility: roles.includes("admin")? "visible":"hidden",}}
-                            >
-                                {isSelecting ? "Cancel" : "Select"}
-                            </Button>
                             {/*Order Selector */}
                             <PhotoOrderSelector
                                 setSelectOrder={setSelectOrder}
@@ -357,25 +360,24 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                         </Box>
                     </Box>
                     {loading ? (
-                        <Box sx={{display: "flex", alignItems: "center", gap: 2}}>
+                        <Box sx={styles.loading}>
                             <CircularProgress/>
-                            <Typography>Loading photos...</Typography>
+                            <Typography>{t("photoGallery.loading")}</Typography>
                         </Box>
                     ) : error ? (
-                        <Typography color="error">Error: {error}</Typography>
+                        <Typography color="error">{t("photoGallery.error")}: {error}</Typography>
                     ) : (
-                        <ImageList variant="masonry" cols={3} gap={12} sx={{margin:"0.5% 0 0 0 "}}>
+                        <ImageList variant="masonry"
+                                   cols={isMobile ? 1 : 3}
+                                   gap={12}
+                                   sx={{margin:"0.5% 0 0 0 "}}>
                         {sortedPhotos.map((photo, index) => (
                             <ImageListItem key={index}>
                                 <img
                                     src={photo.src}
                                     alt={photo.title}
                                     loading="lazy"
-                                    style={{
-                                        borderRadius: 8,
-                                        cursor: 'pointer',
-                                        boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
-                                    }}
+                                    style={styles.image}
                                     onClick={() => handlePreview(photo)}
                                 />
                                 {/*Favorite Button in top right corner*/}
@@ -385,13 +387,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         handleLikeToggle(photo)
                                     }}
                                     sx={{
-                                        position: "absolute",
-                                        top: "1%", right: "1%",
-                                        backgroundColor: "rgba(255,255,255,0.8)",
-                                        '&:hover': {
-                                            backgroundColor: "rgba(255,255,255,0.9)",
-                                        },
-                                        zIndex: 2,
+                                        ...styles.favoriteIcon,
                                         visibility: photo.canLike ? "visible" : "hidden"
                                     }}
                                 >{photo.is_like ? <Favorite sx={{color: "red"}} /> : <FavoriteBorder />}
@@ -409,7 +405,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         //title={photo.title}
                                         sx={{borderRadius:"5px"}}
                                         subtitle={
-                                            `Upload Time: ${photo.uploadTime}`}
+                                            `${t("photoGallery.photoDetails.uploadTime")}: ${photo.uploadTime}`}
                                         actionIcon={
                                             <Box>
                                                 <Checkbox

@@ -7,20 +7,16 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import MailIcon from '@mui/icons-material/Mail';
 import UploadIcon from '@mui/icons-material/Upload';      // ← neu Icon
 import { Link } from 'react-router-dom';                 // ← import Link
-import  {useNavigate,useLocation} from 'react-router-dom';
-import Keycloak from "./keycloak";
-import AuthProvider, {useAuthHook} from "./AuthProvider";
+import {useAuthHook} from "./AuthProvider";
 import LogOut from "./LogOut";
 import Profile from "./Profile";
 import UploadHistory from "../pages/UploadHistory";
 import Upload from "../pages/Upload";
 import Tutorial from "../pages/Tutorial";
 import ProductIntroduction from "../pages/ProductIntroduction";
-import BuildingPhotoGallery from "../pages/BuildingPhotoGallery";
+import PhotoGallery from "../pages/PhotoGallery";
 import {useEffect, useState} from "react";
 import KeycloakClient from "./keycloak";
 import {Checklist, History, Info, MenuBook, PhotoLibrary, RateReview} from "@mui/icons-material";
@@ -38,13 +34,10 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     const [roles, setRoles] = useState<string[]>([]);
 
 
-
-
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo= await KeycloakClient.extractUserInfo(token);
             setRoles(userInfo?.roles||[]);
-            console.log(userInfo?.roles);
         }
         if (token!==null && token!==undefined) {
             fetchRoles();
@@ -56,13 +49,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
             <Box sx={{ width: 250 }} role="presentation" >{/*onClose={onClose}*/}
                 <Box>
                     <List>
-                        {/*<ListItem key={'dashboard'} disablePadding >*/}
-                        {/*    <ListItemButton component={Link} to={"/dashboard"}>*/}
-                        {/*        <ListItemIcon>*/}
-                        {/*        </ListItemIcon>*/}
-                        {/*        <ListItemText primary='dashboard' />*/}
-                        {/*    </ListItemButton>*/}
-                        {/*</ListItem>*/}
+
                         <Profile token={token}/>
                     </List>
                     <Divider />
@@ -82,10 +69,9 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                             </ListItemButton>
                         </ListItem>
 
-                        <ListItemButton  component={Link} to="/dashboard/buildingPhoto">
-                            <ListItemIcon><PhotoLibrary />
-                            </ListItemIcon>
-                            <ListItemText primary="Building Photo Gallery" />
+                        <ListItemButton  component={Link} to="/dashboard/photoGallery">
+                            <ListItemIcon><PhotoLibrary /></ListItemIcon>
+                            <ListItemText primary="Photo Gallery" />
                         </ListItemButton>
                         <ListItemButton component={Link} to="/dashboard/uploadHistory" >
                             <ListItemIcon><History  />

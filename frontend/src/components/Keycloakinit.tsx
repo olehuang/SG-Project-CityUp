@@ -20,7 +20,6 @@ const KeycloakInit = () => {
         KeycloakClient.creatKeycloak.onAuthSuccess = () => {
             setAuth(true);//recoder login status from Keycloak
             setAuthLoading(false);
-
         };
        //if use no in DB storaged, save in DB
         if (user_id) {
@@ -47,11 +46,11 @@ const KeycloakInit = () => {
                         setAuthLoading(false);
                         setToken(token);
                         setRole0(userInfo.roles[0])
-                        console.log(userInfo);
+
                     }
                 });
         }catch (error:any){
-            console.log(error);           // print to console
+            console.error(error);           // print to console
             // addAlert("Failed to obtain Keycloak token: " + error.message, "error");
         }
     };
@@ -64,7 +63,6 @@ const KeycloakInit = () => {
     const uploadRole =async (user_id:any,role="user")=>{
          const url=`http://127.0.0.1:8000/users/update_user`;
          const payload={user_id, role}
-        console.log("payload in upload role",payload);
          try{
              const response = await fetch(url, {
                  method: "POST",
@@ -78,7 +76,7 @@ const KeycloakInit = () => {
                  throw new Error(errorData.detail || "Upload user role faile");
              }
              const data = await response.json();
-             console.log("Upload user role seccessfull", data);
+
          }catch (error:any){
              console.error("Something wrong with uploading user role ：", error);
          }
@@ -135,7 +133,6 @@ const KeycloakInit = () => {
             email:userInfo.email,
             role: userInfo.roles && userInfo.roles.length > 0 ? userInfo.roles[0] : "user"
         }
-        console.log("payload to save user:",payload);
         try {
         const response = await fetch(url, {
             method: "POST",
@@ -150,7 +147,7 @@ const KeycloakInit = () => {
             }
 
             const data = await response.json();
-            console.log("save user seccessfull", data);
+
         }catch (error:any){
             console.error("Something wrong with saving user ：", error);
         }
