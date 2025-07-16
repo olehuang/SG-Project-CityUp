@@ -220,9 +220,230 @@ declare module 'i18next' {
                     exit: string;
                     logOut:string;
                 };
-                tutorial:{
-
-                }
+                tutorial: {
+                    photograph: {
+                        title: string;
+                        description: string;
+                        noShadows: {
+                            title: string;
+                            description: string;
+                        };
+                        noObstructions: {
+                            title: string;
+                            description: string;
+                        };
+                        straightPerspective: {
+                            title: string;
+                            description: string;
+                        };
+                        incorrectExamples: {
+                            title: string;
+                            tooManyObstructions: string;
+                            buildingWithShadow: string;
+                        };
+                    };
+                    photoUpload: {
+                        title: string;
+                        description: string;
+                        setLocation: {
+                            title: string;
+                            description: string;
+                            browserOptions: {
+                                intro: string;
+                                allowWhileVisiting: {
+                                    title: string;
+                                    description: string;
+                                };
+                                allowThisTime: {
+                                    title: string;
+                                    description: string;
+                                };
+                                neverAllow: {
+                                    title: string;
+                                    description: string;
+                                };
+                            };
+                        };
+                        uploadPhotos: {
+                            title: string;
+                            click:string;
+                            shootingUpload: {
+                                description: string;
+                                buttonText: string;
+                            };
+                            albumUpload: {
+                                description: string;
+                                buttonText: string;
+                            };
+                        };
+                        finalizeUpload: {
+                            title: string;
+                            submit: {
+                                description: string;
+                                buttonText: string;
+                            };
+                            remove: {
+                                description: string;
+                                buttonText: string;
+                            };
+                            successMessage: string;
+                        };
+                    };
+                    uploadHistory: {
+                        title: string;
+                        description: string;
+                        click:string;
+                        steps: {
+                            searchAndFilter: {
+                                title: string;
+                                description: string;
+                                searchInstructions: {
+                                    enterKeywords: string;
+                                    clickSearch: string;
+                                    clickClear: string;
+                                    desc1:string;
+                                    desc2:string;
+                                };
+                                statusFilter: {
+                                    title: string;
+                                    pending: {
+                                        title: string;
+                                        description: string;
+                                    };
+                                    reviewing: {
+                                        title: string;
+                                        description: string;
+                                    };
+                                    approved: {
+                                        title: string;
+                                        description: string;
+                                    };
+                                    rejected: {
+                                        title: string;
+                                        description: string;
+                                    };
+                                };
+                            };
+                            viewDetails: {
+                                title: string;
+                                description: string;
+                                closeButton: string;
+                                viewDetails:string;
+                                desc:string;
+                            };
+                            pagination: {
+                                title: string;
+                                description: string;
+                                navigation: string;
+                            };
+                            exitAndReturn: {
+                                title: string;
+                                description: string;
+                            };
+                        };
+                    };
+                    gallery: {
+                        title: string;
+                        description: string;
+                        step1: {
+                            title: string;
+                            content: string;
+                        };
+                        step2: {
+                            title: string;
+                            content1: string;
+                            viewAll: string;
+                            content2: string;
+                        };
+                    };
+                    userinfo: {
+                        title: string;
+                        description: string;
+                        step1: {
+                            title: string;
+                            content1: string;
+                            profile: string;
+                            userinfo: string;
+                            content2: string;
+                            content3:string;
+                        };
+                        step2: {
+                            title: string;
+                            content1: string;
+                            save: string;
+                            cancel: string;
+                            content2: string;
+                            content3:string;
+                            click:string;
+                        };
+                    };
+                    photoReview: {
+                        title: string;
+                        description: string;
+                        step1: {
+                            title:string;
+                            desc1:string;
+                            fetchPhotos: string;
+                            desc2: string;
+                            statusApproved:string;
+                            and: string;
+                            statusRejected:string;
+                        },
+                        step2: {
+                            title: string;
+                            desc1: string;
+                            accept: string;
+                            desc2: string;
+                            reject: string;
+                            desc3: string;
+                            cancel: string;
+                        },
+                        step3: {
+                            title:string;
+                            desc1:string;
+                            desc2:string;
+                            photoReview: string;
+                            or: string;
+                            exit: string;
+                            desc3: string;
+                        }
+                    };
+                    userManagement:{
+                        title: string;
+                        description: string;
+                        step1: {
+                            title: string;
+                            description: string;
+                        };
+                        step2: {
+                            title: string;
+                            description1: string;
+                            refresh: string;
+                            description2: string;
+                        };
+                        step3: {
+                            title: string;
+                            description1: string;
+                            delete: string;
+                        };
+                        step4: {
+                            title: string;
+                            description1: string;
+                            group: string;
+                            description2: string;
+                            joinGroup: string;
+                            reminder: string;
+                            description3: string;
+                            description4: string;
+                            adminGroup: string;
+                            description5: string;
+                            join: string;
+                            description6: string;
+                            leave: string;
+                            description7: string;
+                        };
+                    }
+                };
             };
         };
     }
@@ -451,8 +672,229 @@ const resources: Resource = {
                     download:"Failed to download photo.",
                 },
             },
-            tutorial:{
-
+            tutorial: {
+                photograph: {
+                    title: "Photograph",
+                    description: "In this section, you will learn how to take proper building photographs. Please follow these essential requirements:",
+                    noShadows: {
+                        title: "No shadows",
+                        description: "Ensure the lighting is even and natural to avoid distortion."
+                    },
+                    noObstructions: {
+                        title: "No obstructions",
+                        description: "The building should be fully visible, with no objects (trees, cars, people) blocking it."
+                    },
+                    straightPerspective: {
+                        title: "Straight and aligned perspective",
+                        description: "Photos should be taken parallel to the building to maintain accuracy."
+                    },
+                    incorrectExamples: {
+                        title: "Below are some incorrect examples:",
+                        tooManyObstructions: "Too many obstructions",
+                        buildingWithShadow: "Building with shadow"
+                    }
+                },
+                photoUpload: {
+                    title: "Photo Upload",
+                    description: "In this section, you will learn how to upload and edit the photos you take, as well as enter the address the photos correspond to. Follow these steps to ensure a smooth upload process:",
+                    setLocation: {
+                        title: "1. Set your location",
+                        description: "You have two location options: 1. allow the website to automatically detect your current location or 2. manually enter an address to position your location.",
+                        browserOptions: {
+                            intro: "When enabling location access, your browser will offer three options:",
+                            allowWhileVisiting: {
+                                title: "Allow while visiting the site",
+                                description: "lets the site access your location automatically each time you visit."
+                            },
+                            allowThisTime: {
+                                title: "Allow this time",
+                                description: "grants location access just once; you'll be prompted again next time."
+                            },
+                            neverAllow: {
+                                title: "Never allow",
+                                description: "blocks location access completely. In this case, you'll need to manually enter the location and click 'Search'."
+                            }
+                        }
+                    },
+                    uploadPhotos: {
+                        title: "2. Upload photos",
+                        click:"Click",
+                        shootingUpload: {
+                            description: ", navigate to the folder containing the uploaded image, select the image, and click Open. Please note that only PNG and JPG file formats are supported.",
+                            buttonText: "Shooting and Upload"
+                        },
+                        albumUpload: {
+                            description: ", if you are uploading multiple photos, the system supports up to 5 images at a time.",
+                            buttonText: "Album Upload"
+                        }
+                    },
+                    finalizeUpload: {
+                        title: "3. Finalize upload",
+                        submit: {
+                            description: ", once your photos are selected and the process is complete.",
+                            buttonText: "Submit"
+                        },
+                        remove: {
+                            description: ", in the top-right corner of the image to remove it if you're not satisfied with the photo.",
+                            buttonText: "red X icon"
+                        },
+                        successMessage: "You will be prompted when the photo is uploaded successfully."
+                    }
+                },
+                uploadHistory: {
+                    title: "Upload History",
+                    description: "In this section, you'll learn how to search, filter, and navigate your photo upload history.",
+                    click:"Click",
+                    steps: {
+                        searchAndFilter: {
+                            title: "1. Search and filter photos",
+                            description: "Use the address search to find uploaded photos, or apply the status filter to view photos based on their current state.",
+                            searchInstructions: {
+                                enterKeywords: "Enter keywords and click",
+                                clickSearch: "Search",
+                                clickClear: "Clear",
+                                desc1:"; the results will appear below the search box.",
+                                desc2:"to clear the search content."
+                            },
+                            statusFilter: {
+                                title: "Status filter includes four options:",
+                                pending: {
+                                    title: "Pending",
+                                    description: "The photo is waiting for review."
+                                },
+                                reviewing: {
+                                    title: "Reviewing",
+                                    description: "The administrator is currently checking the photo."
+                                },
+                                approved: {
+                                    title: "Approved",
+                                    description: "The photo has passed the review."
+                                },
+                                rejected: {
+                                    title: "Rejected",
+                                    description: "The photo did not pass the review. This may be due to not meeting photo requirements. Please refer to the \"Photograph\" section and re-upload the image after making corrections."
+                                }
+                            }
+                        },
+                        viewDetails: {
+                            title: "2. View details",
+                            description: "to access full information about a photo.",
+                            closeButton: "CLOSE",
+                            viewDetails:" 'View Details' ",
+                            desc:"back to previous step."
+                        },
+                        pagination: {
+                            title: "3. Navigate pagination",
+                            description: "This page supports pagination. Photos are sorted from newest to oldest, with the most recently uploaded photos displayed at the top.",
+                            navigation: "<, > is for previous/next page, |<, >| is for first/last page."
+                        },
+                        exitAndReturn: {
+                            title: "4. Exit and return",
+                            description: "To leave this section, use the sidebar menu on the left or click 'Return to Main Menu'."
+                        }
+                    }
+                },
+                gallery: {
+                    title: "Photo Gallery",
+                    description: "In this section, you will learn how to search for building-related photo uploads and view images easily.",
+                    step1: {
+                        title: "1. Search by address",
+                        content: "Enter an address in the search bar to view the latest upload times and the number of photos related to that location.",
+                    },
+                    step2: {
+                        title: "2. View Photos",
+                        content1: "Click on a photo with address from the right panel and click ",
+                        viewAll: "'view all'",
+                        content2: "to use filter options to sort the photo gallery.",
+                    }
+                },
+                userinfo: {
+                    title: "User Information",
+                    description: "In this section, you will learn how to manage your own registration information.",
+                    step1: {
+                        title: "1. Open the User Information page",
+                        content1: "From the side menu, click ",
+                        profile: "Profile",
+                        userinfo: " User Information",
+                        content2: "to enter the user information management interface.",
+                        content3:"in the dropdown, then select"
+                    },
+                    step2: {
+                        title: "2. Edit your personal details",
+                        content1: "On this page, you can update your personal information, such as a valid email address, last name, and first name. Click ",
+                        save: " Save",
+                        cancel: " Cancel",
+                        content2: "to discard them.",
+                        content3:"to save changes, or",
+                        click:"Click"
+                    }
+                },
+                photoReview: {
+                    title: "Photo Review",
+                    description: "In this admin section, you can review and approve photos submitted by users.",
+                    step1: {
+                        title: "1. Fetch user-uploaded photos",
+                        desc1: "Click ",
+                        fetchPhotos: "'Fetch Photos'",
+                        desc2: " to load the images submitted by users for review. You will see photos marked with status ",
+                        statusApproved: "'approved'",
+                        and: "and",
+                        statusRejected: "'rejected'"
+                    },
+                    step2: {
+                        title: "2. Approve or reject photos",
+                        desc1: "Use the selection buttons to approve a single photo or multiple photos at once.",
+                        accept: "Accept",
+                        desc2: " means the photo meets requirements and has the correct address information. If the photo does not meet upload guidelines or does not match the address details, click ",
+                        reject: "'Reject'",
+                        desc3: "If you want to withdraw the operation, you can click ",
+                        cancel: "‘Cancel’"
+                    },
+                    step3: {
+                        title: "3. Final check",
+                        desc1: "Review how many photos are still pending. The review date should not exceed three working days.",
+                        desc2: "Click ",
+                        photoReview: "Photo Review",
+                        or: "or",
+                        exit: "Exit",
+                        desc3: " to return to the main menu."
+                    }
+                },
+                userManagement: {
+                    title: "User Management",
+                    description: "In this admin section, you can manage user accounts and permissions.",
+                    step1: {
+                        title: "1. Access User Management Panel",
+                        description: "From the homepage, click the left menu and select Admin Panel to access the Keycloak interface.",
+                    },
+                    step2: {
+                        title: "2. Find Users",
+                        description1: "Click",
+                        refresh: " Refresh",
+                        description2: "first to retrieve the latest user list. You can then search users by name or email.",
+                    },
+                    step3: {
+                        title: "3. Delete Users",
+                        description1: "To delete a user, click the three dots at the end of the row and select",
+                        delete: " Delete",
+                    },
+                    step4: {
+                        title: "4. Add User as Admin",
+                        description1: "Select the user's email, click",
+                        group: " Group ",
+                        description2: "and choose",
+                        joinGroup: " Join Group",
+                        reminder: "Make sure not to remove the user from the User group.",
+                        description3: "Next, click",
+                        description4: "to open groups, select the",
+                        adminGroup: " admin ",
+                        description5: "group and click",
+                        join: " Join",
+                        description6: "After joining, you can remove users from the admin group if needed by clicking",
+                        leave: " Leave",
+                        description7: ", then confirm. A success message will appear once the removal is complete.",
+                    }
+                }
             }
         }
     },
@@ -679,7 +1121,230 @@ const resources: Resource = {
                     download:"Herunterladen des Fotos fehlgeschlagen.",
                 },
             },
-            tutorial:{
+            tutorial: {
+                photograph: {
+                    title: "Fotografie",
+                    description: "In diesem Abschnitt lernen Sie, wie Sie ordnungsgemäße Gebäudefotos aufnehmen. Bitte befolgen Sie diese wesentlichen Anforderungen:",
+                    noShadows: {
+                        title: "Keine Schatten",
+                        description: "Stellen Sie sicher, dass die Beleuchtung gleichmäßig und natürlich ist, um Verzerrungen zu vermeiden."
+                    },
+                    noObstructions: {
+                        title: "Keine Hindernisse",
+                        description: "Das Gebäude sollte vollständig sichtbar sein, ohne dass Objekte (Bäume, Autos, Personen) es verdecken."
+                    },
+                    straightPerspective: {
+                        title: "Gerade und ausgerichtete Perspektive",
+                        description: "Fotos sollten parallel zum Gebäude aufgenommen werden, um die Genauigkeit zu gewährleisten."
+                    },
+                    incorrectExamples: {
+                        title: "Hier sind einige falsche Beispiele:",
+                        tooManyObstructions: "Zu viele Hindernisse",
+                        buildingWithShadow: "Gebäude mit Schatten"
+                    }
+                },
+                photoUpload: {
+                    title: "Foto-Upload",
+                    description: "In diesem Abschnitt lernen Sie, wie Sie Ihre aufgenommenen Fotos hochladen und bearbeiten und die entsprechende Adresse eingeben. Befolgen Sie diese Schritte für einen reibungslosen Upload-Prozess:",
+                    setLocation: {
+                        title: "1. Standort festlegen",
+                        description: "Sie haben zwei Standort-Optionen: 1. der Website erlauben, Ihren aktuellen Standort automatisch zu erkennen oder 2. manuell eine Adresse eingeben, um Ihren Standort zu positionieren.",
+                        browserOptions: {
+                            intro: "Bei der Aktivierung des Standortzugriffs bietet Ihr Browser drei Optionen:",
+                            allowWhileVisiting: {
+                                title: "Beim Besuch der Website erlauben",
+                                description: "ermöglicht der Website, bei jedem Besuch automatisch auf Ihren Standort zuzugreifen."
+                            },
+                            allowThisTime: {
+                                title: "Dieses Mal erlauben",
+                                description: "gewährt einmalig Standortzugriff; Sie werden beim nächsten Mal erneut gefragt."
+                            },
+                            neverAllow: {
+                                title: "Niemals erlauben",
+                                description: "blockiert den Standortzugriff vollständig. In diesem Fall müssen Sie den Standort manuell eingeben und 'Suchen' klicken."
+                            }
+                        }
+                    },
+                    uploadPhotos: {
+                        title: "2. Fotos hochladen",
+                        click:"Klicken",
+                        shootingUpload: {
+                            description: ", navigieren Sie zum Ordner mit dem hochgeladenen Bild, wählen Sie das Bild aus und klicken Sie auf Öffnen. Bitte beachten Sie, dass nur PNG- und JPG-Dateiformate unterstützt werden.",
+                            buttonText: "Aufnahme und Upload"
+                        },
+                        albumUpload: {
+                            description: ", wenn Sie mehrere Fotos hochladen, unterstützt das System bis zu 5 Bilder gleichzeitig.",
+                            buttonText: "Album-Upload"
+                        }
+                    },
+                    finalizeUpload: {
+                        title: "3. Upload abschließen",
+                        submit: {
+                            description: ", sobald Ihre Fotos ausgewählt sind und der Prozess abgeschlossen ist.",
+                            buttonText: "Absenden"
+                        },
+                        remove: {
+                            description: ", in der oberen rechten Ecke des Bildes, um es zu entfernen, wenn Sie mit dem Foto nicht zufrieden sind.",
+                            buttonText: "rotes X-Symbol"
+                        },
+                        successMessage: "Sie werden benachrichtigt, wenn das Foto erfolgreich hochgeladen wurde."
+                    }
+                },
+                uploadHistory: {
+                    title: "Upload-Verlauf",
+                    description: "In diesem Abschnitt lernen Sie, wie Sie Ihren Foto-Upload-Verlauf durchsuchen, filtern und navigieren.",
+                    click:"Klicken Sie auf",
+                    steps: {
+                        searchAndFilter: {
+                            title: "1. Fotos suchen und filtern",
+                            description: "Verwenden Sie die Adresssuche, um hochgeladene Fotos zu finden, oder wenden Sie den Statusfilter an, um Fotos basierend auf ihrem aktuellen Zustand anzuzeigen.",
+                            searchInstructions: {
+                                enterKeywords: "Geben Sie Schlüsselwörter ein und klicken Sie auf",
+                                clickSearch: "Suchen",
+                                clickClear: "Löschen",
+                                desc1:"; Die Ergebnisse werden unter dem Suchfeld angezeigt.",
+                                desc2:"um den Suchinhalt zu löschen."
+                            },
+                            statusFilter: {
+                                title: "Der Statusfilter umfasst vier Optionen:",
+                                pending: {
+                                    title: "Ausstehend",
+                                    description: "Das Foto wartet auf Überprüfung."
+                                },
+                                reviewing: {
+                                    title: "Wird überprüft",
+                                    description: "Der Administrator überprüft derzeit das Foto."
+                                },
+                                approved: {
+                                    title: "Genehmigt",
+                                    description: "Das Foto hat die Überprüfung bestanden."
+                                },
+                                rejected: {
+                                    title: "Abgelehnt",
+                                    description: "Das Foto hat die Überprüfung nicht bestanden. Dies kann daran liegen, dass es die Fotoanforderungen nicht erfüllt. Bitte lesen Sie den Abschnitt \"Fotografie\" und laden Sie das Bild nach Korrekturen erneut hoch."
+                                }
+                            }
+                        },
+                        viewDetails: {
+                            title: "2. Details anzeigen",
+                            description: "um vollständige Informationen über ein Foto zu erhalten.",
+                            closeButton: "SCHLIESSEN",
+                            viewDetails:" 'Details anzeigen' ",
+                            desc:"Zurück zum vorherigen Schritt."
+                        },
+                        pagination: {
+                            title: "3. Seitennavigation",
+                            description: "Diese Seite unterstützt die Paginierung. Fotos sind vom neuesten zum ältesten sortiert, wobei die zuletzt hochgeladenen Fotos oben angezeigt werden.",
+                            navigation: "<, > ist für vorherige/nächste Seite, |<, >| ist für erste/letzte Seite."
+                        },
+                        exitAndReturn: {
+                            title: "4. Beenden und zurückkehren",
+                            description: "Um diesen Abschnitt zu verlassen, verwenden Sie das Seitenmenü links oder klicken Sie auf 'Zurück zum Hauptmenü'."
+                        }
+                    }
+                },
+                gallery: {
+                    title: "Fotogalerie",
+                    description: "In diesem Abschnitt erfahren Sie, wie Sie Gebäude-bezogene Foto-Uploads suchen und einfach anzeigen können.",
+                    step1: {
+                        title: "1. Suche nach Adresse",
+                        content: "Geben Sie eine Adresse in die Suchleiste ein, um die neuesten Upload-Zeiten und die Anzahl der Fotos für diesen Ort anzuzeigen.",
+                    },
+                    step2: {
+                        title: "2. Fotos anzeigen",
+                        content1: "Klicken Sie auf ein Foto mit Adresse aus dem rechten Bereich und dann auf ",
+                        viewAll: "'Alle anzeigen'",
+                        content2: ", um Filteroptionen zur Sortierung der Galerie zu nutzen.",
+                    }
+                },
+                userinfo: {
+                    title: "Benutzerinformationen",
+                    description: "In diesem Abschnitt erfahren Sie, wie Sie Ihre Registrierungsinformationen verwalten.",
+                    step1: {
+                        title: "1. Benutzerinformationsseite öffnen",
+                        content1: "Klicken Sie im Seitenmenü auf ",
+                        profile: "Profil",
+                        userinfo: " Benutzerinformationen",
+                        content2: ", um die Benutzerverwaltungsoberfläche zu öffnen.",
+                        content3:"in der Dropdown-Liste, und wählen Sie dann"
+                    },
+                    step2: {
+                        title: "2. Persönliche Daten bearbeiten",
+                        content1: "Auf dieser Seite können Sie Ihre persönlichen Daten aktualisieren, z. B. eine gültige E-Mail-Adresse, Nachname und Vorname. Klicken Sie auf ",
+                        save: " Speichern",
+                        cancel: " Abbrechen",
+                        content2: ", um die Änderungen zu verwerfen.",
+                        content3:"um Änderungen zu speichern, oder",
+                        click:"Klicken Sie auf"
+                    }
+                },
+                photoReview: {
+                    title: "Fotoüberprüfung",
+                    description: "In diesem Admin-Bereich können Sie von Nutzern eingereichte Fotos überprüfen und freigeben.",
+                    step1: {
+                        title: "1. Nutzerfotos abrufen",
+                        desc1: "Klicken Sie auf ",
+                        fetchPhotos: "'Fotos abrufen'",
+                        desc2: ", um die von Nutzern zur Überprüfung eingereichten Bilder zu laden. Sie sehen Fotos mit dem Status ",
+                        statusApproved: "'genehmigt'",
+                        and: "und",
+                        statusRejected: "'abgelehnt'"
+                    },
+                    step2: {
+                        title: "2. Fotos genehmigen oder ablehnen",
+                        desc1: "Verwenden Sie die Auswahlbuttons, um ein einzelnes Foto oder mehrere Fotos gleichzeitig zu genehmigen.",
+                        accept: "Genehmigen",
+                        desc2: " bedeutet, dass das Foto den Anforderungen entspricht und korrekte Adressinformationen enthält. Wenn das Foto nicht den Upload-Richtlinien entspricht oder nicht zur Adresse passt, klicken Sie auf ",
+                        reject: "'Ablehnen'",
+                        desc3: "Wenn Sie die Aktion zurücknehmen möchten, klicken Sie auf ",
+                        cancel: "'Abbrechen'"
+                    },
+                    step3: {
+                        title: "3. Letzte Überprüfung",
+                        desc1: "Überprüfen Sie, wie viele Fotos noch ausstehen. Das Überprüfungsdatum sollte drei Werktage nicht überschreiten.",
+                        desc2: "Klicken Sie auf ",
+                        photoReview: "Fotoüberprüfung",
+                        or: "oder",
+                        exit: "Beenden",
+                        desc3: ", um zum Hauptmenü zurückzukehren."
+                    }
+                },
+                userManagement: {
+                    title: "Benutzerverwaltung",
+                    description: "In diesem Admin-Bereich können Sie Benutzerkonten und Berechtigungen verwalten.",
+                    step1: {
+                        title: "1. Zugriff auf das Benutzerverwaltungs-Panel",
+                        description: "Klicken Sie auf der Startseite im linken Menü auf Admin-Panel, um die Keycloak-Oberfläche zu öffnen.",
+                    },
+                    step2: {
+                        title: "2. Benutzer finden",
+                        description1: "Klicken Sie auf",
+                        refresh: " Aktualisieren",
+                        description2: ", um die aktuelle Benutzerliste abzurufen. Sie können dann nach Namen oder E-Mail suchen.",
+                    },
+                    step3: {
+                        title: "3. Benutzer löschen",
+                        description1: "Um einen Benutzer zu löschen, klicken Sie auf die drei Punkte am Ende der Zeile und wählen Sie",
+                        delete: " Löschen",
+                    },
+                    step4: {
+                        title: "4. Benutzer als Admin hinzufügen",
+                        description1: "Wählen Sie die E-Mail des Benutzers aus, klicken Sie auf",
+                        group: " Gruppe ",
+                        description2: "und wählen Sie",
+                        joinGroup: " Gruppe beitreten",
+                        reminder: "Stellen Sie sicher, dass der Benutzer nicht aus der Benutzergruppe entfernt wird.",
+                        description3: "Klicken Sie anschließend auf",
+                        description4: ", um die Gruppen zu öffnen, wählen Sie die",
+                        adminGroup: " admin ",
+                        description5: "Gruppe und klicken Sie auf",
+                        join: " Beitreten",
+                        description6: "Nach dem Beitritt können Sie Benutzer bei Bedarf wieder aus der Admin-Gruppe entfernen, indem Sie auf",
+                        leave: " Verlassen ",
+                        description7: "klicken und bestätigen. Eine Erfolgsmeldung wird nach Abschluss angezeigt.",
+                    }
+                }
+
 
             }
         }

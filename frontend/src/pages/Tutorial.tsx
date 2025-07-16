@@ -150,14 +150,11 @@ const Tutorial = () => {
                 return (
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Photograph", searchTerm)}
+                            {highlightText(t("tutorial.photograph.title"), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you will learn how to take proper building photographs. Please follow these essential requirements:",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.photograph.description"), searchTerm)}
                         </Typography>
 
                         {/* ✅ Good examples */}
@@ -167,8 +164,8 @@ const Tutorial = () => {
                                     ✅
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>No shadows</strong> –{" "}
-                                    {highlightText("Ensure the lighting is even and natural to avoid distortion.", searchTerm)}
+                                    <strong>{t("tutorial.photograph.noShadows.title")}</strong> –{" "}
+                                    {highlightText(t("tutorial.photograph.noShadows.description"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -177,8 +174,8 @@ const Tutorial = () => {
                                     ✅
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>No obstructions</strong> –{" "}
-                                    {highlightText("The building should be fully visible, with no objects (trees, cars, people) blocking it.", searchTerm)}
+                                    <strong>{t("tutorial.photograph.noObstructions.title")}</strong> –{" "}
+                                    {highlightText(t("tutorial.photograph.noObstructions.description"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -187,8 +184,8 @@ const Tutorial = () => {
                                     ✅
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>Straight and aligned perspective</strong> –{" "}
-                                    {highlightText("Photos should be taken parallel to the building to maintain accuracy.", searchTerm)}
+                                    <strong>{t("tutorial.photograph.straightPerspective.title")}</strong> –{" "}
+                                    {highlightText(t("tutorial.photograph.straightPerspective.description"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -210,7 +207,7 @@ const Tutorial = () => {
                         {/* ❌ Bad examples */}
                         <Box sx={{ ...styles.body, mt: 4 }}>
                             <Typography variant="h6" sx={{ mt: 4 }}>
-                                {highlightText("Below are some incorrect examples:", searchTerm)}
+                                {highlightText(t("tutorial.photograph.incorrectExamples.title"), searchTerm)}
                             </Typography>
 
                             <Box sx={{ display: "flex", alignItems: "flex-start", mt: 2, mb: 1.5 }}>
@@ -218,7 +215,7 @@ const Tutorial = () => {
                                     ❌
                                 </Typography>
                                 <Typography variant="body1">
-                                    {highlightText("Too many obstructions", searchTerm)}
+                                    {highlightText(t("tutorial.photograph.incorrectExamples.tooManyObstructions"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -235,7 +232,7 @@ const Tutorial = () => {
                                     ❌
                                 </Typography>
                                 <Typography variant="body1">
-                                    {highlightText("Building with shadow", searchTerm)}
+                                    {highlightText(t("tutorial.photograph.incorrectExamples.buildingWithShadow"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -254,14 +251,11 @@ const Tutorial = () => {
                 return (
                     <Box sx={{...styles.tutorialModelBox,paddingBottom: '80px'}}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Photo Upload", searchTerm)}
+                            {highlightText(t("tutorial.photoUpload.title"), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you will learn how to upload and edit the photos you take, as well as enter the address the photos correspond to. Follow these steps to ensure a smooth upload process:",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.photoUpload.description"), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -272,7 +266,7 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Set your location</strong>
+                                        <strong>{t("tutorial.photoUpload.setLocation.title")}</strong>
                                     </Typography>
 
                                     <Box sx={{ mt: 1.5 }}>
@@ -288,30 +282,18 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 1.5 }}>
-                                        {highlightText(
-                                            "You have two location options: 1. allow the website to automatically detect your current location or 2. manually enter an address to position your location.",
-                                            searchTerm
-                                        )}
+                                        {highlightText(t("tutorial.photoUpload.setLocation.description"), searchTerm)}
                                         <br />
-                                        <strong>When enabling location access, your browser will offer three options:</strong>
+                                        <strong>{t("tutorial.photoUpload.setLocation.browserOptions.intro")}</strong>
                                         <br />
-                                        <strong>“Allow while visiting the site”</strong> –{" "}
-                                        {highlightText(
-                                            "lets the site access your location automatically each time you visit.",
-                                            searchTerm
-                                        )}
+                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.title")}"</strong> –{" "}
+                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.description"), searchTerm)}
                                         <br />
-                                        <strong>“Allow this time”</strong> –{" "}
-                                        {highlightText(
-                                            "grants location access just once; you’ll be prompted again next time.",
-                                            searchTerm
-                                        )}
+                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.title")}"</strong> –{" "}
+                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.description"), searchTerm)}
                                         <br />
-                                        <strong>“Never allow”</strong> –{" "}
-                                        {highlightText(
-                                            "blocks location access completely. In this case, you’ll need to manually enter the location and click 'Search'.",
-                                            searchTerm
-                                        )}
+                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.title")}"</strong> –{" "}
+                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.description"), searchTerm)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -322,7 +304,7 @@ const Tutorial = () => {
                                     📷
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>2. Upload photos</strong>
+                                    <strong>{t("tutorial.photoUpload.uploadPhotos.title")}</strong>
                                     <br />
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
@@ -331,19 +313,13 @@ const Tutorial = () => {
                                             style={{ width: '800px', borderRadius: 8 }}
                                         />
                                     </Box>
-                                    {highlightText("Click ", searchTerm)}
-                                    <strong>{highlightText("'Shooting and Upload'", searchTerm)}</strong>
-                                    {highlightText(
-                                        ", navigate to the folder containing the uploaded image, select the image, and click Open. Please note that only PNG and JPG file formats are supported.",
-                                        searchTerm
-                                    )}
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                    <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.shootingUpload.buttonText")}'`, searchTerm)}</strong>
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.shootingUpload.description"), searchTerm)}
                                     <br />
-                                    {highlightText("Click ", searchTerm)}
-                                    <strong>{highlightText("'Album Upload'", searchTerm)}</strong>
-                                    {highlightText(
-                                        ", if you are uploading multiple photos, the system supports up to 5 images at a time.",
-                                        searchTerm
-                                    )}
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                    <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.albumUpload.buttonText")}'`, searchTerm)}</strong>
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.albumUpload.description"), searchTerm)}
                                 </Typography>
                             </Box>
 
@@ -353,7 +329,7 @@ const Tutorial = () => {
                                     ✅
                                 </Typography>
                                 <Typography variant="body1">
-                                    <strong>3. Finalize upload</strong>
+                                    <strong>{t("tutorial.photoUpload.finalizeUpload.title")}</strong>
                                     <br />
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
@@ -362,19 +338,13 @@ const Tutorial = () => {
                                             style={{ width: '600px', borderRadius: 8 }}
                                         />
                                     </Box>
-                                    {highlightText("Click ", searchTerm)}
-                                    <strong>{highlightText("'Submit'", searchTerm)}</strong>
-                                    {highlightText(
-                                        ", once your photos are selected and the process is complete.",
-                                        searchTerm
-                                    )}
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                    <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.submit.buttonText")}'`, searchTerm)}</strong>
+                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.submit.description"), searchTerm)}
                                     <br />
-                                    {highlightText("Click ", searchTerm)}
-                                    <strong>{highlightText("'red X icon'", searchTerm)}</strong>
-                                    {highlightText(
-                                        ", in the top-right corner of the image to remove it if you're not satisfied with the photo.",
-                                        searchTerm
-                                    )}
+                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                    <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.remove.buttonText")}'`, searchTerm)}</strong>
+                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.remove.description"), searchTerm)}
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
                                             src="/assets/Uploadsucess.png"
@@ -383,7 +353,7 @@ const Tutorial = () => {
                                         />
                                     </Box>
                                     <br />
-                                    {highlightText("You will be prompted when the photo is uploaded successfully. ", searchTerm)}
+                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.successMessage"), searchTerm)}
                                 </Typography>
                             </Box>
                         </Box>
@@ -401,15 +371,12 @@ const Tutorial = () => {
                     >
                         {/* 标题 */}
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Upload History", searchTerm)}
+                            {highlightText(t("tutorial.uploadHistory.title"), searchTerm)}
                         </Typography>
 
                         {/* 段落说明 */}
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you'll learn how to search, filter, and navigate your photo upload history.",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.uploadHistory.description"), searchTerm)}
                         </Typography>
 
                         {/* 各步骤列表 */}
@@ -424,17 +391,14 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Search and filter photos</strong> –{" "}
-                                        {highlightText(
-                                            "Use the address search to find uploaded photos, or apply the status filter to view photos based on their current state.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.uploadHistory.steps.searchAndFilter.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.uploadHistory.steps.searchAndFilter.description"), searchTerm)}
                                     </Typography>
 
                                     <Typography variant="body1" sx={{ mt: 1 }}>
-                                        Enter keywords and click <strong>'Search'</strong>; the results will appear below the search box.
+                                        {t("tutorial.uploadHistory.steps.searchAndFilter.searchInstructions.enterKeywords")} <strong>'{t("tutorial.uploadHistory.steps.searchAndFilter.searchInstructions.clickSearch")}'</strong>{t("tutorial.uploadHistory.steps.searchAndFilter.searchInstructions.desc1")}
                                         <br />
-                                        Click <strong>'Clear'</strong> to clear the search content.
+                                        {t("tutorial.uploadHistory.click")} <strong>'{t("tutorial.uploadHistory.steps.searchAndFilter.searchInstructions.clickClear")}'</strong>{t("tutorial.uploadHistory.steps.searchAndFilter.searchInstructions.desc2")}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -451,15 +415,15 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        <strong>Status filter includes four options:</strong>
+                                        <strong>{t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.title")}</strong>
                                         <br />
-                                        <strong>"Pending"</strong>: The photo is waiting for review.
+                                        <strong>"{t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.pending.title")}"</strong>: {t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.pending.description")}
                                         <br />
-                                        <strong>"Reviewing"</strong>: The administrator is currently checking the photo.
+                                        <strong>"{t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.reviewing.title")}"</strong>: {t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.reviewing.description")}
                                         <br />
-                                        <strong>"Approved"</strong>: The photo has passed the review.
+                                        <strong>"{t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.approved.title")}"</strong>: {t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.approved.description")}
                                         <br />
-                                        <strong>"Rejected"</strong>: The photo did not pass the review. This may be due to not meeting photo requirements. Please refer to the <strong>"Photograph"</strong> section and re-upload the image after making corrections.
+                                        <strong>"{t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.rejected.title")}"</strong>: {t("tutorial.uploadHistory.steps.searchAndFilter.statusFilter.rejected.description")}
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -488,13 +452,13 @@ const Tutorial = () => {
                                 {/* 文字内容包一层 */}
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>2. View details</strong> {" "}
+                                        <strong>{t("tutorial.uploadHistory.steps.viewDetails.title")}</strong> {" "}
                                         <br />
-                                        {highlightText("Click ", searchTerm)}
-                                        <strong>{highlightText("'View Details'", searchTerm)}</strong>
-                                        {highlightText(" to access full information about a photo.", searchTerm)}
+                                        {highlightText(t("tutorial.uploadHistory.click"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.uploadHistory.steps.viewDetails.viewDetails"), searchTerm)}</strong>
+                                        {highlightText(t("tutorial.uploadHistory.steps.viewDetails.description"), searchTerm)}
                                         <br />
-                                        Click <strong>'CLOSE'</strong> back to previous step.
+                                        {t("tutorial.uploadHistory.click")} <strong>'{t("tutorial.uploadHistory.steps.viewDetails.closeButton")}'</strong> {t("tutorial.uploadHistory.steps.viewDetails.desc")}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -517,18 +481,12 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Navigate pagination</strong> –{" "}
-                                        {highlightText(
-                                            "This page supports pagination. Photos are sorted from newest to oldest, with the most recently uploaded photos displayed at the top.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.uploadHistory.steps.pagination.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.uploadHistory.steps.pagination.description"), searchTerm)}
                                     </Typography>
 
                                     <Typography variant="body1" sx={{ mt: 1 }}>
-                                        {highlightText(
-                                            "<, > is for previous/next page, |<, >| is for first/last page.",
-                                            searchTerm
-                                        )}
+                                        {highlightText(t("tutorial.uploadHistory.steps.pagination.navigation"), searchTerm)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -555,11 +513,8 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>4. Exit and return</strong> –{" "}
-                                        {highlightText(
-                                            "To leave this section, use the sidebar menu on the left or click 'Return to Main Menu'.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.uploadHistory.steps.exitAndReturn.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.uploadHistory.steps.exitAndReturn.description"), searchTerm)}
                                     </Typography>
 
                                     {/* ✅ 图片放在正文下方 */}
@@ -586,14 +541,11 @@ const Tutorial = () => {
                 return (
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Building Photo Gallery", searchTerm)}
+                            {highlightText(t('tutorial.gallery.title'), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you will learn how to search for building-related photo uploads and view images easily.",
-                                searchTerm
-                            )}
+                            {highlightText(t('tutorial.gallery.description'), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -608,11 +560,8 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Search by address</strong> –{" "}
-                                        {highlightText(
-                                            "Enter an address in the search bar to view the latest upload times and the number of photos related to that location.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t('tutorial.gallery.step1.title')}</strong> –{" "}
+                                        {highlightText(t('tutorial.gallery.step1.content'), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -639,18 +588,15 @@ const Tutorial = () => {
                                     📷
                                 </Typography>
 
-                                <Box sx={{ flex: 1 }}>
+                                <Box sx={{flex: 1}}>
                                     <Typography variant="body1">
-                                        <strong>2. View Photos</strong> –{" "}
-                                        {highlightText(
-                                            "Click on a photo with address from the right panel and click ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("'view all'", searchTerm)}</strong>{" "}
-                                        {highlightText("to use filter options to sort the photo gallery.", searchTerm)}
+                                        <strong>{t('tutorial.gallery.step2.title')}</strong> –{" "}
+                                        {highlightText(t('tutorial.gallery.step2.content1'), searchTerm)}
+                                        <strong>{highlightText(t('tutorial.gallery.step2.viewAll'), searchTerm)}</strong>{" "}
+                                        {highlightText(t('tutorial.gallery.step2.content2'), searchTerm)}
                                     </Typography>
 
-                                    <Box sx={{ mt: 2 }}>
+                                    <Box sx={{mt: 2}}>
                                         <img
                                             src="/assets/Selectone.png"
                                             alt="Select Photo"
@@ -677,7 +623,6 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-
                         </Box>
                     </Box>
                 );
@@ -686,14 +631,11 @@ const Tutorial = () => {
                 return (
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("User Information", searchTerm)}
+                            {highlightText(t("tutorial.userinfo.title"), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you will learn how to manage your own registration information.",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.userinfo.description"), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -707,18 +649,12 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Open the User Information page</strong> –{" "}
-                                        {highlightText(
-                                            "From the side menu, click ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("Profile", searchTerm)}</strong>{" "}
-                                        {highlightText("in the dropdown, then select ", searchTerm)}
-                                        <strong>{highlightText("User Information", searchTerm)}</strong>{" "}
-                                        {highlightText(
-                                            "to enter the user information management interface.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.userinfo.step1.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.userinfo.step1.content1"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step1.profile"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step1.content3"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step1.userinfo"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step1.content2"), searchTerm)}
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -745,19 +681,16 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>2. Edit your personal details</strong> –{" "}
+                                        <strong>{t("tutorial.userinfo.step2.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.userinfo.step2.content1"), searchTerm)}{" "}
                                         {highlightText(
-                                            "On this page, you can update your personal information, such as a valid email address, last name, and first name.",
-                                            searchTerm
-                                        )}{" "}
-                                        {highlightText(
-                                            "Click ",
+                                            t("tutorial.userinfo.step2.click"),
                                             searchTerm
                                         )}
-                                        <strong>{highlightText("Save", searchTerm)}</strong>{" "}
-                                        {highlightText("to save changes, or ", searchTerm)}
-                                        <strong>{highlightText("Cancel", searchTerm)}</strong>{" "}
-                                        {highlightText("to discard them.", searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step2.save"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step2.content3"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step2.cancel"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step2.content2"), searchTerm)}
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -782,15 +715,12 @@ const Tutorial = () => {
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         {/* Title */}
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Photo Review", searchTerm)}
+                            {highlightText(t("tutorial.photoReview.title"), searchTerm)}
                         </Typography>
 
                         {/* Description */}
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this admin section, you can review and approve photos submitted by users.",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.photoReview.description"), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -805,16 +735,13 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Fetch user-uploaded photos</strong> –{" "}
-                                        {highlightText("Click ", searchTerm)}
-                                        <strong>{highlightText("'Fetch Photos'", searchTerm)}</strong>{" "}
-                                        {highlightText(
-                                            "to load the images submitted by users for review. You will see photos marked with status ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("'approved'", searchTerm)}</strong>{" "}
-                                        {highlightText("and", searchTerm)}{" "}
-                                        <strong>{highlightText("'rejected'", searchTerm)}</strong>.
+                                        <strong>{t("tutorial.photoReview.step1.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.photoReview.step1.desc1"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.fetchPhotos"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step1.desc2"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusApproved"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step1.and"), searchTerm)}{" "}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusRejected"), searchTerm)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -843,24 +770,15 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>2. Approve or reject photos</strong> –{" "}
-                                        {highlightText(
-                                            "Use the selection buttons to approve a single photo or multiple photos at once.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.photoReview.step2.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.photoReview.step2.desc1"), searchTerm)}
                                         <br />
-                                        <strong>{highlightText("Accept", searchTerm)}</strong>{" "}
-                                        {highlightText(
-                                            "means the photo meets requirements and has the correct address information. If the photo does not meet upload guidelines or does not match the address details, click ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("'Reject'", searchTerm)}</strong>.
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.accept"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step2.desc2"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.reject"), searchTerm)}</strong>.
                                         <br />
-                                        {highlightText(
-                                            "If you want to withdraw the operation, you can click ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("‘Cancel’", searchTerm)}</strong>.
+                                        {highlightText(t("tutorial.photoReview.step2.desc3"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.cancel"), searchTerm)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -911,17 +829,14 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Final check</strong> –{" "}
-                                        {highlightText(
-                                            "Review how many photos are still pending. The review date should not exceed three working days.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.photoReview.step3.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.photoReview.step3.desc1"), searchTerm)}
                                         <br />
-                                        {highlightText("Click ", searchTerm)}
-                                        <strong>{highlightText("Photo Review", searchTerm)}</strong>{" "}
-                                        {highlightText("or", searchTerm)}{" "}
-                                        <strong>{highlightText("Exit", searchTerm)}</strong>{" "}
-                                        {highlightText("to return to the main menu.", searchTerm)}
+                                        {highlightText(t("tutorial.photoReview.step3.desc2"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step3.photoReview"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step3.or"), searchTerm)}{" "}
+                                        <strong>{highlightText(t("tutorial.photoReview.step3.exit"), searchTerm)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step3.desc3"), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -947,11 +862,11 @@ const Tutorial = () => {
                 return roles.includes("admin") ? (
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("User Management", searchTerm)}
+                            {highlightText(t("tutorial.userManagement.title"), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText("In this admin section, you can manage user accounts and permissions.", searchTerm)}
+                            {highlightText(t("tutorial.userManagement.description"), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -962,11 +877,8 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Access User Management Panel</strong> –{" "}
-                                        {highlightText(
-                                            "From the homepage, click the left menu and select Admin Panel to access the Keycloak interface.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t("tutorial.userManagement.step1.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.userManagement.step1.description"), searchTerm)}
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -985,12 +897,10 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>2. Find Users</strong> –{" "}
-                                        {highlightText(
-                                            "Click ", searchTerm
-                                        )}
-                                        <strong>{highlightText("Refresh", searchTerm)}</strong>{" "}
-                                        {highlightText("first to retrieve the latest user list. You can then search users by name or email.", searchTerm)}
+                                        <strong>{t("tutorial.userManagement.step2.title")}</strong> –{" "}
+                                        {t("tutorial.userManagement.step2.description1")}
+                                        <strong>{t("tutorial.userManagement.step2.refresh")}</strong>{" "}
+                                        {t("tutorial.userManagement.step2.description2")}
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -1009,13 +919,9 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Delete Users</strong> {" "}
-                                        <br />
-                                        {highlightText(
-                                            "To delete a user, click the three dots at the end of the row and select ",
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText("Delete", searchTerm)}</strong>.
+                                        <strong>{t("tutorial.userManagement.step3.title")}</strong> <br />
+                                        {t("tutorial.userManagement.step3.description1")}
+                                        <strong>{t("tutorial.userManagement.step3.delete")}</strong>.
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
@@ -1034,12 +940,12 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>4. Add User as Admin</strong>
+                                        <strong>{t("tutorial.userManagement.step4.title")}</strong>
                                         <br />
-                                        {highlightText("Select the user's email, click ", searchTerm)}
-                                        <strong>{highlightText("Group", searchTerm)}</strong>
-                                        {highlightText(" and choose ", searchTerm)}
-                                        <strong>{highlightText("Join Group", searchTerm)}</strong>.
+                                        {t("tutorial.userManagement.step4.description1")}
+                                        <strong>{t("tutorial.userManagement.step4.group")}</strong>
+                                        {t("tutorial.userManagement.step4.description2")}
+                                        <strong>{t("tutorial.userManagement.step4.joinGroup")}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1058,7 +964,7 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText("Make sure not to remove the user from the User group.", searchTerm)}
+                                        {highlightText(t("tutorial.userManagement.step4.reminder"), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1070,11 +976,11 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText("Next, click ", searchTerm)} <strong>{highlightText(">", searchTerm)}</strong>
-                                        {highlightText(" to open groups, select the ", searchTerm)}
-                                        <strong>{highlightText("admin", searchTerm)}</strong>
-                                        {highlightText(" group and click ", searchTerm)}
-                                        <strong>{highlightText("Join", searchTerm)}</strong>.
+                                        {highlightText(t("tutorial.userManagement.step4.description3"), searchTerm)} <strong>{highlightText(">", searchTerm)}</strong>
+                                        {highlightText(t("tutorial.userManagement.step4.description4"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.adminGroup"), searchTerm)}</strong>
+                                        {highlightText(t("tutorial.userManagement.step4.description5"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.join"), searchTerm)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1093,9 +999,9 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText("After joining, you can remove users from the admin group if needed by clicking ", searchTerm)}
-                                        <strong>{highlightText("Leave", searchTerm)}</strong>
-                                        {highlightText(", then confirm. A success message will appear once the removal is complete.", searchTerm)}
+                                        {highlightText(t("tutorial.userManagement.step4.description6"), searchTerm)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.leave"), searchTerm)}</strong>
+                                        {highlightText(t("tutorial.userManagement.step4.description7"), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
