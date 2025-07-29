@@ -512,11 +512,13 @@ async def get_upload_history(
                 total_pages=0
             )
 
-        # 计算总页数
+        # 计算分页
         total_pages = math.ceil(total_count / limit)
 
         # 计算跳过的文档数
         skip = (page - 1) * limit
+        print(f"DEBUG: Total count: {total_count}, Page: {page}, Limit: {limit}")
+        print(f"DEBUG: Query conditions: {query}")
 
         # 查询数据
         photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
@@ -537,7 +539,7 @@ async def get_upload_history(
             # filename = photo_doc.get("filename")
             # if filename:
             #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
-
+            print(f"DEBUG: Successfully processed {len(photos)} photos")
             photos.append(PhotoResponse(**photo_doc))
 
         return UploadHistoryResponse(

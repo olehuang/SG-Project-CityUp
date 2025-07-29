@@ -5,10 +5,15 @@ import {Button, Box, Typography} from "@mui/material";
 
 import { AuthProvider,useAuthHook} from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
+//import { v4 as uuidv4 } from 'uuid'; //
 
 const HomePage = () => {
     const {auth,setAuth,setAuthLoading}=useAuthHook();
     const [clicked, setClicked] = useState(false);
+    //useEffect(() => {
+      //  const id = uuidv4();
+        //console.log("mobile-based UUID:", id);
+    //}, []);
     const hanldeLogin= async ()=>{
         setClicked(true);
         //click Get Start translat to keycloak webseite

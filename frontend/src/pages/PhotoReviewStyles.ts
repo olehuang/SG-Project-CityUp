@@ -12,7 +12,9 @@ export const photoReviewStyles = {
     } as const,
     contentWrapper: {
         flex: 1,
+        overflowY: 'auto',
         display: "flex",
+        padding: '16px',
         flexDirection: "column",
         width: "100%",
         maxWidth: "none",
@@ -21,15 +23,22 @@ export const photoReviewStyles = {
     },
     topActionContainer: {
         display: "flex",
+        flexWrap: 'wrap',
         justifyContent: "space-between",
         alignItems: "flex-start",
         mb: 2,
         flexDirection: { xs: "column", sm: "row" },  // 手机端垂直布局
-        gap: { xs: 1, sm: 0 },                       // 手机端添加间距
+        gap: { xs: 1, sm: 0 }, // 手机端添加间距
+        flexShrink: 0,
+        '@media (max-width:600px)': {
+            flexDirection: 'row',     // 移动端：横向排列
+            justifyContent: 'center', // 居中显示
+        }
     },
     leftActionGroup: {
         display: "flex",
         alignItems: "center",
+        flexDirection: 'row',
         gap: { xs: 1, sm: 2 },   // 响应式间距
         flexWrap: "wrap",        // 允许换行
     },
@@ -309,5 +318,53 @@ export const photoReviewStyles = {
         objectFit: "contain" as const,
         borderRadius: "8px",
         boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
-    }
+    },
+
+    // 新增移动端卡片容器样式
+    cardContainer: {
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 16, // 卡片之间间距
+        padding: '8px',
+    },
+
+    // 单张卡片样式
+    card: {
+        position: 'relative',
+        borderRadius: 2,
+        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+    },
+
+    // 图片区域
+    cardMedia: {
+        cursor: 'pointer',
+        height: 180,
+        objectFit: 'cover',
+        borderTopLeftRadius: 8,
+        borderTopRightRadius: 8,
+    },
+
+    // 文字内容区
+    cardContent: {
+        padding: '12px 16px',
+        '& > p': {
+            marginBottom: 8,
+            fontSize: '0.9rem',
+            color: '#444',
+        },
+    },
+
+    // 按钮组区域
+    cardActions: {
+        justifyContent: 'flex-end',
+        gap: 8,
+        padding: '8px 16px 16px',
+    },
+
+    // 选择框定位（checkbox）
+    cardCheckbox: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+    },
 };

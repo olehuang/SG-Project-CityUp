@@ -301,7 +301,8 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
             <Dialog
                 open={open}
                 onClose={handleDialogClose}
-                maxWidth="lg"
+                maxWidth={isMobile ? "xs" : "lg"} //
+                fullScreen={isMobile} //
                 fullWidth
             >
                 <DialogTitle
@@ -321,16 +322,16 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
 
                 <Box
                     sx={{
-                        padding: "1% 1% 0 1%",
+                        padding: { xs: 1, sm: 2, md: "1% 1% 0 1%" },
                         backgroundColor: "#FAF6E9",
-                        fontSize: { xs: 16, sm: 18, md: 20 },
+                        fontSize: { xs: 14, sm: 16, md: 18 },
                     }}
                 >
                     <Box sx={{ display: "flex", mb: 1, alignItems: "center", margin: 0 }}>
                         <Typography variant="h5">Photos Preview</Typography>
                         {/*Download button*/}
                         <Box sx={{ display: "flex", flexDirection: { xs: "column", sm: "row" }, //
-                            mb: 1, gap: 2, alignItems: "center",margin: 0}}>
+                             gap: 2, alignItems: "center",margin: 0, width: "100%", flexWrap: "wrap",}}>
                         <Box sx={{ display: "flex", gap: 2, alignItems: "center",marginLeft: "auto"}}>
 
                             {isSelecting && selectedPhotoIds.size > 0 && (
@@ -385,11 +386,12 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                     loading="lazy"
                                     style={{
                                         width: "100%", // new
-                                        maxWidth: "100%",  //new
+                                        maxWidth: isMobile ? "100%" : "100%",   //new
                                         height: "auto", //new
                                         borderRadius: 8,
                                         cursor: 'pointer',
                                         boxShadow:"0px 4px 12px rgba(0,0,0,0.2)",
+                                        objectFit: "contain",
                                     }}
                                     onClick={() => handlePreview(photo)}
                                 />
@@ -427,7 +429,8 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                             <Typography
                                                 variant="caption"
                                                 sx={{
-                                                    fontSize: { xs: 12, sm: 14 },
+                                                    fontSize: { xs: 10, sm: 12, md: 13 },//
+                                                    lineHeight: 1.3, //
                                                     wordBreak: "break-word"
                                                 }}
                                             >

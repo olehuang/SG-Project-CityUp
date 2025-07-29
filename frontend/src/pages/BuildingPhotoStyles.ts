@@ -6,7 +6,8 @@ const BuildingPhotoStyles={
         left: 0,
         margin: '0 auto',
         padding: { xs: '8px', sm: '12px', md: '16px' },
-        height: "100vh", //`calc(100vh - ${70}px)`,
+        height: { xs: 'auto', md: '100vh' },
+        minHeight: '100vh', //`calc(100vh - ${70}px)`,
         //border:"1px solid skyblue",
         borderRadius:"5px",
         overflow:"hidden",
@@ -25,7 +26,7 @@ const BuildingPhotoStyles={
         display:"flex",
         flexDirection: { xs: "column", md: "row" },//  Direction of all result
         gap: { xs: 2, md: 3 },// space between resualt
-        height: "calc(100% - 120px)",
+        height: { xs: 'auto', md: 'calc(100% - 120px)' },
         // border:"1px solid red",
         backgroundColor: "#FAF6E9",
         borderRadius:"5px",
@@ -41,7 +42,7 @@ const BuildingPhotoStyles={
         justifyContent:"left",
         display:"flex",
         flexDirection: "column",//  Direction of all result
-        gap: "8px",// space between resualt
+        gap: { xs: 1, md: 2 },// space between resualt
         width: { xs: "100%", md: "calc(70% - 3px)" },
         minWidth: { xs: "100%", md: "300px" },
         maxHeight:  { xs: '40vh', md: '100%' },
@@ -78,7 +79,7 @@ const BuildingPhotoStyles={
         display:"flex",
         flexDirection: "column",
         flexWrap:"nowrap",
-        gap: "8px",// space between resualt
+        gap: { xs: 1, md: 2 },// space between resualt
         paddingLeft: { xs: 0, md: 1 },
         height: { xs: "auto", md: "100%" },
         backgroundColor: "#FAF6E9",
@@ -86,7 +87,7 @@ const BuildingPhotoStyles={
         borderRadius:"5px",
         overflowY: "auto",
         width: { xs: "100%", md: "calc(30% - 3px)" },
-        flex: "none",
+        flex: 1,
         minWidth: { xs: "100%", md: "200px" },
         maxWidth: { xs: "100%", md: "400px" },
         boxSizing: 'border-box'
@@ -102,7 +103,7 @@ const BuildingPhotoStyles={
         borderRadius:"8px",
         position: "sticky",
         top: 0,
-        gap: 1
+        gap: { xs: 1, md: 2 },
     },
     resizer: {
         width: "6px",

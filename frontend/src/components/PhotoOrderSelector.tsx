@@ -17,22 +17,26 @@ const PhotoOrderSelector:React.FC<Porps> =({setSelectOrder,selectOrder})=>{
         setSelectOrder(event.target.value as string);
     }
     return(
-        <FormControl sx={{  minWidth: 120, width: { xs: "100%", sm: 180 }, }}>
-            <InputLabel id="demo-simple-select-helper-label">Order</InputLabel>
+        <FormControl
+            fullWidth
+            sx={{  minWidth: { xs: '100%', sm: 160 },
+            maxWidth: { xs: '100%', sm: 200 }, }}>
+            <InputLabel id="demo-simple-select-helper-label"sx={{ fontSize: { xs: 12, sm: 14 } }}>Order</InputLabel>
             <Select
                 labelId="demo-simple-select-helper-label"
                 id="demo-simple-select-helper"
                 value={selectOrder}
                 label="Order"
                 onChange={handleChange}
-                sx={{padding:"0 0.5% 0 1%", fontSize: { xs: 12, sm: 14 }, }}
+                sx={{fontSize: { xs: 12, sm: 14 },
+                    padding: { xs: '4px 8px', sm: '6px 12px' }, }}
             >
-                <MenuItem value={"Time Asc"}>Sort by Upload Time Ascending</MenuItem>
-                <MenuItem value={"Time Desc"}>Sort by Upload Time Descending</MenuItem>
-                <MenuItem value={"Name Asc"}>Sort by Name A-Z</MenuItem>
-                <MenuItem value={"Name Desc"}>Sort by Name Z-A</MenuItem>
-                <MenuItem value={"Like Asc"}>Sort by most favorite</MenuItem>
-                <MenuItem value={"Like Desc"}>Sort by least favorite</MenuItem>
+                <MenuItem value="Time Asc" sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by Upload Time Ascending</MenuItem>
+                <MenuItem value="Time Desc"sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by Upload Time Descending</MenuItem>
+                <MenuItem value="Name Asc"sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by Name A-Z</MenuItem>
+                <MenuItem value="Name Desc"sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by Name Z-A</MenuItem>
+                <MenuItem value="Like Asc"sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by most favorite</MenuItem>
+                <MenuItem value="Like Desc"sx={{ fontSize: { xs: 8, sm: 12 } }}>Sort by least favorite</MenuItem>
             </Select>
         </FormControl>
     )
