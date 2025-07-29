@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import {useNavigate,useLocation,Link} from "react-router-dom";
 import LanguageSelector from "../LanguageSelector";
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery, useTheme } from "@mui/material";
 interface TopBarProps {
     onMenuClick: () => void;
 }
@@ -27,6 +28,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     const [giveLanguage,setGiveLanguage]=useState("en");
     const { t } = useTranslation();
 
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
     const getPageTitle = () => {
         switch (location.pathname) {
@@ -94,10 +98,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     alignItems: 'center',
                     mr: "6%",//margin right
                 }}>
-                    <LanguageSelector
+                    {!isMobile && (<LanguageSelector
                         setLanguage={setLanguage}
                         giveLanguage={giveLanguage}
-                    />
+                    />)}
                     <Button
                         onClick={() => {
                             navigate('/dashboard');
