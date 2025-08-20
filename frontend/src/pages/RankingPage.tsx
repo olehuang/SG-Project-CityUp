@@ -180,7 +180,7 @@ const RankingPage =()=>{
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-            overflowY: "auto",
+
             overflowX: "hidden",
             px: [1, 2, 4],
             maxWidth: '100vw', }}>

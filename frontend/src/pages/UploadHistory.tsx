@@ -30,6 +30,8 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
+import { useTheme, useMediaQuery } from "@mui/material";
+
 const PAGE_SIZE = 10;
 const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
 const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
@@ -38,7 +40,7 @@ const statusColorMap: Record<string, "default" | "success" | "error" | "warning"
     approved: "success", // success color green
     rejected: "error", // error color red
 };
-import { useTheme, useMediaQuery } from "@mui/material";
+
 
 interface UploadItem {
     photo_id: string;
