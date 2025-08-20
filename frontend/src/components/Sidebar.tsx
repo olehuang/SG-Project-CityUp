@@ -25,11 +25,12 @@ import LogoutIcon from '@mui/icons-material/Logout';
 interface SidebarProps {
     open: boolean;
     onClose: () => void;
+    variant: 'temporary' | 'permanent'; // new
 }
 
 
 
-const Sidebar = ({ open, onClose }: SidebarProps) => {
+const Sidebar = ({ open, onClose, variant }: SidebarProps) => {
     const {token}=useAuthHook();
     const [roles, setRoles] = useState<string[]>([]);
 
@@ -45,8 +46,8 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
     },[token]);
 
     return (
-        <Drawer open={open} onClick={onClose}>
-            <Box sx={{ width: 250 }} role="presentation" >{/*onClose={onClose}*/}
+        <Drawer open={open} onClick={onClose} variant={variant} ModalProps={{ keepMounted: true }} >
+            <Box sx={{  width: { xs: 220, sm: 250 },  }} role="presentation" onClick={variant === 'temporary' ? onClose : undefined}>{/*onClose={onClose}*/}
                 <Box>
                     <List>
 
@@ -83,6 +84,7 @@ const Sidebar = ({ open, onClose }: SidebarProps) => {
                             </ListItemIcon>
                             <ListItemText primary="Product Introduction" />
                         </ListItemButton>
+
                         {roles.includes('admin') &&
                             <ListItemButton component={Link} to="/dashboard/photoReview">
                                 <ListItemIcon><RateReview  />

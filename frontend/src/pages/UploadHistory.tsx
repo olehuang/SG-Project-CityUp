@@ -38,6 +38,7 @@ const statusColorMap: Record<string, "default" | "success" | "error" | "warning"
     approved: "success", // success color green
     rejected: "error", // error color red
 };
+import { useTheme, useMediaQuery } from "@mui/material";
 
 interface UploadItem {
     photo_id: string;
@@ -74,10 +75,22 @@ const UploadHistory: React.FC = () => {
     const [detailOpen, setDetailOpen] = useState(false);
     const [selectedItem, setSelectedItem] = useState<UploadItem | null>(null);
     // const navigate = useNavigate();
-    // 新增】搜索结果状态和原始数据缓存
+    // 新增 搜索结果状态和原始数据缓存
     const [originalUploads, setOriginalUploads] = useState<UploadItem[]>([]);
     const [searchResults, setSearchResults] = useState<UploadItem[]>([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
+    const theme = useTheme();//
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));//
+
+    const PAGE_SIZE = 10;
+    const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
+    const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
+        pending: "default", //default color
+        reviewing: "warning", // warning color yellow
+        approved: "success", // success color green
+        rejected: "error", // error color red
+    };
+
     const { t } = useTranslation();
     // Debounce search term - 【修改】增加自动搜索触发
     useEffect(() => {
@@ -85,7 +98,14 @@ const UploadHistory: React.FC = () => {
             setDebouncedSearchTerm(searchTerm);
             // 【新增】当搜索词变化时自动执行搜索
             if (searchTerm.trim()) {
-                handleSearch();
+                // 直接在这里执行搜索逻辑，而不是调用handleSearch
+                const searchLower = searchTerm.toLowerCase();
+                const results = originalUploads.filter(item => {
+                    const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
+                    return addressMatch;
+                });
+                setSearchResults(results);
+                setIsSearchActive(true);
             } else {
                 // 【新增】清空搜索时恢复原始数据
                 setIsSearchActive(false);
@@ -94,7 +114,7 @@ const UploadHistory: React.FC = () => {
         }, 500); // 500ms delay
 
         return () => clearTimeout(timer);
-    }, [searchTerm]);
+    }, [searchTerm, originalUploads]);
 
     // Pull the current user's upload history from the backend /photos/history interface
     // Supports paging, filtering status, and server-side search
@@ -155,6 +175,17 @@ const UploadHistory: React.FC = () => {
             setTotal(0);
         } finally {
             setLoading(false);
+            // 如果当前处于搜索状态，重新执行搜索
+            if (isSearchActive && searchTerm.trim()) {
+                setTimeout(() => {
+                    const searchLower = searchTerm.toLowerCase();
+                    const results = originalUploads.filter(item => {
+                        const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
+                        return addressMatch;
+                    });
+                    setSearchResults(results);
+                }, 100);
+            }
         }
     };
 
@@ -175,13 +206,14 @@ const UploadHistory: React.FC = () => {
             // 搜索建筑地址
             const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
             // 搜索状态
-            const statusMatch = item.status.toLowerCase().includes(searchLower);
+            //const statusMatch = item.status.toLowerCase().includes(searchLower);
             // 搜索photo_id
-            const photoIdMatch = item.photo_id.toLowerCase().includes(searchLower);
+            //const photoIdMatch = item.photo_id.toLowerCase().includes(searchLower);
             // 搜索反馈内容
-            const feedbackMatch = item.feedback?.toLowerCase().includes(searchLower);
+            //const feedbackMatch = item.feedback?.toLowerCase().includes(searchLower);
 
-            return addressMatch || statusMatch || photoIdMatch || feedbackMatch;
+            //return addressMatch || statusMatch || photoIdMatch || feedbackMatch;
+            return addressMatch;
         });
 
         setSearchResults(results);
@@ -197,24 +229,27 @@ const UploadHistory: React.FC = () => {
         const regex = new RegExp(`(${searchTerm})`, 'gi');
         const parts = text.split(regex);
 
-        return parts.map((part, index) => {
-            if (regex.test(part)) {
-                return (
-                    <span
-                        key={index}
-                        style={{
-                            backgroundColor: '#ffeb3b',
-                            padding: '0 2px',
-                            borderRadius: '2px',
-                            fontWeight: 'bold'
-                        }}
-                    >
+        return (
+            <>
+                {parts.map((part, index) =>
+                    regex.test(part) ? (
+                        <span
+                            key={index}
+                            style={{
+                                backgroundColor: '#ffeb3b',
+                                padding: '0 2px',
+                                borderRadius: '2px',
+                                fontWeight: 'bold'
+                            }}
+                        >
                         {part}
                     </span>
-                );
-            }
-            return part;
-        });
+                    ) : (
+                        <span key={index}>{part}</span>
+                    )
+                )}
+            </>
+        );
     };
 
     //When the user clicks the View button, a Dialog pops up showing the upload details.
@@ -328,7 +363,8 @@ const UploadHistory: React.FC = () => {
 
             {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
             <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0 }}>
-                <TextField
+                {!isMobile && (
+                    <TextField
                     label="Search by building address"
                     variant="outlined"
                     size="small"
@@ -380,7 +416,8 @@ const UploadHistory: React.FC = () => {
                             borderRadius: '8px',
                         }
                     }}
-                />
+                    />
+                )}
 
                 {/* Status filter drop-down menu */}
                 <FormControl size="small" sx={{ minWidth: 160 }}>
@@ -419,103 +456,154 @@ const UploadHistory: React.FC = () => {
                 </Box>
             ) : (
                 <>
-                    {/* 表格数据 - 【修改】使用当前显示数据 */}
-                    <TableContainer
-                        component={Paper}
-                        sx={{
-                            flex: 1,
-                            overflow: 'auto',
-                            maxHeight: 'calc(100vh - 300px)' // 为搜索框、标题和分页留出空间
-                        }}
-                    >
-                        <Table stickyHeader>
-                            <TableHead>
-                                <TableRow>
-                                    <TableCell>Image</TableCell>
-                                    <TableCell>Building Address</TableCell>
-                                    <TableCell>Status</TableCell>
-                                    <TableCell>Uploaded At</TableCell>
-                                    <TableCell>Action</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {currentDisplayData.map((item) => (
-                                    <TableRow key={item.photo_id}>
-                                        <TableCell>
-                                            {item.image_url ? (
-                                                <img
-                                                    src={item.image_url}
-                                                    alt="upload"
-                                                    style={{
-                                                        width: 150,
-                                                        height: 100,
-                                                        objectFit: "cover",
-                                                        borderRadius: 4,
-                                                        border: "1px solid #ddd"
-                                                    }}
-                                                    onError={(e) => {
-                                                        e.currentTarget.src = "/api/placeholder/100/60";
-                                                    }}
-                                                />
-                                            ) : (
-                                                <Box
-                                                    sx={{
-                                                        width: 150,
-                                                        height: 100,
-                                                        backgroundColor: "#f5f5f5",
-                                                        display: "flex",
-                                                        alignItems: "center",
-                                                        justifyContent: "center",
-                                                        borderRadius: 1,
-                                                        border: "1px solid #ddd"
-                                                    }}
-                                                >
-                                                    No Image
-                                                </Box>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {/* 【新增】高亮显示搜索结果 */}
-                                            {item.building_addr ?
-                                                highlightText(item.building_addr, searchTerm) : "N/A"
-                                            }
-                                        </TableCell>
-                                        <TableCell>
+                    {isMobile ? (
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            {currentDisplayData.map(item => (
+                                <Paper key={item.photo_id} elevation={2} sx={{ p: 2, borderRadius: 2 }}>
+                                    <Box onClick={() => handleDetailOpen(item)} sx={{ cursor: 'pointer' }}>
+                                        {/* 图片展示 */}
+                                        {item.image_url ? (
+                                            <img
+                                                src={item.image_url}
+                                                alt="upload"
+                                                style={{
+                                                    width: "100%",
+                                                    height: 180,
+                                                    objectFit: "cover",
+                                                    borderRadius: 8,
+                                                    border: "1px solid #ddd"
+                                                }}
+                                                onError={(e) => {
+                                                    e.currentTarget.src = "/api/placeholder/150/100";
+                                                }}
+                                            />
+                                        ) : (
+                                            <Box
+                                                sx={{
+                                                    width: "100%",
+                                                    height: 180,
+                                                    backgroundColor: "#f5f5f5",
+                                                    display: "flex",
+                                                    justifyContent: "center",
+                                                    alignItems: "center",
+                                                    borderRadius: 2
+                                                }}
+                                            >
+                                                No Image
+                                            </Box>
+                                        )}
+
+                                        {/* 信息区域 */}
+                                        <Box mt={2}>
+                                            <Typography variant="body2" fontWeight="bold">
+                                                {item.building_addr
+                                                    ? highlightText(item.building_addr, searchTerm)
+                                                    : "N/A"}
+                                            </Typography>
                                             <Chip
-                                                label={highlightText(getStatusDisplayName(item.status), searchTerm)}
+                                                label={getStatusDisplayName(item.status)}
                                                 color={statusColorMap[item.status] || "default"}
                                                 size="small"
+                                                sx={{ mt: 1,pointerEvents: 'none' }}
                                             />
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatDate(item.upload_time)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Button
-                                                size="small"
-                                                variant="outlined"
-                                                onClick={() => handleDetailOpen(item)}
-                                            >
-                                                View Details
-                                            </Button>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                                {currentDisplayData.length === 0 && !loading && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} align="center">
-                                            <Typography variant="body2" color="textSecondary">
-                                                {isSearchActive ?
-                                                    `No records found matching "<strong>{searchTerm}</strong>".` :
-                                                    "No records found."
-                                                }
+                                            <Typography variant="caption" color="textSecondary" sx={{ display: 'block', mt: 0.5 }}>
+                                                {formatDate(item.upload_time)}
                                             </Typography>
-                                        </TableCell>
+                                        </Box>
+                                    </Box>
+                                </Paper>
+                            ))}
+                        </Box>
+                    ) : (
+                        /* 原始 PC 表格保留 */
+                        <TableContainer
+                            component={Paper}
+                            sx={{
+                                flex: 1,
+                                overflow: "auto",
+                                maxHeight: "calc(100vh - 300px)"
+                            }}
+                        >
+                            <Table stickyHeader>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Image</TableCell>
+                                        <TableCell>Building Address</TableCell>
+                                        <TableCell>Status</TableCell>
+                                        <TableCell>Uploaded At</TableCell>
+                                        <TableCell>Action</TableCell>
                                     </TableRow>
-                                )}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                </TableHead>
+                                <TableBody>
+                                    {currentDisplayData.map((item) => (
+                                        <TableRow key={item.photo_id}>
+                                            <TableCell>
+                                                {item.image_url ? (
+                                                    <img
+                                                        src={item.image_url}
+                                                        alt="upload"
+                                                        style={{
+                                                            width: 150,
+                                                            height: 100,
+                                                            objectFit: "cover",
+                                                            borderRadius: 4,
+                                                            border: "1px solid #ddd"
+                                                        }}
+                                                        onError={(e) => {
+                                                            e.currentTarget.src = "/api/placeholder/100/60";
+                                                        }}
+                                                    />
+                                                ) : (
+                                                    <Box
+                                                        sx={{
+                                                            width: 150,
+                                                            height: 100,
+                                                            backgroundColor: "#f5f5f5",
+                                                            display: "flex",
+                                                            alignItems: "center",
+                                                            justifyContent: "center",
+                                                            borderRadius: 1,
+                                                            border: "1px solid #ddd"
+                                                        }}
+                                                    >
+                                                        No Image
+                                                    </Box>
+                                                )}
+                                            </TableCell>
+                                            <TableCell>
+                                                {item.building_addr ? highlightText(item.building_addr, searchTerm) : "N/A"}
+                                            </TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={getStatusDisplayName(item.status)}
+                                                    color={statusColorMap[item.status] || "default"}
+                                                    size="small"
+                                                    sx={{ pointerEvents: 'none' }}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{formatDate(item.upload_time)}</TableCell>
+                                            <TableCell>
+                                                <Button size="small" variant="outlined" onClick={() => handleDetailOpen(item)}>
+                                                    View Details
+                                                </Button>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                    {currentDisplayData.length === 0 && !loading && (
+                                        <TableRow>
+                                            <TableCell colSpan={5} align="center">
+                                                <Typography variant="body2" color="textSecondary">
+                                                    {isSearchActive
+                                                        ? `No records found matching "${searchTerm}".`
+                                                        : "No records found."}
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
 
                     {/* 【修改】分页 - 根据搜索状态调整分页逻辑 */}
                     {!isSearchActive && currentTotal > PAGE_SIZE && (
@@ -562,18 +650,17 @@ const UploadHistory: React.FC = () => {
                     {selectedItem && (
                         <Box>
                             <Box mb={2}>
-                                <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Photo ID:</strong> {highlightText(selectedItem.photo_id, searchTerm)}
+                                <Typography variant={isMobile ? "body2" : "subtitle2"} gutterBottom sx={{ wordBreak: 'break-word' }}>
+                                    <strong>Photo ID:</strong> ...
                                 </Typography>
-                                <Typography variant="subtitle2" gutterBottom>
-                                    <strong>Building Address:</strong> {selectedItem.building_addr ?
-                                    highlightText(selectedItem.building_addr, searchTerm) : "N/A"
-                                }
+
+                                <Typography>
+                                    <strong>Building Address:</strong> {selectedItem.building_addr || "N/A"}
                                 </Typography>
                                 <Typography variant="subtitle2" gutterBottom>
                                     <strong>Status:</strong> {" "}
                                     <Chip
-                                        label={highlightText(getStatusDisplayName(selectedItem.status), searchTerm)}
+                                        label={getStatusDisplayName(selectedItem.status)}
                                         color={statusColorMap[selectedItem.status] || "default"}
                                         size="small"
                                     />
@@ -588,7 +675,7 @@ const UploadHistory: React.FC = () => {
                                 )}
                                 {selectedItem.feedback && (
                                     <Typography variant="subtitle2" gutterBottom>
-                                        <strong>Feedback:</strong> {highlightText(selectedItem.feedback, searchTerm)}
+                                        <strong>Feedback:</strong> {selectedItem.feedback}
                                     </Typography>
                                 )}
                                 {selectedItem.review_time && (

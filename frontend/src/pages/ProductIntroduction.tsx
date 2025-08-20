@@ -16,8 +16,17 @@ const ProductIntroduction=()=>{
             <Box sx={pageBackgroundStyles.wrapper}>
                 <Typography variant="h3" component="h2" sx={{
                     ...pageBackgroundStyles.title,
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
-                    mb: 3,
+                    // 在移动端使用更小的字体，但保持你的响应式设计
+                    fontSize: {
+                        xs: '3rem',  // MODIFIED for mobile
+                        sm: '4rem',
+                        md: '5rem',
+                    },
+                    marginBottom: '1.5rem',
+                    textAlign: 'center',
+                    lineHeight: 1.1,
+                    maxWidth: '100vw',
+                    overflowX: 'hidden',  // 防止横向滚动
                 }}>
                     {t('productIntro.title')}
                 </Typography>
@@ -97,5 +106,4 @@ const ProductIntroduction=()=>{
         </Box>
     )
 }
-
 export default ProductIntroduction;

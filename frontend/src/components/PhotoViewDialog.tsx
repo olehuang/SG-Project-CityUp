@@ -298,8 +298,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
-
-
     return(
         <>
             <Dialog open={open}

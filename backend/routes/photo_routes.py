@@ -23,6 +23,7 @@ import io
 from io import BytesIO
 import zipfile
 # from utils.logger import log_error
+from utils.photo_auto_review import get_exif_gps, check_photo_location, is_image_blurry
 
 router = APIRouter()
 photo_collection = MongoDB.get_instance().get_collection("photos")
@@ -91,6 +92,31 @@ async def upload_photo(
                 shutil.copyfileobj(photo.file, buffer)
             # 生成访问URL
             image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
+
+            # ======== Auto review START =========
+
+            # 1. get pic's EXIF GPS
+            exif_gps = get_exif_gps(image_binary_data)
+            result_auto_check = ReviewStatus.Pending #审查的状态
+
+            if exif_gps is None:
+                # pic without EXIF，check blurry 无exif的图片检查清晰度
+                blurry_ok, lap_var = is_image_blurry(image_binary_data)
+                if not blurry_ok:
+                    result_auto_check = ReviewStatus.Rejected
+            else:
+                # pic with EXIF，check location 有exif的图片检查地址后检查清晰度，全部合格才设status为pending
+                building_gps = (lat, lng)
+                location_ok, dist = check_photo_location(exif_gps, building_gps, threshold=100)
+                if not location_ok:
+                    result_auto_check = ReviewStatus.Rejected
+                else:
+                    # Test clarity after position passes 位置合格后，再检测清晰度
+                    blurry_ok, lap_var = is_image_blurry(image_binary_data)
+                    if not blurry_ok:
+                        result_auto_check = ReviewStatus.Rejected
+            # ======== Auto review START =========
+
             photo_obj = Photo(
                 user_id=user_id,
                 building_addr=building_addr,# building address
@@ -100,7 +126,7 @@ async def upload_photo(
                 image_data=image_binary_data,
                 content_type=photo.content_type,
                 upload_time=datetime.now(timezone.utc),
-                status=ReviewStatus.Pending
+                status=result_auto_check # 通过auto检查设置 status:pending; 未通过设置status：rejected
             )
             #save building addr into DBMS
             geo_coords ={"lat":lat,"lng":lng}
@@ -520,11 +546,13 @@ async def get_upload_history(
                 total_pages=0
             )
 
-        # 计算总页数
+        # 计算分页
         total_pages = math.ceil(total_count / limit)
 
         # 计算跳过的文档数
         skip = (page - 1) * limit
+        print(f"DEBUG: Total count: {total_count}, Page: {page}, Limit: {limit}")
+        print(f"DEBUG: Query conditions: {query}")
 
         # 查询数据
         photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
@@ -545,7 +573,16 @@ async def get_upload_history(
             # filename = photo_doc.get("filename")
             # if filename:
             #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+            print(f"DEBUG: Successfully processed {len(photos)} photos")
 
+            # For the system to automatically rejected photos show admin as reviewer
+            # ======为系统自动rejected的照片设置reviewer为admin ======
+            if (
+                    photo_doc.get("status") == ReviewStatus.Rejected.value
+                    and not photo_doc.get("reviewer_id")
+            ):
+                photo_doc["reviewer_id"] = "admin"
+            # ====================================================
             photos.append(PhotoResponse(**photo_doc))
 
         return UploadHistoryResponse(
