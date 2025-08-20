@@ -180,10 +180,11 @@ const RankingPage =()=>{
             flexDirection: "column",
             justifyContent: "center",
             alignItems: "center",
-
+            overflowY: "auto",
             overflowX: "hidden",
             px: [1, 2, 4],
-            maxWidth: '100vw', }}>
+            //maxWidth: '100vw',
+        }}>
             <Box sx={{
                 ...styles.personInfo,
                 flexDirection: { xs: "column", sm: "row" },  // 保持响应式
@@ -228,9 +229,8 @@ const RankingPage =()=>{
             <TableContainer component={Paper}
                             sx={{
                                 ...styles.tableContainer,
-                                maxHeight: { xs: 300 },
                                 width: "100%",
-                                overflowX: "auto",
+                                //overflowX: "auto",
                             }}>
 
                 {isMobile ? (
@@ -238,17 +238,17 @@ const RankingPage =()=>{
                         sx={{
                             width: '100%',
                             maxWidth: '100vw',            // 避免内容超出视口
-                            px: 2,                         // 保留内边距但不要 pl+px 同时用
+                            //px: 2,                         // 保留内边距但不要 pl+px 同时用
                             mx: 'auto',                    // 强制居中
-                            boxSizing: 'border-box',
+                            //boxSizing: 'border-box',
                             overflowX: 'hidden'           // 禁止横向滚动
                         }}
                     >
 
                         {/* 移除原来的top 3卡片区域，改为统一表格 */}
-                        <Table sx={{
+                        <Table stickyHeader sx={{
                             width: '100%',
-                            tableLayout: 'fixed',
+                            tableLayout: 'auto'//'fixed',
                         }}>
                             <TableHead>
                                 <TableRow>
@@ -293,7 +293,9 @@ const RankingPage =()=>{
                                                     })()}
                                                 </Box>
                                             </TableCell>
-                                            <TableCell sx={{ maxWidth: 120 }}>
+                                            <TableCell sx={{
+                                                 maxWidth: 120
+                                            }}>
                                                 <Typography
                                                     variant="body2"
                                                     noWrap
