@@ -4,7 +4,7 @@ export const photoReviewStyles = {
     mainContainer: {
         ...pageBackgroundStyles.container,
         padding: { xs: "1px 4px", sm: "1px 8px" },  // 减小容器padding
-        height: "100vh",
+        height: "100%",
         boxSizing: "border-box",
         display: "flex",
         flexDirection: "column",
@@ -13,10 +13,11 @@ export const photoReviewStyles = {
     contentWrapper: {
         flex: 1,
         overflowY: 'auto',
+        overflowX: "hidden",
         display: "flex",
         padding: '16px',
         flexDirection: "column",
-        width: "100%",
+        width: "98%",
         maxWidth: "none",
         margin: "0 auto",
         px: { xs: 0.5, sm: 1 },  // 减小内边距，给表格更多空间
