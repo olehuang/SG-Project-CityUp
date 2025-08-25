@@ -122,7 +122,7 @@ const styles = {
         ...pageBackgroundStyles.container,
         //background: "linear-gradient(to bottom right, #FFF8E1, #FBE9E7)",
         margin:"auto",// Control the border outside the button area so that the button appears in the center of the page
-        paddingTop:"2%",// Control the border outside the button area so that the button appears in the center of the page
+        paddingTop: {xs:"7%",md:"2%"},// Control the border outside the button area so that the button appears in the center of the page
         //py: { xs: 2, sm: 3, md: 4 }, // 响应式垂直间距
     },
     contentContainer: {
@@ -146,8 +146,9 @@ const styles = {
             md: "1 1 calc(33.333% - 16px)", // 桌面端3列
             lg: "1 1 calc(33.333% - 32px)"
         },
+
         //minWidth: { xs: "140px", sm: "200px", md: "280px" }, // 响应式最小宽度
-        //maxWidth: { xs: "180px", sm: "280px", md: "320px" }, // 响应式最大宽度
+        //maxHeight: { xs: "180px", sm: "280px", md: "320px" }, // 响应式最大宽度
     },
     buttonBase: {
         borderRadius: { xs: 12, sm: 14, md: 16 }, // 响应式圆角
@@ -161,7 +162,7 @@ const styles = {
         flexDirection: "column" as const,
         justifyContent: "center",
         alignItems: "center",
-        padding: { xs: 1, sm: 1.5, md: 2 }, // 响应式内边距
+        padding: { xs: "5%", sm: "8%", md: "10%" }, // 响应式内边距
         backgroundColor: "#D7CCC8",
         boxShadow: "0 4px 8px rgba(0,0,0,0.1)",
         transition: "all 0.2s ease-in-out",
