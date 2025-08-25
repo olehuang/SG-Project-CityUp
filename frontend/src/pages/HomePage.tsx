@@ -34,7 +34,7 @@ const HomePage = () => {
             overflow: "hidden",
         },
         topContent: {
-            paddingTop: { xs: "20vh", sm: "22vh", md: "25vh" }, // 响应式顶部间距
+            paddingTop: { xs: "30vh", sm: "22vh", md: "25vh" }, // 响应式顶部间距
             zIndex: 2,
             px: { xs: 2, sm: 3, md: 4 }, // 响应式水平内边距，防止内容贴边
         },
@@ -50,7 +50,6 @@ const HomePage = () => {
             zIndex: 1,
             filter: "brightness(0.8) saturate(1) opacity(0.3)",
         },
-
 
         title: {
             fontWeight: "bold",

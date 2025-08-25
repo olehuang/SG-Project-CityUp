@@ -182,7 +182,7 @@ const RankingPage =()=>{
             alignItems: "center",
             overflowY: "auto",
             overflowX: "hidden",
-            px: [1, 2, 4],
+            //px: [1, 2, 4],
             //maxWidth: '100vw',
         }}>
             <Box sx={{

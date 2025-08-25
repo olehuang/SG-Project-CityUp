@@ -120,13 +120,14 @@ const DashboardPage: React.FC = () => {
 const styles = {
     mainContainer: {
         ...pageBackgroundStyles.container,
-        background: "linear-gradient(to bottom right, #FFF8E1, #FBE9E7)",
-        minHeight: "100vh",
-        py: { xs: 2, sm: 3, md: 4 }, // 响应式垂直间距
+        //background: "linear-gradient(to bottom right, #FFF8E1, #FBE9E7)",
+        margin:"auto",// Control the border outside the button area so that the button appears in the center of the page
+        paddingTop:"2%",// Control the border outside the button area so that the button appears in the center of the page
+        //py: { xs: 2, sm: 3, md: 4 }, // 响应式垂直间距
     },
     contentContainer: {
         maxWidth: { xs: "100%", sm: 600, md: 900, lg: 1100 }, // 响应式最大宽度
-        margin: "0 auto",
+        margin: "auto auto",
         px: { xs: 1, sm: 2 }, // 响应式水平间距
     },
     buttonGrid: {

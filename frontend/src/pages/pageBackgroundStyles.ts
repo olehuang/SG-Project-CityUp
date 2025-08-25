@@ -1,15 +1,15 @@
 
 const pageBackgroundStyles = {
         container: {
-            minHeight: "100vh",
+            height: "100%",
             margin: 0,
-            padding: "0 1rem", //添加左右内边距，避免内容贴边
+            //padding: "1% 1%", //添加左右内边距，避免内容贴边
             boxSizing: "border-box",
             backgroundColor: "#FFF8E1",
             display: "flex",
             justifyContent: "center",
             alignItems: "center",
-            overflowY: "auto",
+            overflowY: "hidden",
             flexDirection: "column",
             maxWidth: "100vw",         // 避免内部撑宽超过视口
             overflowX: "hidden",       // 禁止横向滚动条出现
