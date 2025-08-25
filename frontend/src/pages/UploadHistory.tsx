@@ -31,6 +31,7 @@ import { useAuthHook } from "../components/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useTheme, useMediaQuery } from "@mui/material";
+import pageBackgroundStyles from "./pageBackgroundStyles";
 
 const PAGE_SIZE = 10;
 const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
@@ -348,13 +349,16 @@ const UploadHistory: React.FC = () => {
     const currentTotal = getCurrentTotal();
 
     return (
+
         <Box
             sx={{
+                ...pageBackgroundStyles.container,
                 p: 4,
-                height: '100vh',
+                height: '100%',
                 overflow: 'auto',
                 display: 'flex',
-                flexDirection: 'column'
+                flexDirection: 'column',
+                justifyContent:"content",
             }}
         >
             {error && (
@@ -364,7 +368,7 @@ const UploadHistory: React.FC = () => {
             )}
 
             {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
-            <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0 }}>
+            <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0,width:"100%", }}>
                 {!isMobile && (
                     <TextField
                     label="Search by building address"
