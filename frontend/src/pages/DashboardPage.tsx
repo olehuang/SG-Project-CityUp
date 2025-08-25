@@ -128,6 +128,7 @@ const styles = {
     contentContainer: {
         maxWidth: { xs: "100%", sm: 600, md: 900, lg: 1100 }, // 响应式最大宽度
         margin: "auto auto",
+        //py: { xs: 2, sm: 3, md: 4 }, // 响应式垂直间距
         px: { xs: 1, sm: 2 }, // 响应式水平间距
     },
     buttonGrid: {
@@ -145,16 +146,16 @@ const styles = {
             md: "1 1 calc(33.333% - 16px)", // 桌面端3列
             lg: "1 1 calc(33.333% - 32px)"
         },
-        minWidth: { xs: "140px", sm: "200px", md: "280px" }, // 响应式最小宽度
-        maxWidth: { xs: "180px", sm: "280px", md: "320px" }, // 响应式最大宽度
+        //minWidth: { xs: "140px", sm: "200px", md: "280px" }, // 响应式最小宽度
+        //maxWidth: { xs: "180px", sm: "280px", md: "320px" }, // 响应式最大宽度
     },
     buttonBase: {
         borderRadius: { xs: 12, sm: 14, md: 16 }, // 响应式圆角
         width: "100%",
-        height: { xs: 160, sm: 180, md: 180 }, // 响应式高度
+        height:  "100%" , // button height
         textTransform: "none",
         fontWeight: "bold",
-        fontSize: { xs: 14, sm: 15, md: 16 }, // 响应式字体大小
+        fontSize: { xs: 12, sm: 14, md: 16 }, // 响应式字体大小
         color: "#3E2723",
         display: "flex",
         flexDirection: "column" as const,
@@ -194,6 +195,7 @@ const styles = {
         fontWeight: "normal",
         textAlign: "center" as const,
         fontSize: { xs: 12, sm: 13, md: 14 }, // 响应式描述字体
+        display: { xs: "none", sm: "block" },// hidden Desc if mobil
         lineHeight: 1.3,
         px: 0.5, // 防止文字过长换行
     },
@@ -232,7 +234,7 @@ const styles = {
     },
     rankingButtonIcon: {
         fontSize: { xs: 28, sm: 32, md: 40 }, // 响应式图标大小
-        mr: { xs: 1, sm: 1.5, md: 2 }, // 响应式右边距
+       // mr: { xs: 1, sm: 1.5, md: 2 }, // 响应式右边距
     },
     rankingButtonTitle: {
         fontSize: { xs: 18, sm: 20, md: 22 }, // 响应式标题字体
@@ -244,6 +246,7 @@ const styles = {
         color: "#6D4C41",
         lineHeight: 1.3,
         display: { xs: "none", sm: "block" }, // 手机端隐藏描述文字，节省空间
+
     },
 };
 

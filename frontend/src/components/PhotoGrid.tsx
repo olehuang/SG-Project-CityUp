@@ -300,9 +300,9 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         display: "flex",
         flexWrap: "wrap",   // automatic change row
         gap: 2,             // space between photo
-        Width:"100%",
-        justifyContent: 'center',
-        margin:"0 auto",
+        minWidth:"95%",
+        minHeight:"100%",
+        margin:"0 0 0 2%",
 
     },
     dialogContainer:{
@@ -366,8 +366,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          }
      },
     photoBox:{
-        flex: '0 0 calc(33.333% - 16px)',
-        maxWidth: 'calc(33.333% - 16px)',
+        flex: '0 0 30%',
+        //maxWidth: 'calc(33.333% - 16px)',
         aspectRatio: '3 / 4',
         backgroundColor: '#fff',
         borderRadius: 1,
