@@ -15,6 +15,4 @@ macOS/Linux: .../SGproject-CityUp/frontend/public/tiles/
 Your final structure should look like:
 frontend/public/tiles/
   18/<x>/<y>.png
-  19/<x>/<y>.png
-  20/<x>/<y>.png
-  21/<x>/<y>.png
+
