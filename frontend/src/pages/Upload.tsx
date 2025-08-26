@@ -335,7 +335,7 @@ const Upload: React.FC = () => {
                 justifyContent: "stretch",
                 boxSizing: "border-box",
                 position: "relative",
-                padding: isSmallScreen ? "20px" : "0",
+                padding: isSmallScreen ? "1% 20px 1% 20px" : "0",//monitor adapter
                 paddingBottom: isMobile ? "20px" : "0"
             }}
         >
@@ -345,7 +345,7 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 2,
                     width: isSmallScreen ? "100%" : "68%",
-                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 44px 6vw"),
+                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 1% 6vw"),//monitor adapter
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -357,7 +357,7 @@ const Upload: React.FC = () => {
                     style={{
                         fontSize: isMobile ? "1.3rem" : "2rem",
                         fontWeight: 700,
-                        margin: "0 0 22px 0",
+                        margin: "0 0 1% 0",//monitor adapter
                         whiteSpace: "nowrap", // 不换行
                         textOverflow: "ellipsis"
                     }}
@@ -445,7 +445,7 @@ const Upload: React.FC = () => {
                 </div>
                 {/* 缺失门牌号提示 Missing door number alert*/}
                 {houseNumberMissing && (
-                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8 }}>
+                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8}}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
@@ -454,7 +454,7 @@ const Upload: React.FC = () => {
                     ref={mapDivRef}
                     style={{
                         width: "100%",
-                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "60vh"),
+                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "53vh"),//monitor adapter
                         maxHeight: 500,
                         minHeight: isMobile ? 150 : (isSmallScreen ? 300 : 350),
                         borderRadius: 16,
@@ -521,7 +521,7 @@ const Upload: React.FC = () => {
                     width: isSmallScreen ? "100%" : "32%",
                     overflowY:isMobile? "visible":"auto",
                     padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `119px 6vw 44px 38px`), // ← 用isMobile微调padding
+                        : (isSmallScreen ? "20px" : `88px 6vw 44px 38px`), // ← 用isMobile微调padding //monitor adapter
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -539,7 +539,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "10px 12px",
+                            padding: "7.5px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -568,7 +568,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "10px 12px",
+                            padding: "7.5px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -719,7 +719,7 @@ const Upload: React.FC = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         gap: "10px",
-                        marginTop:isMobile?"12px":"16px",
+                        marginTop:isMobile?"12px":"10px",
                     }}
                 >
                     {isSubmitting ? (
