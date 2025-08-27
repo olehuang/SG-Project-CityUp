@@ -3,7 +3,7 @@ import {Autocomplete, Button, TextField,Box} from "@mui/material";
 import InputAdornment from "@mui/material/InputAdornment";
 import SearchIcon from "@mui/icons-material/Search";
 import {useTranslation} from "react-i18next";
-
+import { createFilterOptions } from "@mui/material/Autocomplete";
 
 interface Props {
     onSearch: (query: string) => void;//return search result
@@ -81,13 +81,18 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
         setHistory([]);
     };
 
-    const mergedOptions = Array.from(new Set([...history]));
+    const filterOptions = createFilterOptions({
+        matchFrom:"any",
+        stringify:(option:string)=>option,
+    })
+    const mergedOptions = Array.from(new Set([...history,...allAddresses]));
     return (
         <>
         <Autocomplete
             style={{margin:"1% 1% 0 1%"}}
             freeSolo
             options={mergedOptions}
+            filterOptions={filterOptions}
             value={selectedAddress}
             inputValue={inputValue}
             onInputChange={(event, newInputValue) => {
