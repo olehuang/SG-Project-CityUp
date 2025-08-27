@@ -5,8 +5,12 @@ import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
 import { useTranslation } from 'react-i18next';
 // 默认达姆施塔特市中心 Default Darmstadt city centre
-const DEFAULT_CENTER: [number, number] = [49.8728, 8.6512];
-const VIEWBOX = [8.570, 49.810, 8.720, 49.930];
+
+// 默认Audimax Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
+const DEFAULT_CENTER: [number, number] = [49.874727, 8.656193];
+const MAX_BOUNDS: [[number, number], [number, number]] = [
+    [49.8723750961, 8.6504056457], [49.8860459490, 8.6629604999],];
+const VIEWBOX = [8.6504056457, 49.8723750961, 8.6629604999, 49.8860459490];
 
 interface UploadPhoto {
     id: string;
@@ -115,13 +119,12 @@ const Upload: React.FC = () => {
                 .filter(Boolean)
                 .join(", ")
                 .toLowerCase();
-            //地址不在达姆时处理addr not in Darmstad
+            //地址不在地图内时处理addr not in  our Model's Map
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
                 setHouseNumber("");
                 setHouseNumberMissing(false);
-                setError("Current location is not in Darmstadt");
                 setError(t('uploadMessages.locationNotInDarmstadt'));
                 return;
             }
@@ -136,14 +139,13 @@ const Upload: React.FC = () => {
             } else {
                 setHouseNumberMissing(false);
             }
-            const parts = [hn,addr.road,"Darmstadt",addr.postcode,"Hessen","Deutschland"]
+            const streetLine = [addr.road, hn].filter(Boolean).join(" ");
+            const parts = [streetLine,"Darmstadt",addr.postcode,"Hessen","Deutschland"]
                 .filter(Boolean);
             setAddress(parts.join(", "));
-
         } catch {
             setError(t('uploadMessages.addressResolutionFailure'));
         }
-
     };
     // 地图点击事件 + 光标marker拖拽 Process user map clicks, update markers and addresses.
     function LocationPicker() {
@@ -161,6 +163,12 @@ const Upload: React.FC = () => {
         const map = useMap();
         useEffect(() => {
             mapRef.current = map;
+            //地图挂载后 & 下一轮渲染时刷新尺寸
+            setTimeout(() => map.invalidateSize(), 0);
+            // 窗口变化时也刷新
+            const onResize = () => map.invalidateSize();
+            window.addEventListener("resize", onResize);
+            return () => window.removeEventListener("resize", onResize);
         }, [map]);
         return null;
     }
@@ -383,10 +391,17 @@ const Upload: React.FC = () => {
                                 type="text"
                                 value={houseNumber}
                                 onChange={(e) => {
-                                    setHouseNumber(e.target.value);
+                                    const value = e.target.value.trim();
+                                    setHouseNumber(value);
                                     const parts = address.split(", ");
-                                    parts[0] = e.target.value || "";
+                                    const streetOnly = parts[0]?.replace(/\s+\d+[a-zA-Z]?$/, "") ?? parts[0];
+                                    // 重新拼 “街道 + 新门牌号”
+                                    parts[0] = value ? `${streetOnly} ${value}` : streetOnly;
                                     setAddress(parts.filter(Boolean).join(", "));
+                                    //setHouseNumber(e.target.value);
+                                    //const parts = address.split(", ");
+                                    //parts[0] = e.target.value || "";
+                                    //setAddress(parts.filter(Boolean).join(", "));
                                 }}
                                 placeholder="Door Nr."
                                 style={{
@@ -471,11 +486,17 @@ const Upload: React.FC = () => {
                             zoom={18}
                             style={{ width: "100%", height: "100%" }}
                             scrollWheelZoom={true}
+                            maxBounds={MAX_BOUNDS}
+                            maxBoundsViscosity={1}
+                            worldCopyJump={false}
                         >
-                            {/* 换来源的话改url，但这里仅是符合Leaflet的情况。属性改成来源*/}
+                            {/* 换来源的话改url，但这里仅是符合Leaflet的情况。属性改成来源 osm来源是 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" */}
                             <TileLayer
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                attribution="&copy; OpenStreetMap contributors"
+                                url="/tiles/{z}/{x}/{y}.png"
+                                noWrap
+                                minZoom={17}
+                                maxZoom={21}
+                                attribution="&copy; Implemented by MZP using Unity and QGIS"
                             />
                             <Marker
                                 position={latlng}
@@ -670,12 +691,16 @@ const Upload: React.FC = () => {
                         <span>📋</span> {t('photoRequirements.title')}
                     </h3>
                     <ul style={{ paddingLeft: 22, margin: 0, lineHeight: 1.6 }}>
+                        <li><strong>Pls!</strong> Please Prioritize photographing the flesh-colored, khaki, and brown houses on the map.</li>
                         <li>{t('photoRequirements.noFaces')}</li>
                         <li>{t('photoRequirements.noObstructions')}</li>
                         <li>{t('photoRequirements.noShadows')}</li>
                         <li>{t('photoRequirements.noDistortion')}</li>
                         <li>{t('photoRequirements.clear')}</li>
                         <li>{t('photoRequirements.wholeBuilding')}</li>
+
+
+
                     </ul>
                 </div>
                 {/* 错误提示 error handle*/}

@@ -1,3 +1,8 @@
+# Regarding Additional Map Tiles
+The file "tiles" are map tile packages. Please download them here(https://www.dropbox.com/scl/fi/5nmw396ab4mq44i7o4pqp/tiles.rar?rlkey=2xtt6hryohhb06ieqzq9gx2cd&st=obeor8ys&dl=0), extract them, and place them in the public folder within the frontend directory. 
+Path looks like:[xxx\SGproject-CityUp\frontend\public] xxx is the folder path where you have stored this project.
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
