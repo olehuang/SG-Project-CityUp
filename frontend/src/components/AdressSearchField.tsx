@@ -56,10 +56,11 @@ const AdressSearchField: React.FC<Props> = ({onSearch,onSelect,isNomatch,setIsNo
     //storage and  search  user input
     const handleSearch = () => {
         const trimmedInput = inputValue.trim();
+        console.log("Search input:", JSON.stringify(trimmedInput));
         if (trimmedInput !== "") {
             onSearch(trimmedInput);
             updateHistory(trimmedInput);
-            setInputValue("");
+            //setInputValue("");
             setSelectedAddress(null);
             setHasSearched(true);
         }

@@ -318,9 +318,9 @@ const PhotoGallery=()=>{
                                                         >
                                                             <TableCell>
                                                                 {addr
-                                                                    .replace(/,/g, '')
                                                                     .replace(/Deutschland/gi, '')
-                                                                    .replace(/Hessen/gi, '')}
+                                                                    .replace(/Hessen/gi, '').replace(/, ,/g, '')
+                                                                }
                                                             </TableCell>
                                                             <TableCell>{info.updateTime}</TableCell>
                                                             <TableCell>{info.photoNr}</TableCell>
