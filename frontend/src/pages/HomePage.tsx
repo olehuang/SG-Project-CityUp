@@ -34,8 +34,9 @@ const HomePage = () => {
             overflow: "hidden",
         },
         topContent: {
-            paddingTop: "25vh",
+            paddingTop: { xs: "30vh", sm: "22vh", md: "25vh" }, // 响应式顶部间距
             zIndex: 2,
+            px: { xs: 2, sm: 3, md: 4 }, // 响应式水平内边距，防止内容贴边
         },
         background: {
             position: "absolute",
@@ -50,21 +51,30 @@ const HomePage = () => {
             filter: "brightness(0.8) saturate(1) opacity(0.3)",
         },
 
-
         title: {
             fontWeight: "bold",
             // color: "#0d3b66",
             color: "#3E2723",
-            fontSize: { xs: "8rem", md: "10rem", lg: "12rem" },
-            marginBottom: "1.5rem",
+            fontSize: {
+                xs: "4rem",    // 手机端: 64px
+                sm: "6rem",    // 平板端: 96px
+                md: "8rem",    // 中等屏幕: 128px
+                lg: "10rem",   // 大屏幕: 160px
+                xl: "12rem"    // 超大屏幕: 192px
+            },
+            marginBottom: { xs: "1rem", sm: "1.25rem", md: "1.5rem" }, // 响应式下边距
+            lineHeight: { xs: 0.9, sm: 1, md: 1.1 }, // 响应式行高，防止文字过高
+            // 防止长文本溢出
+            wordBreak: "break-word",
+            maxWidth: "100%",
         },
         button: {
             bgcolor: clicked ? "#ffb703" : "#fb8500",
             color: "#fff",
-            px: 4,
-            py: 1.5,
+            px: { xs: 3, sm: 3.5, md: 4 }, // 响应式水平内边距
+            py: { xs: 1.2, sm: 1.35, md: 1.5 }, // 响应式垂直内边距
             fontWeight: "bold",
-            fontSize: "1.25rem",
+            fontSize: { xs: "1rem", sm: "1.125rem", md: "1.25rem" }, // 响应式字体大小
             borderRadius: "50px",
             boxShadow: clicked
                 ? "0 0 15px 5px rgba(251, 133, 0, 0.7)"
@@ -74,15 +84,25 @@ const HomePage = () => {
                 bgcolor: "#ffb703",
                 boxShadow: "0 0 20px 8px rgba(255, 183, 3, 0.9)",
             },
+            // 移动端点击效果
+            "&:active": {
+                transform: "scale(0.95)",
+                boxShadow: clicked
+                    ? "0 0 12px 4px rgba(251, 133, 0, 0.6)"
+                    : "0 2px 6px rgba(251, 133, 0, 0.4)",
+            },
             position: "relative",
             overflow: "visible",
+            // 确保按钮在小屏幕上可见且易于点击
+            minWidth: { xs: "140px", sm: "160px", md: "180px" },
+            minHeight: { xs: "44px", sm: "48px", md: "52px" }, // 遵循移动端最小点击区域标准
         },
         bubble: {
             position: "absolute",
-            top: "-10px",
-            right: "-10px",
-            width: "20px",
-            height: "20px",
+            top: { xs: "-8px", sm: "-9px", md: "-10px" }, // 响应式定位
+            right: { xs: "-8px", sm: "-9px", md: "-10px" }, // 响应式定位
+            width: { xs: "16px", sm: "18px", md: "20px" }, // 响应式尺寸
+            height: { xs: "16px", sm: "18px", md: "20px" }, // 响应式尺寸
             bgcolor: "#ffb703",
             borderRadius: "50%",
             animation: "bubble 1s ease-out",
@@ -116,6 +136,20 @@ const HomePage = () => {
           opacity: 0;
         }
       }
+      /* 移动端优化：防止页面缩放 */
+                @media (max-width: 600px) {
+                    body {
+                        -webkit-text-size-adjust: 100%;
+                        -ms-text-size-adjust: 100%;
+                    }
+                }
+                
+                /* 确保背景图片在移动端正确显示 */
+                @media (max-width: 600px) {
+                    .background-image {
+                        background-attachment: scroll !important;
+                    }
+                }
     `}</style>
         </Box>
     );

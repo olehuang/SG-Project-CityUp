@@ -1,21 +1,18 @@
-
-import {Box, Typography, Container, Button,Dialog, DialogTitle,LinearProgress,Alert} from "@mui/material";
 import React, {useState,useEffect,useRef} from "react";
-
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import {useAuthHook} from "../components/AuthProvider";
 import axios from "axios";
-import {photoReviewStyles} from "./PhotoReviewStyles";
 import {useNavigate} from "react-router-dom";
-import CircularProgress from "@mui/material/CircularProgress";
+import Pagination from '@mui/material/Pagination'; //
+import { useTheme, useMediaQuery } from '@mui/material';//
+import {
+    Box, Typography, CircularProgress, Alert,
+    TableContainer, Table, TableHead, TableRow, TableCell, TableBody,
+    Card, CardContent, Grid,Button
+} from '@mui/material';
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
-import Pagination from '@mui/material/Pagination';
+import pageBackgroundStyles from "./pageBackgroundStyles";
+
 import { useTranslation } from 'react-i18next';
 /**
  * a class form user, because user ranking in DBMS storage
@@ -67,6 +64,11 @@ const RankingPage =()=>{
     const [showingMyPosition,setShowingMyPosition]=useState(false);
     const navigat = useNavigate();
     const url="http://127.0.0.1:8000"
+    const theme = useTheme();//
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm')); //
+    const top3 = userRanking?.users.slice(0, 3) || [];//
+    const restUsers = userRanking?.users.slice(3) || [];//
+
     const { t } = useTranslation();
     useEffect(() => {
 
@@ -176,76 +178,216 @@ const RankingPage =()=>{
     }, [scrollToMyRow, usersloading, userRanking]);
 
     return (
-        <Box sx={{display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center",overflowY: "auto",}}>
-            <Box sx={styles.personInfo}>
-                <Typography variant="h6" sx={{marginLeft: "2%", fontWeight: "bold"}}>
-                    {t('ranking.userName')}: {user.username }</Typography>
-                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>
-                    {t('ranking.myRanking')}: {user.rank!== -1 && +user.point !== 0 ? user.rank : t("ranking.notInRanking") }</Typography>
-                <Typography variant="h6" sx={{marginLeft: "auto", fontWeight: "bold"}}>
-                    {t("ranking.myPoint")}: {user.point}</Typography>
-                <Button sx={{margin: "auto 2% 0.5% auto", visibility: totalPages > 1 ? "visible" : "hidden",}}
-                        size="large"
-                        variant={"outlined"}
-                        onClick={toMyPosition}
-                > {showingMyPosition ? t("ranking.top") : t("ranking.myPosition")}
+        <Box sx={{
+            ...pageBackgroundStyles.container,
+            ...styles.pages,
+        }}>
+            <Box sx={{
+                ...styles.personInfo,
+                flexDirection: { xs: "column", sm: "row" },  // 保持响应式
+                alignItems: { xs: "flex-start", sm: "center" },  // 保持响应式
+                //textAlign: { xs: "left", sm: "baseline" },  // 保持响应式
+                gap: { xs: 1, sm: 0 },  // 移动端有gap，网页端无gap
+            }}>
+                <Typography variant="h6" sx={{
+                    fontWeight: "bold",
+                    marginLeft: { xs: 0, sm: "2%" }  // 网页端恢复原始marginLeft
+                }}>
+                    {/* 根据屏幕大小显示不同的标签 */}
+                    {isMobile ? t('ranking.userName')+`: ${user.username}` : t('ranking.userName')+`: ${user.username}`}
+                </Typography>
+                <Typography variant="h6" sx={{
+                    fontWeight: "bold",
+                    margin: { xs: 0, sm: "auto auto auto 17%" }  // 网页端恢复原始marginLeft
+                }}>
+                    {t('ranking.myRanking')}: {user.rank !== -1 && +user.point !== 0 ? user.rank : "not in Ranking"}
+                </Typography>
+
+                <Box sx={{
+                    display: "flex",
+                    flexDirection: { xs: "row", sm:"" }, //mobile row, website column
+                    alignItems: { xs: "flex-start", sm: "center" },
+                    width: {xs:"100%",md:"30%"},
+                }}>
+                <Typography variant="h6" sx={{
+                    fontWeight: "bold",
+                    //marginLeft: { xs: 0, sm: "auto" }  // 网页端恢复原始marginLeft
+                }}>
+                    {t("ranking.myPoint")}: {user.point}
+                </Typography>
+                <Button
+                    size= "small"
+                    variant="outlined"
+                    sx={{
+                        alignSelf: { xs: "flex-end", sm: "center" },
+                        visibility: totalPages > 1 ? "visible" : "hidden",
+                        // 网页端恢复原始margin样式
+                        margin: { xs: "0 2% 0 auto", sm: "1% 2% 0.5% auto" },
+                    }}
+                    onClick={toMyPosition}
+                >
+                    {showingMyPosition ? t("ranking.top") : t("ranking.myPosition")}
                 </Button>
+                </Box>
             </Box>
+
             <TableContainer component={Paper}
-                            sx={{...styles.tableContainer,overflow:"auto"}}>
+                            sx={{
+                                ...styles.tableContainer,
+                            }}>
+                {isMobile ? (
+                    <Box
+                        sx={{
+                            width: '100%',
+                            //maxWidth: '100vw',            // 避免内容超出视口
+                            //px: 2,                         // 保留内边距但不要 pl+px 同时用
+                            //mx: 'auto',                    // 强制居中
+                            //boxSizing: 'border-box',
+                            overflowX: 'hidden'           // 禁止横向滚动
+                        }}
+                    >
 
-                <Table stickyHeader sx={{width:'100%',}}>
-                    <TableHead >
-                        <TableRow sx={{ backgroundColor: "#F1EFEC",//"#abd1e6",
-                        }}>
-                            <TableCell sx={styles.headerCell(25)}>{t("ranking.ranking")}</TableCell>
-                            <TableCell sx={styles.headerCell(30)}>{t("ranking.username")}</TableCell>
-                            <TableCell sx={styles.headerCell(25)}>{t("ranking.points")}</TableCell>
-                        </TableRow>
-                    </TableHead>
-
-                    <TableBody >
-                        {usersloading ? (
-                        <TableRow >
-                            <TableCell sx={{display: "flex", flexDirection: "column", justifyContent: "center"}}>
-                                <Box sx={{margin:"auto",textAlign: "center"}}>
-                                    <CircularProgress color={"primary"}></CircularProgress>
-                                    <Typography variant="h6" sx={{ fontWeight: "bold"}}>
-                                        {t("ranking.loading")}
-                                    </Typography>
-                                    {getRankingError  &&
-                                        <Alert variant={"filled"} severity="error">{getRankingError}</Alert>
-                                    }
-                                    {privateUserError  &&
-                                        <Alert variant={"filled"} severity="error">{privateUserError}</Alert>
-                                    }
-                                </Box>
-                            </TableCell>
-                        </TableRow>
-                    ): (
-                        userRanking?.users.map((rowUser, index) => (
-                            <TableRow key={index+1}
-                                      sx={rowUser.user_id=== user_id? {...styles.tableRowHiligh}:{}}
-                                      ref={rowUser.user_id===user_id? myRuf:null}
-                            >
-                                <TableCell >
-                                    <Box sx={{display: "flex", alignItems:"center", justifyContent: "flex-start"}}>
-                                    {(() => {
-                                    const rank = rowUser.rank;
-                                    if (rank <= 3) {
-                                        const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
-                                        return <WorkspacePremiumRoundedIcon sx={{ color }} />;
-                                    }
-                                        return <Typography sx={{marginLeft:"2%"}}>{rank}</Typography>;
-                                })()}</Box>
-                                </TableCell>
-                                <TableCell>{rowUser.username}</TableCell>
-                                <TableCell>{rowUser.point}</TableCell>
+                        {/* 移除原来的top 3卡片区域，改为统一表格 */}
+                        <Table stickyHeader >
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell >{t("ranking.ranking")}</TableCell>
+                                    <TableCell >{t("ranking.username")}</TableCell>
+                                    <TableCell >{t("ranking.points")}</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {usersloading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={3} sx={{ textAlign: 'center', py: 4 }}>
+                                            <Box>
+                                                <CircularProgress color="primary" />
+                                                <Typography variant="h6" sx={{ fontWeight: "bold", mt: 2 }}>Loading...</Typography>
+                                                {getRankingError && <Alert variant="filled" severity="error">{getRankingError}</Alert>}
+                                                {privateUserError && <Alert variant="filled" severity="error">{privateUserError}</Alert>}
+                                            </Box>
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    userRanking?.users.map((rowUser, index) => (
+                                        <TableRow
+                                            key={rowUser.user_id}
+                                            sx={rowUser.user_id === user_id ? { ...styles.tableRowHiligh } : {}}
+                                            ref={rowUser.user_id === user_id ? myRuf : null}
+                                        >
+                                            <TableCell>
+                                                <Box sx={{ display: "flex", alignItems: "center" }}>
+                                                    {(() => {
+                                                        const rank = rowUser.rank;
+                                                        if (rank <= 3) {
+                                                            const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
+                                                            return (
+                                                                <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+                                                                    <WorkspacePremiumRoundedIcon sx={{ color, fontSize: 24 }} />
+                                                                    {/*<Typography variant="body2" fontWeight="bold">{rank}</Typography>*/}
+                                                                </Box>
+                                                            );
+                                                        }
+                                                        return <Typography variant="body2" sx={{marginLeft:"7%"}}>{rank}</Typography>;
+                                                    })()}
+                                                </Box>
+                                            </TableCell>
+                                            <TableCell sx={{
+                                                 maxWidth: 120
+                                            }}>
+                                                <Typography
+                                                    variant="body2"
+                                                    noWrap
+                                                    sx={{
+                                                        fontWeight: rowUser.rank <= 3 ? "bold" : "normal",
+                                                        color: rowUser.rank <= 3 ? "primary.main" : "inherit"
+                                                    }}
+                                                >
+                                                    {rowUser.username}
+                                                </Typography>
+                                            </TableCell>
+                                            <TableCell>
+                                                <Typography
+                                                    variant="body2"
+                                                    sx={{ fontWeight: rowUser.rank <= 3 ? "bold" : "normal" }}
+                                                >
+                                                    {rowUser.point}
+                                                </Typography>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
+                    </Box>
+                ) : (
+                    // Website
+                    <Table stickyHeader
+                           sx={{width:'100%',}}
+                    >
+                        <TableHead >
+                            <TableRow sx={{ backgroundColor: "#F1EFEC",//"#abd1e6",
+                            }}>
+                                <TableCell sx={styles.headerCell(25)}>{t("ranking.ranking")}</TableCell>
+                                <TableCell sx={styles.headerCell(30)}>{t("ranking.username")}</TableCell>
+                                <TableCell sx={styles.headerCell(25)}>{t("ranking.points")}</TableCell>
                             </TableRow>
-                        ))
-                        )}
-                    </TableBody>
-                </Table>
+                        </TableHead>
+
+                        <TableBody >
+                            {usersloading ? (
+                                <TableRow >
+                                    <TableCell sx={{
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center"
+                                    }}>
+                                        <Box sx={{
+                                            margin:"auto",textAlign: "center"}}>
+                                            <CircularProgress color={"primary"}></CircularProgress>
+                                            <Typography variant="h6" sx={{ fontWeight: "bold",marginLeft:"auto"}}>
+                                                {t("ranking.loading")}
+                                            </Typography>
+                                            {getRankingError  &&
+                                                <Alert variant={"filled"} severity="error">{getRankingError}</Alert>
+                                            }
+                                            {privateUserError  &&
+                                                <Alert variant={"filled"} severity="error">{privateUserError}</Alert>
+                                            }
+                                        </Box>
+                                    </TableCell>
+                                </TableRow>
+                            ): (
+                                userRanking?.users.map((rowUser, index) => (
+                                    <TableRow key={index+1}
+                                              sx={rowUser.user_id=== user_id? {...styles.tableRowHiligh}:{}}
+                                              ref={rowUser.user_id===user_id? myRuf:null}
+                                    >
+                                        <TableCell >
+                                            <Box sx={{
+                                                display: "flex",
+                                                alignItems:"center",
+                                                justifyContent: "flex-start",
+                                                //maxHeight:"10%",
+                                            }}>
+                                                {(() => {
+                                                    const rank = rowUser.rank;
+                                                    if (rank <= 3) {
+                                                        const color = rank === 1 ? "gold" : rank === 2 ? "silver" : "coral";
+                                                        return <WorkspacePremiumRoundedIcon sx={{ color }} />;
+                                                    }
+                                                    return <Typography sx={{marginLeft:"3%"}}>{rank}</Typography>;
+                                                })()}</Box>
+                                        </TableCell>
+                                        <TableCell>{rowUser.username}</TableCell>
+                                        <TableCell>{rowUser.point}</TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                )}
+
             </TableContainer>
             {userRanking && (
                 <Pagination
@@ -260,24 +402,32 @@ const RankingPage =()=>{
 }
 
 const styles={
+    pages:{display: "flex",
+        flexDirection: "column",
+        justifyContent: "content",
+        alignItems: "center",
+        overflowY: "hidden",
+        overflowX: "hidden",
+    },
     tableContainer:{
         backgroundColor: "#FAF6E9",//"#d9e7f1",
         display:"flex",
-        flex:1,
-        width: "90%",
-        maxWidth:"90%",
-        maxHeight: 450,
+        //flex:1,
+        width: { xs: '100%', sm: '90%' },
+        maxHeight: "77%",
+        height:"auto",
         margin: "0 auto 1% auto",
+        boxShadow:"0 4px 10px rgba(0, 0, 0, 0.1)"
     },
     personInfo:{
         display:"flex",
-        flexDirection:"row",
-        alignItems:"baseline",
         justifyContent:"space-between",
-        width:'90%',
-        height:"30%",
-        margin:"0 0 1% 0",
-        padding: "1% 0% 1% 0%",
+        width: { xs: '100%', sm: '90%' },  // 响应式宽度
+        height: {xs:"18%",sm:"10%"},
+        margin:  "0 0 1% 0",  // 响应式margin
+        maxWidth: { xs: '100%' },  // 响应式最大宽度
+        marginBottom:  { xs: 2 },
+        padding: { xs: "1rem", sm: "1% 0% 1% 0%" },  // 响应式padding
         //border:"1px solid black",
         borderRadius:"10px",
         backgroundColor: "#FAF6E9",
@@ -286,6 +436,7 @@ const styles={
     headerCell:(width:number) =>({
         width:`${width}%`,
         fontWeight:"bold",
+        fontSize: { xs: "0.8rem"},
     }),
     loadingZone:{},
     tableRowHiligh:{

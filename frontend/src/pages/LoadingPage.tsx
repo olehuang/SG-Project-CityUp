@@ -27,8 +27,9 @@ const LoadingPage=()=>{
             overflow: "hidden",
         },
         topContent: {
-            paddingTop: "25vh",
+            paddingTop: { xs: "30vh", sm: "22vh", md: "25vh" },
             zIndex: 2,
+            px: { xs: 2, sm: 3, md: 4 }, // 添加水平内边距
         },
         background: {
             position: "absolute",
@@ -47,16 +48,25 @@ const LoadingPage=()=>{
             fontWeight: "bold",
             // color: "#0d3b66",
             color: "#3E2723",
-            fontSize: {xs: "8rem", md: "10rem", lg: "12rem"},
-            marginBottom: "1.5rem",
+            fontSize: {
+                xs: "4rem",    // 手机端
+                sm: "6rem",    // 平板端
+                md: "8rem",    // 中等屏幕
+                lg: "10rem",   // 大屏幕
+                xl: "12rem"    // 超大屏幕
+            },
+            marginBottom: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
+            lineHeight: { xs: 0.9, sm: 1, md: 1.1 },
+            wordBreak: "break-word",
+            maxWidth: "100%",
         },
         button: {
             bgcolor: clicked ? "#ffb703" : "#fb8500",
             color: "#fff",
-            px: 4,
-            py: 1.5,
+            px: { xs: 3, sm: 3.5, md: 4 },
+            py: { xs: 1.2, sm: 1.35, md: 1.5 },
             fontWeight: "bold",
-            fontSize: "1.25rem",
+            fontSize: { xs: "1rem", sm: "1.125rem", md: "1.25rem" },
             borderRadius: "50px",
             boxShadow: clicked
                 ? "0 0 15px 5px rgba(251, 133, 0, 0.7)"
@@ -66,15 +76,23 @@ const LoadingPage=()=>{
                 bgcolor: "#ffb703",
                 boxShadow: "0 0 20px 8px rgba(255, 183, 3, 0.9)",
             },
+            "&:active": {
+                transform: "scale(0.95)",
+                boxShadow: clicked
+                    ? "0 0 12px 4px rgba(251, 133, 0, 0.6)"
+                    : "0 2px 6px rgba(251, 133, 0, 0.4)",
+            },
             position: "relative",
             overflow: "visible",
+            minWidth: { xs: "140px", sm: "160px", md: "180px" },
+            minHeight: { xs: "44px", sm: "48px", md: "52px" },
         },
         bubble: {
             position: "absolute",
-            top: "-10px",
-            right: "-10px",
-            width: "20px",
-            height: "20px",
+            top: { xs: "-8px", sm: "-9px", md: "-10px" },
+            right: { xs: "-8px", sm: "-9px", md: "-10px" },
+            width: { xs: "16px", sm: "18px", md: "20px" },
+            height: { xs: "16px", sm: "18px", md: "20px" },
             bgcolor: "#ffb703",
             borderRadius: "50%",
             animation: "bubble 1s ease-out",
@@ -90,7 +108,7 @@ const LoadingPage=()=>{
             // color: "#0d3b66",
             color: "#3E2723",
             fontSize: {xs: "1rem", md: "1rem", lg: "1.2rem"},
-            marginBottom: "1.5rem",
+            marginBottom: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
         },
     };
 
@@ -107,7 +125,11 @@ const LoadingPage=()=>{
                 </Typography>
                 <Box style={styles.prograssBar}>
                     <Stack spacing={2} alignItems="center" height={"50%"}>
-                        <CircularProgress size="5rem" sx={{color: "#3E2723"}}/>
+                        <CircularProgress sx={{
+                            color: "#3E2723",
+                            width: { xs: "3rem", sm: "4rem", md: "5rem" },
+                            height: { xs: "3rem", sm: "4rem", md: "5rem" }
+                        }}/>
                         <Typography variant="h6" component="h6" sx={styles.loadingText}>
                             Loading...
                         </Typography>
@@ -129,6 +151,14 @@ const LoadingPage=()=>{
                 transform: scale(2);
                 opacity: 0;
               }
+            }
+            /* 移动端优化 */
+            @media (max-width: 600px) {
+                body {
+                    -webkit-text-size-adjust: 100%;
+                    -ms-text-size-adjust: 100%;
+                }
+            }
             }`}</style>
         </Box>
     )

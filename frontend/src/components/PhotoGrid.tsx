@@ -311,7 +311,12 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         display: "flex",
         flexDirection: "row",
         alignItems: "flex-start",
-        gap: 4
+        gap: 4,
+
+        '@media (max-width: 768px)': {
+            flexDirection: 'column',
+            alignItems: 'center'
+        }
     },
      dialogFirstBox:{
          display: "flex",
@@ -321,6 +326,13 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          minHeight: 500, //
          p: 2,
          paddingBottom:0,
+
+         '@media (max-width: 768px)': {
+             flexDirection: 'column',
+             minHeight: 'auto',
+             width: '100%',
+             alignItems: 'center'
+         }
      },
      dialogPhotoArea:{
          width: "90%",
@@ -330,7 +342,14 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          objectFit: "contain",
          borderRadius: 2,
          //border: "1px solid black",
-         boxShadow:"0px 4px 12px rgba(0,0,0,0.1)"
+         boxShadow:"0px 4px 12px rgba(0,0,0,0.1)",
+
+         '@media (max-width: 768px)': {
+             width: '100%',
+             maxWidth: '100%',
+             height: 'auto',
+             maxHeight: '400px'
+         }
 
      },
      dialogInfoArea:{
@@ -339,25 +358,40 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
          flexDirection: "column",
          textAlign: "left",
          justifyContent: "space-between",
+
+         '@media (max-width: 768px)': {
+             alignItems: 'center',
+             textAlign: 'center',
+             mt: 2
+         }
      },
     photoBox:{
-        flex: "0 0 30%",                  // width 1/3 - space（gap*2）
-        aspectRatio: "3 / 4",               // （width:height = 3:4）
-        backgroundColor: "#fff",
+        flex: '0 0 30%',
+        //maxWidth: 'calc(33.333% - 16px)',
+        aspectRatio: '3 / 4',
+        backgroundColor: '#fff',
         borderRadius: 1,
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        cursor: "pointer",
-        transition: "all 0.2s ease-in-out",
-        "&:hover()":{
-            backgroundColor: "#e0f7fa",
-            borderColor: "#128d9e",
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        cursor: 'pointer',
+        transition: 'all 0.2s ease-in-out',
+        '&:hover': {
+            backgroundColor: '#e0f7fa',
+            borderColor: '#128d9e'
         },
-        "&:active": {
-            transform: "scale(0.98)",
-            backgroundColor: "#b2ebf2",
+        '&:active': {
+            transform: 'scale(0.98)',
+            backgroundColor: '#b2ebf2'
         },
+        '@media (max-width: 768px)': {
+            flex: '0 0 calc(50% - 12px)',
+            maxWidth: 'calc(50% - 12px)'
+        },
+        '@media (max-width: 480px)': {
+            flex: '0 0 100%',
+            maxWidth: '100%'
+        }
     },
 
  }

@@ -1,7 +1,7 @@
 import ListItemText from "@mui/material/ListItemText";
 import ListItemButton from "@mui/material/ListItemButton";
 import pageBackgroundStyles from "./pageBackgroundStyles";
-import React, { useEffect, useState, } from "react";
+import React, { useEffect, useState,useRef } from "react";
 import {
     Box,
     Typography,
@@ -15,6 +15,9 @@ import {
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
 import KeycloakClient from "../components/keycloak";
+import { useTheme, useMediaQuery, Drawer, AppBar, Toolbar, Button } from "@mui/material";
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 
 const Tutorial = () => {
@@ -24,6 +27,13 @@ const Tutorial = () => {
     const [selectedSection, setSelectedSection] = useState("Tutorial");
     const [searchTerm, setSearchTerm] = useState("");
     const [searchResults, setSearchResults] = useState<string[]>([]);
+    // 用于挂载每个模块的 DOM 引用，读取 innerText
+    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const isSearchActive = searchTerm.trim().length > 0;
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // sm: 600px
+    const [mobileOpen, setMobileOpen] = useState(false); // 控制 Drawer 打开关闭
+
     const {t} = useTranslation();
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
@@ -43,6 +53,7 @@ const Tutorial = () => {
         { key: "Photo Upload", label: t("tutorial.menu.photoUpload") },
         { key: "Upload History", label: t("tutorial.menu.uploadHistory") },
         { key: "Building Photo Gallery", label: t("tutorial.menu.gallery") },
+        { key: "Rankings", label: t("tutorial.menu.rankings") },
         { key: "User Information", label: t("tutorial.menu.userInfo") },
         { key: "FAQ", label: t("tutorial.menu.faq") },
         ...(roles.includes("admin")
@@ -55,35 +66,6 @@ const Tutorial = () => {
     ];
 
 
-    // Search Keywords Daten
-    const searchableContent = {
-        "Photograph": [
-            "photograph", "building", "visible", "well-lit", "blurry", "images", "take", "proper",
-            "shadows", "lighting", "even", "natural", "distortion", "obstructions", "objects",
-            "trees", "cars", "people", "blocking", "straight", "aligned", "perspective", "parallel", "accuracy"
-        ],
-        "Photo Upload": [
-            "upload", "edit", "photos", "address", "relative", "enter"
-        ],
-        "Upload History": [
-            "history", "view", "approved", "confirm", "upload"
-        ],
-        "Building Photo Gallery": [
-            "building", "photo", "addresses", "relevant", "find"
-        ],
-        "Photo Review": [
-            "review", "photo", "admin"
-        ],
-        "User Management": [
-            "user", "management", "admin"
-        ],
-        "FAQ": [
-            "faq", "frequently", "asked", "questions", "help", "common", "issues", "problems", "troubleshooting"
-        ],
-        "Tutorial": [
-            "tutorial", "welcome", "cityup", "topic", "started", "select", "faq", "questions", "help"
-        ]
-    };
 
     // Based on the search content it looks for matches in the sections and searchableContent and updates the search results.
     const handleSearch = () => {
@@ -92,42 +74,39 @@ const Tutorial = () => {
             return;
         }
 
-        //Case insensitive search
         const results: string[] = [];
         const searchLower = searchTerm.toLowerCase();
 
+        sections.forEach((sectionName) => {
+            const titleMatch = sectionName.key.toLowerCase().includes(searchLower);
+            const contentText = sectionRefs.current[sectionName.key]?.innerText?.toLowerCase() || "";
+            const contentMatch = contentText.includes(searchLower);
 
-        sections.forEach(section => {
-            if (section.key.toLowerCase().includes(searchLower)) {
-                results.push(section.key);
-            }
-        });
-
-        // Deposit the matching name for page display
-        Object.entries(searchableContent).forEach(([sectionName, keywords]) => {
-            if (sections.some(sec => sec.key === sectionName) && !results.includes(sectionName)) {
-                const hasMatch = keywords.some(keyword =>
-                    keyword.toLowerCase().includes(searchLower)
-                );
-                if (hasMatch) {
-                    results.push(sectionName);
-                }
+            if (titleMatch || contentMatch) {
+                results.push(sectionName.key);
             }
         });
 
         setSearchResults(results);
 
-        // If there are any results, jump to the first result
-        if (results.length > 0) {
-            setSelectedSection(results[0]);
-        }
+        // 使用 setTimeout 确保状态更新后再跳转
+        setTimeout(() => {
+            if (results.length > 0) {
+                const firstMatch = results[0];
+                setSelectedSection(firstMatch);
+                const ref = sectionRefs.current[firstMatch];
+                if (ref) {
+                    ref.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+            }
+        }, 0);
     };
 
-    // Highlighting text
-    const highlightText = (text: string, searchTerm: string) => {
-        if (!searchTerm.trim()) return text;
+    // 修复后的 highlightText 函数
+    const highlightText = (text: string, searchTerm: string, isSearchActive: boolean = true) => {
+        // 修复bug1：当搜索词为空或不处于搜索状态时，返回原始文本
+        if (!searchTerm.trim() || !isSearchActive) return text;
 
-        //Global Match & Case Ignored
         const regex = new RegExp(`(${searchTerm})`, 'gi');
         const parts = text.split(regex);
 
@@ -143,8 +122,8 @@ const Tutorial = () => {
                             fontWeight: 'bold'
                         }}
                     >
-                        {part}
-                    </span>
+                    {part}
+                </span>
                 );
             }
             return part;
@@ -155,99 +134,110 @@ const Tutorial = () => {
         switch (selectedSection) {
             case "Photograph":
                 return (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Photograph"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.photograph.title"), searchTerm)}
+                            {highlightText(t("tutorial.photograph.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.photograph.description"), searchTerm)}
+                            {highlightText(t("tutorial.photograph.description"), searchTerm, isSearchActive)}
                         </Typography>
 
-                        {/* ✅ Good examples */}
-                        <Box sx={{ ...styles.body, mt: 2 }}>
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#4caf50", mr: 1, fontWeight: "bold" }}>
-                                    ✅
-                                </Typography>
-                                <Typography variant="body1">
-                                    <strong>{t("tutorial.photograph.noShadows.title")}</strong> –{" "}
+                        {/* ✅ 正面示例 */}
+                        <Typography variant="h6" sx={{ mt: 4 }}>
+                            {highlightText("Correct photo examples:", searchTerm, isSearchActive)}
+                        </Typography>
+
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: { xs: "column", sm: "row" },
+                                gap: 2,
+                                mt: 2,
+                                justifyContent: "center",
+                            }}
+                        >
+                            {/* Example 1 */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                                    <Typography component="span" sx={{ color: "#4caf50", fontWeight: "bold", mr: 1 }}>
+                                        ✅
+                                    </Typography>
+                                    <strong>{highlightText(t("tutorial.photograph.noShadows.title"), searchTerm, isSearchActive)}</strong> –{"  "}
                                     {highlightText(t("tutorial.photograph.noShadows.description"), searchTerm)}
                                 </Typography>
-                            </Box>
-
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#4caf50", mr: 1, fontWeight: "bold" }}>
-                                    ✅
-                                </Typography>
-                                <Typography variant="body1">
-                                    <strong>{t("tutorial.photograph.noObstructions.title")}</strong> –{" "}
-                                    {highlightText(t("tutorial.photograph.noObstructions.description"), searchTerm)}
-                                </Typography>
-                            </Box>
-
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#4caf50", mr: 1, fontWeight: "bold" }}>
-                                    ✅
-                                </Typography>
-                                <Typography variant="body1">
-                                    <strong>{t("tutorial.photograph.straightPerspective.title")}</strong> –{" "}
-                                    {highlightText(t("tutorial.photograph.straightPerspective.description"), searchTerm)}
-                                </Typography>
-                            </Box>
-
-                            <Box sx={{ mt: 2 }}>
-                                <img
+                                <Box
+                                    component="img"
                                     src="/assets/withoutShadow.png"
-                                    alt="Example without shadow and obstruction"
-                                    style={{ width: "100%", maxWidth: 600, borderRadius: 8, marginBottom: 16 }}
+                                    alt="Example without shadow"
+                                    sx={{ width: "100%", borderRadius: 2, objectFit: "cover", maxWidth: "100%" }}
                                 />
-                                <br />
-                                <img
+                            </Box>
+
+                            {/* Example 2 */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                                    <Typography component="span" sx={{ color: "#4caf50", fontWeight: "bold", mr: 1 }}>
+                                        ✅
+                                    </Typography>
+                                    <strong>{highlightText(t("tutorial.photograph.straightPerspective.title"), searchTerm, isSearchActive)}</strong> –{"  "}
+                                    {highlightText(t("tutorial.photograph.straightPerspective.description"), searchTerm, isSearchActive)}
+                                </Typography>
+                                <Box
+                                    component="img"
                                     src="/assets/site.png"
-                                    alt="Example with aligned perspective"
-                                    style={{ width: "100%", maxWidth: 600, borderRadius: 8 }}
+                                    alt="Example aligned photo"
+                                    sx={{ width: "100%", borderRadius: 2, objectFit: "cover", maxWidth: "100%" }}
                                 />
                             </Box>
                         </Box>
 
-                        {/* ❌ Bad examples */}
-                        <Box sx={{ ...styles.body, mt: 4 }}>
-                            <Typography variant="h6" sx={{ mt: 4 }}>
-                                {highlightText(t("tutorial.photograph.incorrectExamples.title"), searchTerm)}
-                            </Typography>
+                        {/* ❌ 负面示例 */}
+                        <Typography variant="h6" sx={{ mt: 6 }}>
+                            {highlightText(t("tutorial.photograph.incorrectExamples.title"), searchTerm, isSearchActive)}
+                        </Typography>
 
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mt: 2, mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#f44336", mr: 1, fontWeight: "bold" }}>
-                                    ❌
+                        <Box
+                            sx={{
+                                display: "flex",
+                                flexDirection: { xs: "column", sm: "row" },
+                                gap: 2,
+                                mt: 2,
+                                justifyContent: "center",
+                            }}
+                        >
+                            {/* Bad Example 1 */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                                    <Typography component="span" sx={{ color: "#f44336", fontWeight: "bold", mr: 1 }}>
+                                        ❌
+                                    </Typography>
+                                    <strong>{highlightText(t("tutorial.photograph.noObstructions.title"), searchTerm, isSearchActive)}</strong>  –{"  "}
+                                    {highlightText(t("tutorial.photograph.noObstructions.description"), searchTerm)}
                                 </Typography>
-                                <Typography variant="body1">
-                                    {highlightText(t("tutorial.photograph.incorrectExamples.tooManyObstructions"), searchTerm)}
-                                </Typography>
-                            </Box>
-
-                            <Box sx={{ mt: 1, mb: 2 }}>
-                                <img
+                                <Box
+                                    component="img"
                                     src="/assets/withpeople.png"
-                                    alt="Example with obstructions"
-                                    style={{ width: "100%", maxWidth: 600, borderRadius: 8 }}
+                                    alt="Obstructed building"
+                                    sx={{ width: "100%", borderRadius: 2, objectFit: "cover", maxWidth: "100%" }}
                                 />
                             </Box>
 
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#f44336", mr: 1, fontWeight: "bold" }}>
-                                    ❌
+                            {/* Bad Example 2 */}
+                            <Box sx={{ flex: 1 }}>
+                                <Typography variant="body1" sx={{ display: "flex", alignItems: "center", mb: 1 }}>
+                                    <Typography component="span" sx={{ color: "#f44336", fontWeight: "bold", mr: 1 }}>
+                                        ❌
+                                    </Typography>
+                                    <strong>{highlightText(t("tutorial.photograph.incorrectExamples.buildingWithShadow"), searchTerm, isSearchActive)}</strong> –{"  "}
+                                    {highlightText("Heavy shadows distort texture and should be avoided.", searchTerm, isSearchActive)}
                                 </Typography>
-                                <Typography variant="body1">
-                                    {highlightText(t("tutorial.photograph.incorrectExamples.buildingWithShadow"), searchTerm)}
-                                </Typography>
-                            </Box>
-
-                            <Box sx={{ mt: 1 }}>
-                                <img
+                                <Box
+                                    component="img"
                                     src="/assets/withshadow.png"
-                                    alt="Example with heavy shadows"
-                                    style={{ width: "100%", maxWidth: 600, borderRadius: 8 }}
+                                    alt="Shadowed building"
+                                    sx={{ width: "100%", borderRadius: 2, objectFit: "cover", maxWidth: "100%" }}
                                 />
                             </Box>
                         </Box>
@@ -256,13 +246,17 @@ const Tutorial = () => {
 
             case "Photo Upload":
                 return (
-                    <Box sx={{...styles.tutorialModelBox,paddingBottom: '80px'}}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Photo Upload"] = el;}} // 新增
+                        sx={{...styles.tutorialModelBox,paddingBottom: '80px'}}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.photoUpload.title"), searchTerm)}
+                            {highlightText(t("tutorial.photoUpload.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.photoUpload.description"), searchTerm)}
+                            {highlightText(
+                                t("tutorial.photoUpload.description"),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -289,18 +283,30 @@ const Tutorial = () => {
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 1.5 }}>
-                                        {highlightText(t("tutorial.photoUpload.setLocation.description"), searchTerm)}
+                                        {highlightText(
+                                            t("tutorial.photoUpload.setLocation.description"),
+                                            searchTerm, isSearchActive
+                                        )}
                                         <br />
                                         <strong>{t("tutorial.photoUpload.setLocation.browserOptions.intro")}</strong>
                                         <br />
-                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.title")}"</strong> –{" "}
-                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.description"), searchTerm)}
+                                        <strong>{t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.title")}</strong> –{" "}
+                                        {highlightText(
+                                            t("tutorial.photoUpload.setLocation.browserOptions.allowWhileVisiting.description"),
+                                            searchTerm, isSearchActive
+                                        )}
                                         <br />
-                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.title")}"</strong> –{" "}
-                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.description"), searchTerm)}
+                                        <strong>{t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.title")}</strong> –{" "}
+                                        {highlightText(
+                                            t("tutorial.photoUpload.setLocation.browserOptions.allowThisTime.description"),
+                                            searchTerm, isSearchActive
+                                        )}
                                         <br />
-                                        <strong>"{t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.title")}"</strong> –{" "}
-                                        {highlightText(t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.description"), searchTerm)}
+                                        <strong>{t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.title")}</strong> –{" "}
+                                        {highlightText(
+                                            t("tutorial.photoUpload.setLocation.browserOptions.neverAllow.description"),
+                                            searchTerm, isSearchActive
+                                        )}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -310,58 +316,94 @@ const Tutorial = () => {
                                 <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
                                     📷
                                 </Typography>
-                                <Typography variant="body1">
-                                    <strong>{t("tutorial.photoUpload.uploadPhotos.title")}</strong>
-                                    <br />
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>{t("tutorial.photoUpload.uploadPhotos.title")}</strong>
+                                    </Typography>
+
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
                                             src="/assets/Choose%20photos.png"
                                             alt="Choose photo example"
-                                            style={{ width: '800px', borderRadius: 8 }}
+                                            style={{
+                                                width: '100%',          // 自动适配容器
+                                                maxWidth: 800,          // 控制最大宽度
+                                                borderRadius: 8
+                                            }}
                                         />
                                     </Box>
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
-                                    <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.shootingUpload.buttonText")}'`, searchTerm)}</strong>
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.shootingUpload.description"), searchTerm)}
-                                    <br />
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
-                                    <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.albumUpload.buttonText")}'`, searchTerm)}</strong>
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.albumUpload.description"), searchTerm)}
-                                </Typography>
-                            </Box>
 
+                                    <Typography variant="body1" sx={{ mt: 1.5 }}>
+                                        {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                        <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.shootingUpload.buttonText")}'`, searchTerm, isSearchActive)}</strong>
+                                        {highlightText(
+                                            t("tutorial.photoUpload.uploadPhotos.shootingUpload.description"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                        <br />
+                                        {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                        <strong>{highlightText(`'${t("tutorial.photoUpload.uploadPhotos.albumUpload.buttonText")}'`, searchTerm, isSearchActive)}</strong>
+                                        {highlightText(
+                                            t("tutorial.photoUpload.uploadPhotos.albumUpload.description"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                    </Typography>
+                                </Box>
+                            </Box>
                             {/* 3. Finalize upload */}
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
                                     ✅
                                 </Typography>
-                                <Typography variant="body1">
-                                    <strong>{t("tutorial.photoUpload.finalizeUpload.title")}</strong>
-                                    <br />
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>{t("tutorial.photoUpload.finalizeUpload.title")}</strong>
+                                    </Typography>
+
+                                    {/* 图1：提交按钮示例图 */}
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
                                             src="/assets/Submit.png"
                                             alt="Choose photo example"
-                                            style={{ width: '600px', borderRadius: 8 }}
+                                            style={{
+                                                width: '100%',       //  改为自适应容器宽度
+                                                maxWidth: 800,       //  限制最大宽度
+                                                borderRadius: 8,
+                                                objectFit: 'cover'   //  防止图像变形
+                                            }}
                                         />
                                     </Box>
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
-                                    <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.submit.buttonText")}'`, searchTerm)}</strong>
-                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.submit.description"), searchTerm)}
-                                    <br />
-                                    {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
-                                    <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.remove.buttonText")}'`, searchTerm)}</strong>
-                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.remove.description"), searchTerm)}
+
+                                    {/* 描述文字 */}
+                                    <Typography variant="body1" sx={{ mt: 1.5 }}>
+                                        {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.submit.buttonText")}'`, searchTerm, isSearchActive)}</strong>
+                                        {highlightText(t("tutorial.photoUpload.finalizeUpload.submit.description"), searchTerm, isSearchActive)}
+                                        <br />
+                                        {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm)}
+                                        <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.remove.buttonText")}'`, searchTerm, isSearchActive)}</strong>
+                                        {highlightText(t("tutorial.photoUpload.finalizeUpload.remove.description"), searchTerm)}
+                                    </Typography>
+
+                                    {/* 图2：上传成功的界面图 */}
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
                                             src="/assets/Uploadsucess.png"
-                                            alt="Choose photo example"
-                                            style={{ width: '600px', borderRadius: 8 }}
+                                            alt="Upload success example"
+                                            style={{
+                                                width: '100%',       // ✅ 与图1保持一致
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                objectFit: 'cover'
+                                            }}
                                         />
                                     </Box>
-                                    <br />
-                                    {highlightText(t("tutorial.photoUpload.finalizeUpload.successMessage"), searchTerm)}
-                                </Typography>
+
+                                    <Typography variant="body1" sx={{ mt: 1.5 }}>
+                                        {highlightText(t("tutorial.photoUpload.finalizeUpload.successMessage"), searchTerm, isSearchActive)}
+                                    </Typography>
+                                </Box>
                             </Box>
                         </Box>
                     </Box>
@@ -370,7 +412,7 @@ const Tutorial = () => {
 
             case "Upload History":
                 return (
-                    <Box
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Upload History"] = el;}} // 新增
                         sx={{
                             ...styles.tutorialModelBox,
                             paddingBottom: "80px",      // ← 确保底部留白
@@ -378,12 +420,15 @@ const Tutorial = () => {
                     >
                         {/* 标题 */}
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.uploadHistory.title"), searchTerm)}
+                            {highlightText(t("tutorial.uploadHistory.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         {/* 段落说明 */}
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.uploadHistory.description"), searchTerm)}
+                            {highlightText(
+                                t("tutorial.uploadHistory.description"),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         {/* 各步骤列表 */}
@@ -399,7 +444,10 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.uploadHistory.steps.searchAndFilter.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.uploadHistory.steps.searchAndFilter.description"), searchTerm)}
+                                        {highlightText(
+                                            t("tutorial.uploadHistory.steps.searchAndFilter.description"),
+                                            searchTerm, isSearchActive
+                                        )}
                                     </Typography>
 
                                     <Typography variant="body1" sx={{ mt: 1 }}>
@@ -446,7 +494,6 @@ const Tutorial = () => {
                                     </Box>
                                 </Box>
                             </Box>
-
                             {/* 2. View details */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography
@@ -456,14 +503,16 @@ const Tutorial = () => {
                                     📷
                                 </Typography>
 
-                                {/* 文字内容包一层 */}
+                                {/* 内容区包一层 Box：保证结构统一 */}
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>{t("tutorial.uploadHistory.steps.viewDetails.title")}</strong> {" "}
-                                        <br />
-                                        {highlightText(t("tutorial.uploadHistory.click"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.uploadHistory.steps.viewDetails.viewDetails"), searchTerm)}</strong>
-                                        {highlightText(t("tutorial.uploadHistory.steps.viewDetails.description"), searchTerm)}
+                                        <strong>{t("tutorial.uploadHistory.steps.viewDetails.title")}</strong>
+                                    </Typography>
+
+                                    <Typography variant="body1" sx={{ mt: 1.5 }}>
+                                        {highlightText(t("tutorial.uploadHistory.click"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.uploadHistory.steps.viewDetails.viewDetails"), searchTerm, isSearchActive)}</strong>
+                                        {highlightText(t("tutorial.uploadHistory.steps.viewDetails.description"), searchTerm, isSearchActive)}
                                         <br />
                                         {t("tutorial.uploadHistory.click")} <strong>'{t("tutorial.uploadHistory.steps.viewDetails.closeButton")}'</strong> {t("tutorial.uploadHistory.steps.viewDetails.desc")}
                                     </Typography>
@@ -472,73 +521,84 @@ const Tutorial = () => {
                                         <img
                                             src="/assets/Details.png"
                                             alt="Photo details example"
-                                            style={{ width: '600px', borderRadius: 8 }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </Box>
-
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
-                                    📁
-                                </Typography>
-
-                                <Box sx={{ flex: 1 }}>
-                                    <Typography variant="body1">
-                                        <strong>{t("tutorial.uploadHistory.steps.pagination.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.uploadHistory.steps.pagination.description"), searchTerm)}
-                                    </Typography>
-
-                                    <Typography variant="body1" sx={{ mt: 1 }}>
-                                        {highlightText(t("tutorial.uploadHistory.steps.pagination.navigation"), searchTerm)}
-                                    </Typography>
-                                </Box>
-                            </Box>
-                            <Box sx={{ mt: 2 }}>
-                                <img
-                                    src="/assets/Pagination.png"
-                                    alt="Pagination example"
-                                    style={{
-                                        width: "100%",
-                                        maxWidth: 800,
-                                        borderRadius: 8,
-                                        display: "block"
-                                    }}
-                                />
-                            </Box>
-                            {/* 4. Exit and return */}
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
-                                    🔙
-                                </Typography>
-
-                                <Box sx={{ flex: 1 }}>
-                                    <Typography variant="body1">
-                                        <strong>{t("tutorial.uploadHistory.steps.exitAndReturn.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.uploadHistory.steps.exitAndReturn.description"), searchTerm)}
-                                    </Typography>
-
-                                    {/* ✅ 图片放在正文下方 */}
-                                    <Box sx={{ mt: 2 }}>
-                                        <img
-                                            src="/assets/Exit.png"
-                                            alt="Exit example"
                                             style={{
-                                                width: "100%",
-                                                maxWidth: 800,
+                                                width: '100%',          //宽度适应容器
+                                                maxWidth: 800,          //限制最大宽度
                                                 borderRadius: 8,
-                                                display: "block"
+                                                objectFit: 'cover'      //防止压缩变形
                                             }}
                                         />
                                     </Box>
                                 </Box>
                             </Box>
+                            {/* 3. Navigate pagination */}
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    📁
+                                </Typography>
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>{t("tutorial.uploadHistory.steps.pagination.title")}</strong> –{' '}
+                                        {highlightText(
+                                            t("tutorial.uploadHistory.steps.pagination.description"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                    </Typography>
+
+                                    <Typography variant="body1" sx={{ mt: 1.5 }}>
+                                        {highlightText(
+                                            t("tutorial.uploadHistory.steps.pagination.navigation"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                    </Typography>
+
+                                    {/* ✅ 图片放进内容块内部 */}
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/Pagination.png"
+                                            alt="Pagination example"
+                                            style={{
+                                                width: '100%',
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+                            {/* 4. Exit and return */}
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
+                                    🔙
+                                </Typography>
+
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>{t("tutorial.uploadHistory.steps.exitAndReturn.title")}</strong> –{' '}
+                                        {highlightText(
+                                            t("tutorial.uploadHistory.steps.exitAndReturn.description"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                    </Typography>
+
+                                    {/* ✅ 内嵌图像块统一格式 */}
+                                    <Box sx={{ mt: 2 }}>
+                                        <img
+                                            src="/assets/Exit.png"
+                                            alt="Exit example"
+                                            style={{
+                                                width: '100%',
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                    </Box>
+                                </Box>
+                            </Box>
+
                         </Box>
                     </Box>
                 );
@@ -546,29 +606,33 @@ const Tutorial = () => {
 
             case "Building Photo Gallery":
                 return (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Building Photo Gallery"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t('tutorial.gallery.title'), searchTerm)}
+                            {highlightText(t('tutorial.gallery.title'), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t('tutorial.gallery.description'), searchTerm)}
+                            {highlightText(
+                                t('tutorial.gallery.description'),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
-                            {/* 1. Search by address */}
+                            {/* ✅ Step 1. Search by address */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     🔍
                                 </Typography>
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t('tutorial.gallery.step1.title')}</strong> –{" "}
-                                        {highlightText(t('tutorial.gallery.step1.content'), searchTerm)}
+                                        {highlightText(
+                                            t('tutorial.gallery.step1.content'),
+                                            searchTerm, isSearchActive
+                                        )}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -580,97 +644,211 @@ const Tutorial = () => {
                                                 maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover"
                                             }}
                                         />
                                     </Box>
                                 </Box>
                             </Box>
 
-                            {/* 2. View Photos */}
+                            {/* Step 2. View photos */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     📷
                                 </Typography>
 
                                 <Box sx={{flex: 1}}>
                                     <Typography variant="body1">
                                         <strong>{t('tutorial.gallery.step2.title')}</strong> –{" "}
-                                        {highlightText(t('tutorial.gallery.step2.content1'), searchTerm)}
-                                        <strong>{highlightText(t('tutorial.gallery.step2.viewAll'), searchTerm)}</strong>{" "}
-                                        {highlightText(t('tutorial.gallery.step2.content2'), searchTerm)}
+                                        {highlightText(
+                                            t('tutorial.gallery.step2.content1'),
+                                            searchTerm
+                                        )}
+                                        <strong>{highlightText(t('tutorial.gallery.step2.viewAll'), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t('tutorial.gallery.step2.content2'), searchTerm, isSearchActive)}
                                     </Typography>
 
-                                    <Box sx={{mt: 2}}>
-                                        <img
-                                            src="/assets/Selectone.png"
-                                            alt="Select Photo"
-                                            style={{
-                                                width: "100%",
-                                                maxWidth: 1000,
-                                                borderRadius: 8,
-                                                display: "block",
-                                                marginBottom: 12,
-                                            }}
-                                        />
-                                        <img
-                                            src="/assets/viewPhoto.png"
-                                            alt="View Photo"
-                                            style={{
-                                                width: "100%",
-                                                maxWidth: 1000,
-                                                borderRadius: 8,
-                                                display: "block",
-                                                marginBottom: 12,
-                                            }}
-                                        />
+                                    <Box
+                                        sx={{
+                                            mt: 2,
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            gap: 2
+                                        }}
+                                    >
+                                        <Box sx={{ flex: 1 }}>
+                                            <img
+                                                src="/assets/Selectone.png"
+                                                alt="Select Photo"
+                                                style={{
+                                                    width: "100%",
+                                                    maxWidth: 800,
+                                                    borderRadius: 8,
+                                                    objectFit: "cover",
+                                                    display: "block",
+                                                    marginBottom: 16
+                                                }}
+                                            />
+                                        </Box>
+                                        <Box sx={{ flex: 1 }}>
+                                            <img
+                                                src="/assets/bpg3.png"
+                                                alt="View Photo"
+                                                style={{
+                                                    width: "100%",
+                                                    maxWidth: 800,
+                                                    borderRadius: 8,
+                                                    objectFit: "cover",
+                                                    display: "block",
+                                                }}
+                                            />
+                                        </Box>
                                     </Box>
                                 </Box>
                             </Box>
+                            {/* Step 3. Like photos */}
+                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
+                                    ❤️
+                                </Typography>
 
+                                <Box sx={{ flex: 1 }}>
+                                    <Typography variant="body1">
+                                        <strong>3. Like Photos</strong> –{" "}
+                                        {highlightText(
+                                            "You can give a like to other user’s photo by clicking the heart icon. Each like gives that user 1 point.",
+                                            searchTerm,
+                                            isSearchActive
+                                        )}
+                                        <br /> {/* 新增换行标记 */}
+                                        {highlightText(
+                                            "Note: Each user can only like the same photo once. Giving a like to your own photo won’t earn any points.",
+                                            searchTerm,
+                                            isSearchActive
+                                        )}
+                                    </Typography>
+                                </Box>
+                            </Box>
+                        </Box>
+                    </Box>
+                );
+
+            case "Rankings":
+                return (
+                    <Box
+                        ref={(el: HTMLDivElement | null) => {
+                            sectionRefs.current["Rankings"] = el; // 用于自动跳转定位
+                        }}
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: '80px' }}
+                    >
+                        <Typography variant="h4" sx={styles.title}>
+                            {highlightText("Rankings", searchTerm, isSearchActive)}
+                        </Typography>
+
+                        <Typography variant="body1" sx={styles.body}>
+                            {highlightText("📈 How to earn points:", searchTerm, isSearchActive)}
+                        </Typography>
+
+                        <Box sx={styles.body}>
+                            <Typography variant="body1">
+                                <strong>1. Daily check-in via photo upload</strong> –{" "}
+                                {highlightText(
+                                    "You get 1 point for uploading a photo each day. If you upload photos for 7 consecutive days or more, you can earn up to 7 extra points.",
+                                    searchTerm, isSearchActive
+                                )}
+                            </Typography>
+
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>2. Approved photos</strong> –{" "}
+                                {highlightText(
+                                    "Each approved photo earns you 5 points. If 5 consecutive uploaded photos are approved, you receive an extra 5 bonus points.",
+                                    searchTerm, isSearchActive
+                                )}
+                                <br />
+                                {highlightText(
+                                    "Example: Based on the upload sequence of photos 1 to 6, if the 3rd photo is not approved while the others are, you don’t get the extra 5 bonus points. In this case, bonus eligibility resets from photo 4 onwards. If photos 7 and 8 are approved, you can earn 5 extra bonus points starting from photo 4.",
+                                    searchTerm, isSearchActive
+                                )}
+                            </Typography>
+
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>3. Likes from other users</strong> –{" "}
+                                {highlightText(
+                                    "Each like from other users gives you 1 point. If the like is withdrawn, the point is invalid. Likes given to your own photo won’t count, and you can only like each photo once.",
+                                    searchTerm, isSearchActive
+                                )}
+                            </Typography>
+
+                            <Box sx={{ mt: 2 }}>
+                                <img
+                                    src="/assets/rankings1.png"
+                                    alt="Ranking point system example"
+                                    style={{ width: '100%', maxWidth: 800, borderRadius: 8 }}
+                                />
+                            </Box>
+                        </Box>
+
+                        <Typography variant="body1" sx={{ ...styles.body, mt: 4 }}>
+                            {highlightText("📊 About the leaderboard:", searchTerm, isSearchActive)}
+                        </Typography>
+
+                        <Box sx={styles.body}>
+                            <Typography variant="body1">
+                                <strong>1. Display scope</strong> –{" "}
+                                {highlightText(
+                                    "Only the top 50 users by total points will be shown. If a user has 0 points, they won’t appear on the leaderboard.",
+                                    searchTerm, isSearchActive
+                                )}
+                            </Typography>
+
+                            <Typography variant="body1" sx={{ mt: 2 }}>
+                                <strong>2. Pagination</strong> –{" "}
+                                {highlightText(
+                                    "If your ranking is not on the first page, use the page navigation to jump to your position, or return to the first page via the button.",
+                                    searchTerm, isSearchActive
+                                )}
+                            </Typography>
                         </Box>
                     </Box>
                 );
 
             case "User Information":
                 return (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["User Information"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.userinfo.title"), searchTerm)}
+                            {highlightText(t("tutorial.userinfo.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.userinfo.description"), searchTerm)}
+                            {highlightText(t("tutorial.userinfo.description"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
-                            {/* 1. Navigate to User Information page */}
+                            {/* 1️⃣ Navigate to User Information page */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     📂
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.userinfo.step1.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.userinfo.step1.content1"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userinfo.step1.profile"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.userinfo.step1.content3"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userinfo.step1.userinfo"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.userinfo.step1.content2"), searchTerm)}
+                                        {highlightText(t("tutorial.userinfo.step1.content1"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step1.profile"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step1.content3"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step1.userinfo"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step1.content2"), searchTerm, isSearchActive)}
                                     </Typography>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/userinfo1.png"
                                             alt="User Information navigation"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,
+                                                maxWidth: 800,            //与其他步骤统一
                                                 borderRadius: 8,
+                                                objectFit: "cover",
                                                 display: "block",
                                             }}
                                         />
@@ -678,35 +856,31 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* 2. Modify personal details */}
+                            {/* 2 Modify personal details */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     ✏️
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>{t("tutorial.userinfo.step2.title")}</strong> –{" "}
+                                        <strong>t("tutorial.userinfo.step2.title")</strong> –{" "}
                                         {highlightText(t("tutorial.userinfo.step2.content1"), searchTerm)}{" "}
-                                        {highlightText(
-                                            t("tutorial.userinfo.step2.click"),
-                                            searchTerm
-                                        )}
-                                        <strong>{highlightText(t("tutorial.userinfo.step2.save"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.userinfo.step2.content3"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userinfo.step2.cancel"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.userinfo.step2.content2"), searchTerm)}
+                                        {highlightText( t("tutorial.userinfo.step2.click"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step2.save"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step2.content3"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userinfo.step2.cancel"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userinfo.step2.content2"), searchTerm, isSearchActive)}
                                     </Typography>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/userinfo2.png"
                                             alt="Edit user information"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,            // 原来是1000 → 改为800以统一
                                                 borderRadius: 8,
+                                                objectFit: "cover",
                                                 display: "block",
                                             }}
                                         />
@@ -717,17 +891,22 @@ const Tutorial = () => {
                     </Box>
                 );
 
+
             case "Photo Review":
                 return roles.includes("admin") ? (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Photo Review"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         {/* Title */}
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.photoReview.title"), searchTerm)}
+                            {highlightText(t("tutorial.photoReview.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         {/* Description */}
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.photoReview.description"), searchTerm)}
+                            {highlightText(
+                                t("tutorial.photoReview.description"),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -743,12 +922,15 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.photoReview.step1.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.photoReview.step1.desc1"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.photoReview.step1.fetchPhotos"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.photoReview.step1.desc2"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusApproved"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.photoReview.step1.and"), searchTerm)}{" "}
-                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusRejected"), searchTerm)}</strong>.
+                                        {highlightText(t("tutorial.photoReview.step1.desc1"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.fetchPhotos"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(
+                                            t("tutorial.photoReview.step1.desc2"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusApproved"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step1.and"), searchTerm, isSearchActive)}{" "}
+                                        <strong>{highlightText(t("tutorial.photoReview.step1.statusRejected"), searchTerm, isSearchActive)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -757,9 +939,11 @@ const Tutorial = () => {
                                             alt="Fetch user photos example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -778,14 +962,23 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.photoReview.step2.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.photoReview.step2.desc1"), searchTerm)}
+                                        {highlightText(
+                                            t("tutorial.photoReview.step2.desc1"),
+                                            searchTerm, isSearchActive
+                                        )}
                                         <br />
-                                        <strong>{highlightText(t("tutorial.photoReview.step2.accept"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.photoReview.step2.desc2"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.photoReview.step2.reject"), searchTerm)}</strong>.
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.accept"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(
+                                            t("tutorial.photoReview.step2.desc2"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.reject"), searchTerm, isSearchActive)}</strong>.
                                         <br />
-                                        {highlightText(t("tutorial.photoReview.step2.desc3"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.photoReview.step2.cancel"), searchTerm)}</strong>.
+                                        {highlightText(
+                                            t("tutorial.photoReview.step2.desc3"),
+                                            searchTerm, isSearchActive
+                                        )}
+                                        <strong>{highlightText(t("tutorial.photoReview.step2.cancel"), searchTerm, isSearchActive)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -794,10 +987,11 @@ const Tutorial = () => {
                                             alt="Approve photo example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
-                                                marginBottom: 12,
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                         <img
@@ -805,9 +999,11 @@ const Tutorial = () => {
                                             alt="Batch approval example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                         <img
@@ -815,10 +1011,11 @@ const Tutorial = () => {
                                             alt="select batch photo example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
-                                                marginBottom: 12,
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -837,13 +1034,16 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.photoReview.step3.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.photoReview.step3.desc1"), searchTerm)}
+                                        {highlightText(
+                                            t("tutorial.photoReview.step3.desc1"),
+                                            searchTerm, isSearchActive
+                                        )}
                                         <br />
-                                        {highlightText(t("tutorial.photoReview.step3.desc2"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.photoReview.step3.photoReview"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.photoReview.step3.or"), searchTerm)}{" "}
-                                        <strong>{highlightText(t("tutorial.photoReview.step3.exit"), searchTerm)}</strong>{" "}
-                                        {highlightText(t("tutorial.photoReview.step3.desc3"), searchTerm)}
+                                        {highlightText(t("tutorial.photoReview.step3.desc2"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.photoReview.step3.photoReview"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step3.or"), searchTerm, isSearchActive)}{" "}
+                                        <strong>{highlightText(t("tutorial.photoReview.step3.exit"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.photoReview.step3.desc3"), searchTerm, isSearchActive)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -852,9 +1052,11 @@ const Tutorial = () => {
                                             alt="Review progress example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -864,16 +1066,16 @@ const Tutorial = () => {
                     </Box>
                 ) : null;
 
-
             case "User Management":
                 return roles.includes("admin") ? (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["User Management"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.userManagement.title"), searchTerm)}
+                            {highlightText(t("tutorial.userManagement.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.userManagement.description"), searchTerm)}
+                            {highlightText(t("tutorial.userManagement.description"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -885,13 +1087,23 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.userManagement.step1.title")}</strong> –{" "}
-                                        {highlightText(t("tutorial.userManagement.step1.description"), searchTerm)}
+                                        {highlightText(
+                                            t("tutorial.userManagement.step1.description"),
+                                            searchTerm
+                                        )}
                                     </Typography>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/userlink.png"
                                             alt="Admin panel example"
-                                            style={{ width: "100%", maxWidth: 800, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,          // 与其他图像统一
+                                                borderRadius: 8,
+                                                objectFit: "cover",
+                                                display: "block"
+                                            }}
                                         />
                                     </Box>
                                 </Box>
@@ -905,164 +1117,238 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.userManagement.step2.title")}</strong> –{" "}
-                                        {t("tutorial.userManagement.step2.description1")}
-                                        <strong>{t("tutorial.userManagement.step2.refresh")}</strong>{" "}
-                                        {t("tutorial.userManagement.step2.description2")}
+                                        {highlightText(t("tutorial.userManagement.step2.description1"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step2.refresh"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userManagement.step2.description2"), searchTerm, isSearchActive)}
                                     </Typography>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/managment.png"
                                             alt="User search example"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,          // ✅ 原来是1000 → 修改为统一800
+                                                borderRadius: 8,
+                                                objectFit: "cover",
+                                                display: "block"
+                                            }}
                                         />
                                     </Box>
                                 </Box>
                             </Box>
 
-                            {/* 3. Delete Users */}
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
+                            {/* Step 3: Delete Users */}
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
                                     ➖
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>{t("tutorial.userManagement.step3.title")}</strong> <br />
-                                        {t("tutorial.userManagement.step3.description1")}
-                                        <strong>{t("tutorial.userManagement.step3.delete")}</strong>.
+                                        <strong>{t("tutorial.userManagement.step3.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.userManagement.step3.description1"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step3.delete"), searchTerm, isSearchActive)}</strong>.
                                     </Typography>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/delete.png"
                                             alt="Delete user example"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,              // ✅ 统一宽度
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
                                 </Box>
                             </Box>
 
-                            {/* 4. Add User as Admin */}
-                            <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
+                            {/* Step 4: Add User as Admin */}
+                            {/* Step 4: Add User as Admin */}
+                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
+                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
                                     ➕
                                 </Typography>
+
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>{t("tutorial.userManagement.step4.title")}</strong>
-                                        <br />
-                                        {t("tutorial.userManagement.step4.description1")}
-                                        <strong>{t("tutorial.userManagement.step4.group")}</strong>
-                                        {t("tutorial.userManagement.step4.description2")}
-                                        <strong>{t("tutorial.userManagement.step4.joinGroup")}</strong>.
+                                        <strong>{t("tutorial.userManagement.step4.title")}</strong> –{" "}
+                                        {highlightText(t("tutorial.userManagement.step4.description1"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.group"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userManagement.step4.description2"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.joinGroup"), searchTerm, isSearchActive)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin1.png"
                                             alt="Step 1 - Select user and click Group"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin2.png"
                                             alt="Step 2 - Choose Join Group"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText(t("tutorial.userManagement.step4.reminder"), searchTerm)}
+                                        {highlightText(t("tutorial.userManagement.step4.reminder"), searchTerm, isSearchActive)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin3.png"
                                             alt="Reminder - Keep user in User group"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText(t("tutorial.userManagement.step4.description3"), searchTerm)} <strong>{highlightText(">", searchTerm)}</strong>
-                                        {highlightText(t("tutorial.userManagement.step4.description4"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userManagement.step4.adminGroup"), searchTerm)}</strong>
-                                        {highlightText(t("tutorial.userManagement.step4.description5"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userManagement.step4.join"), searchTerm)}</strong>.
+                                        {highlightText(t("tutorial.userManagement.step4.description3"), searchTerm, isSearchActive)} <strong>{highlightText(">", searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userManagement.step4.description4"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.adminGroup"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userManagement.step4.description5"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.join"), searchTerm, isSearchActive)}</strong>.
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin4.png"
                                             alt="Step 4 - Navigate to groups"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin5.png"
                                             alt="Step 5 - Join admin group"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
 
                                     <Typography variant="body1" sx={{ mt: 2 }}>
-                                        {highlightText(t("tutorial.userManagement.step4.description6"), searchTerm)}
-                                        <strong>{highlightText(t("tutorial.userManagement.step4.leave"), searchTerm)}</strong>
-                                        {highlightText(t("tutorial.userManagement.step4.description7"), searchTerm)}
+                                        {highlightText(t("tutorial.userManagement.step4.description6"), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t("tutorial.userManagement.step4.leave"), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t("tutorial.userManagement.step4.description7"), searchTerm, isSearchActive)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin6.png"
                                             alt="Remove user from admin - step 1"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin7.png"
                                             alt="Confirm admin leave"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
+
                                     <Box sx={{ mt: 2 }}>
                                         <img
                                             src="/assets/addadmin8.png"
                                             alt="Success message shown"
-                                            style={{ width: "100%", maxWidth: 1000, borderRadius: 8, display: "block" }}
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                display: "block",
+                                                objectFit: "cover"
+                                            }}
                                         />
                                     </Box>
                                 </Box>
                             </Box>
+
+
+
                         </Box>
                     </Box>
                 ) : null;
 
             case "Photo Download":
                 return (
-                    <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Photo Download"] = el;}} // 新增
+                        sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.photoDownload.title"), searchTerm)}
+                            {highlightText(t("tutorial.photoDownload.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.photoDownload.description"), searchTerm)}
+                            {highlightText(
+                                t("tutorial.photoDownload.description"),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
                             {/* 1. Search by address */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
-                                <Typography
-                                    variant="body1"
-                                    sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}
-                                >
+                                <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     🔍
                                 </Typography>
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t('tutorial.photoDownload.step1.title')}</strong> –{" "}
-                                        {highlightText(t('tutorial.photoDownload.step1.description'), searchTerm)}
+                                        {highlightText(
+                                            t('tutorial.photoDownload.step1.description'),
+                                            searchTerm, isSearchActive
+                                        )}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1074,6 +1360,8 @@ const Tutorial = () => {
                                                 maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12           // 与多张图片保持底部间距一致
                                             }}
                                         />
                                     </Box>
@@ -1094,10 +1382,10 @@ const Tutorial = () => {
                                         <strong>{t('tutorial.photoDownload.step2.title')}</strong> –{" "}
                                         {highlightText(
                                             t('tutorial.photoDownload.step2.description1'),
-                                            searchTerm
+                                            searchTerm, isSearchActive
                                         )}
-                                        <strong>{highlightText(t('tutorial.photoDownload.step2.viewAll'), searchTerm)}</strong>{" "}
-                                        {highlightText(t('tutorial.photoDownload.step2.description2'), searchTerm)}
+                                        <strong>{highlightText(t('tutorial.photoDownload.step2.viewAll'), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t('tutorial.photoDownload.step2.description2'), searchTerm, isSearchActive)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1106,10 +1394,11 @@ const Tutorial = () => {
                                             alt="Photo Selectone"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
-                                                marginBottom: 12,
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                         <img
@@ -1117,10 +1406,11 @@ const Tutorial = () => {
                                             alt="Photo Selecttwo"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
-                                                marginBottom: 12,
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -1139,11 +1429,14 @@ const Tutorial = () => {
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t('tutorial.photoDownload.step3.title')}</strong> –{" "}
-                                        {highlightText(t('tutorial.photoDownload.step3.description1'), searchTerm)}
-                                        <strong>{highlightText(t('tutorial.photoDownload.step3.download'), searchTerm)}</strong>{" "}
-                                        {highlightText(t('tutorial.photoDownload.step3.description2'), searchTerm)}
+                                        {highlightText(t('tutorial.photoDownload.step3.description1'), searchTerm, isSearchActive)}
+                                        <strong>{highlightText(t('tutorial.photoDownload.step3.download'), searchTerm, isSearchActive)}</strong>{" "}
+                                        {highlightText(t('tutorial.photoDownload.step3.description2'), searchTerm, isSearchActive)}
                                         <br />
-                                        {highlightText(t('tutorial.photoDownload.step3.description3'), searchTerm)}
+                                        {highlightText(
+                                            t('tutorial.photoDownload.step3.description3'),
+                                            searchTerm, isSearchActive
+                                        )}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1152,19 +1445,23 @@ const Tutorial = () => {
                                             alt="Viewphoto example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                         <img
-                                            src="/assets/Download.png"
+                                            src="/assets/download4.png"
                                             alt="Download example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 1000,
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
+                                                objectFit: "cover",
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -1177,9 +1474,10 @@ const Tutorial = () => {
 
             case "FAQ":
                 return (
-                    <Box sx={styles.tutorialModelBox}>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["FAQ"] = el;}} // 新增
+                        sx={styles.tutorialModelBox}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText(t("tutorial.faq.title"), searchTerm)}
+                            {highlightText(t("tutorial.faq.title"), searchTerm, isSearchActive)}
                         </Typography>
                         <Box sx={{ ...styles.body, mt: 2 }}>
                             {/* 使用两列布局来节省空间 */}
@@ -1196,14 +1494,14 @@ const Tutorial = () => {
                                     {/* Photo Quality Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText(t("tutorial.faq.photoQuality.title"), searchTerm)}
+                                            {highlightText(t("tutorial.faq.photoQuality.title"), searchTerm, isSearchActive)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                                 {t('tutorial.faq.photoQuality.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                 {highlightText(t("tutorial.faq.photoQuality.a1"), searchTerm)}
+                                                {highlightText(t("tutorial.faq.photoQuality.a1"), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
@@ -1211,7 +1509,7 @@ const Tutorial = () => {
                                                 {t('tutorial.faq.photoQuality.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                 {highlightText(t("tutorial.faq.photoQuality.a2"), searchTerm)}
+                                                {highlightText(t("tutorial.faq.photoQuality.a2"), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1219,14 +1517,14 @@ const Tutorial = () => {
                                     {/* Upload Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText(t("tutorial.faq.upload.title"), searchTerm)}
+                                            {highlightText(t("tutorial.faq.upload.title"), searchTerm, isSearchActive)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                                 {t('tutorial.faq.upload.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.upload.a1'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.upload.a1'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
@@ -1234,7 +1532,7 @@ const Tutorial = () => {
                                                 {t('tutorial.faq.upload.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.upload.a2'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.upload.a2'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1245,14 +1543,14 @@ const Tutorial = () => {
                                     {/* Address Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText(t("tutorial.faq.address.title"), searchTerm)}
+                                            {highlightText(t("tutorial.faq.address.title"), searchTerm, isSearchActive)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                                 {t('tutorial.faq.address.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.address.a1'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.address.a1'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
@@ -1260,7 +1558,7 @@ const Tutorial = () => {
                                                 {t('tutorial.faq.address.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.address.a2'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.address.a2'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1268,14 +1566,14 @@ const Tutorial = () => {
                                     {/* Technical Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText(t("tutorial.faq.technical.title"), searchTerm)}
+                                            {highlightText(t("tutorial.faq.technical.title"), searchTerm, isSearchActive)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
                                                 {t('tutorial.faq.technical.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.technical.a1'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.technical.a1'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
@@ -1283,7 +1581,7 @@ const Tutorial = () => {
                                                 {t('tutorial.faq.technical.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                {highlightText(t('tutorial.faq.technical.a2'), searchTerm)}
+                                                {highlightText(t('tutorial.faq.technical.a2'), searchTerm, isSearchActive)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1295,22 +1593,25 @@ const Tutorial = () => {
             case "Tutorial":
             default:
                 return (
-                    <Box>
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current[""] = el;}} >
                         <Typography variant="h2" sx={styles.title}>
-                            {highlightText(t("tutorial.main.title"), searchTerm)}
+                            {highlightText(t("tutorial.main.title"),searchTerm, isSearchActive)}
                         </Typography>
                         <Divider sx={styles.divider} />
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(t("tutorial.main.welcome"), searchTerm)}
+                            {highlightText(
+                                t("tutorial.main.welcome"),
+                                searchTerm, isSearchActive
+                            )}
                         </Typography>
 
                         {/* 常见问题快速链接 */}
                         <Box sx={{ ...styles.body, mt: 4 }}>
                             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
-                                {highlightText(t("tutorial.main.quickHelpTitle"), searchTerm)}
+                                {highlightText(t("tutorial.main.quickHelpTitle"), searchTerm, isSearchActive)}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                {highlightText(t("tutorial.main.quickHelpIntro"), searchTerm)}
+                                {highlightText(t("tutorial.main.quickHelpIntro"), searchTerm, isSearchActive)}
                             </Typography>
 
                             <Box sx={{ ml: 2 }}>
@@ -1323,7 +1624,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q1"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q1"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1336,7 +1637,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q2"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q2"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1349,7 +1650,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q3"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q3"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1362,7 +1663,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q4"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q4"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1375,7 +1676,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q5"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q5"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1388,7 +1689,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText(t("tutorial.main.faqLinks.q6"), searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q6"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
 
@@ -1401,7 +1702,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                                        {highlightText(t("tutorial.main.faqLinks.viewAll"), searchTerm)}
+                                        {highlightText(t("tutorial.main.faqLinks.viewAll"), searchTerm, isSearchActive)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -1410,25 +1711,40 @@ const Tutorial = () => {
                 );
         }
     };
-
     return (
         <Box sx={pageBackgroundStyles.container} style={{ justifyContent: "flex-start", height: "100vh", alignItems: "stretch", overflow: "hidden" }}>
-            {/* 左侧菜单栏 */}
+            {/* 左侧菜单栏 - 桌面端和移动端都显示 */}
             <Box
                 sx={{
                     position: "fixed",
-                    top: `${64}px`,
+                    top: "64px", // 修改：从顶部菜单栏下方开始
                     left: 0,
-                    width: `${drawerWidth}px`,
-                    height: `calc(100% - ${64}px)`,
+                    width: isMobile ? `${drawerWidth * 0.8}px` : `${drawerWidth}px`, // 移动端稍微窄一点
+                    height: "calc(100vh - 64px)", // 修改：减去顶部菜单栏高度
                     borderRight: "1px solid #ddd",
                     backgroundColor: "#fdfdfb",
                     overflowY: "auto",
-                    zIndex: 1000,
+                    zIndex: 900, // 修改：降低z-index，确保不遮住顶部菜单栏
                     padding: 0,
+                    // 移动端可以滑动隐藏/显示
+                    transform: isMobile && !mobileOpen ? `translateX(-${drawerWidth * 0.8}px)` : 'translateX(0)',
+                    transition: 'transform 0.3s ease-in-out',
                 }}
             >
                 <Box sx={{ overflow: "auto", p: 2 }}>
+                    {/* 移动端添加关闭按钮 */}
+                    {isMobile && (
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+                            <IconButton
+                                size="small"
+                                onClick={() => setMobileOpen(false)}
+                                sx={{ color: 'text.secondary' }}
+                            >
+                                <CloseIcon />
+                            </IconButton>
+                        </Box>
+                    )}
+
                     {/* 搜索框 */}
                     <Box sx={{ mb: 2 }}>
                         <TextField
@@ -1436,7 +1752,13 @@ const Tutorial = () => {
                             size="small"
                             placeholder={t('Search')+"..."}
                             value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
+                            onChange={(e) => {
+                                setSearchTerm(e.target.value);
+                                // 修复bug1：当搜索词为空时，立即清空搜索结果
+                                if (!e.target.value.trim()) {
+                                    setSearchResults([]);
+                                }
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter') {
                                     handleSearch();
@@ -1487,7 +1809,18 @@ const Tutorial = () => {
                                 <ListItem
                                     key={index}
                                     disablePadding
-                                    onClick={() => setSelectedSection(section.key)}
+                                    onClick={() => {
+                                        setSelectedSection(text.key);
+                                        // 新增：点击菜单项自动跳转到模块
+                                        const scrollTarget = sectionRefs.current[text.key];
+                                        if (scrollTarget) {
+                                            scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
+                                        }
+                                        // 移动端选择后自动关闭菜单
+                                        if (isMobile) {
+                                            setMobileOpen(false);
+                                        }
+                                    }}
                                     sx={{
                                         backgroundColor: isHighlighted ? '#e3f2fd' : 'transparent',
                                         borderRadius: '4px',
@@ -1504,17 +1837,7 @@ const Tutorial = () => {
                                         }}
                                     >
                                         <ListItemText
-                                            primary={
-                                                <span>
-                                {isHighlighted && searchTerm ? (
-                                    <span style={{ fontWeight: 'bold' }}>
-                                        {highlightText(section.label, searchTerm)}
-                                    </span>
-                                ) : (
-                                    section.label
-                                )}
-                            </span>
-                                            }
+                                            primary={highlightText(text.label, searchTerm, isSearchActive && searchResults.includes(text))} //  第三处更新：统一调用方式
                                         />
                                     </ListItemButton>
                                 </ListItem>
@@ -1534,20 +1857,67 @@ const Tutorial = () => {
                 </Box>
             </Box>
 
+            {/* 移动端遮罩层 */}
+            {isMobile && mobileOpen && (
+                <Box
+                    sx={{
+                        position: 'fixed',
+                        top: 64, // 修改：从顶部菜单栏下方开始
+                        left: 0,
+                        width: '100vw',
+                        height: 'calc(100vh - 64px)', // 修改：减去顶部菜单栏高度
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        zIndex: 899, // 修改：确保在菜单栏下方
+                    }}
+                    onClick={() => {
+                        setMobileOpen(false);
+
+                        // 新增：关闭菜单时自动滚动到当前选中模块
+                        const currentRef = sectionRefs.current[selectedSection];
+                        currentRef?.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }}
+                />
+            )}
+
+            {/* 移动端菜单切换按钮 */}
+            {isMobile && (
+                <IconButton
+                    sx={{
+                        position: 'fixed',
+                        top: 72, // 修改：调整到顶部菜单栏下方
+                        left: mobileOpen ? `${drawerWidth * 0.8 - 40}px` : '16px',
+                        zIndex: 901, // 修改：确保按钮在菜单栏之上
+                        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                        border: '1px solid #ddd',
+                        transition: 'left 0.3s ease-in-out',
+                        '&:hover': {
+                            backgroundColor: 'rgba(255, 255, 255, 1)',
+                        }
+                    }}
+                    onClick={() => setMobileOpen(!mobileOpen)}
+                >
+                    <MenuIcon />
+                </IconButton>
+            )}
+
+
             {/* 右侧内容区域 */}
             <Box
                 component="main"
                 sx={{
                     flexGrow: 1,
-                    marginLeft: `${drawerWidth}px`,
+                    marginLeft: isMobile ? 0 : `${drawerWidth}px`,
+                    //marginLeft: `${drawerWidth}px`,
                     height: "100vh",
-                    padding: 3,
+                    padding: isMobile ? 2 : 3,
+                    //padding: 3,
                     backgroundColor: "#fdfdfb",
                     overflowY: "auto",
                     paddingBottom: '80px'
                 }}
             >
-                <Box sx={{ paddingBottom: '80px' }}>
+                {/* 内容区域顶部补空，让内容不被 AppBar 挡住 */}
+                <Box sx={{ paddingTop: isMobile ? '60px' : 0}}>
                     {renderContent()}
                 </Box>
             </Box>

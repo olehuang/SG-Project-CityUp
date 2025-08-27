@@ -13,9 +13,9 @@ const PhotoGarlleryStyles={
         top:"0.5%",
         marginRight:"2%",
         paddingTop: "0.5%",
-        height:"90%",//`calc(100vh - ${70}px)`,
+        height:"100%",//`calc(100vh - ${70}px)`,
         '@media (min-width:900px)': {
-            height: "85%",
+            height: "90%",
         },
         //border:"1px solid skyblue",
         borderRadius:"5px",

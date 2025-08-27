@@ -12,23 +12,45 @@ import { useTranslation } from 'react-i18next';
 const ProductIntroduction=()=>{
     const { t } = useTranslation();
     return(
-        <Box sx={pageBackgroundStyles.container}>
-            <Box sx={pageBackgroundStyles.wrapper}>
+        <Box sx={{
+            ...pageBackgroundStyles.container,
+            justifyContent: "content",//monitor adapter
+            overflowY: {sx:"auto",sm:"auto",md:"hidden",lg:"auto"},//monitor adapter
+            overflowX:"hidden",//monitor adapter
+        }}>
+            <Box sx={{
+                ...pageBackgroundStyles.wrapper,
+                marginTop: "1%",//monitor adapter
+            }}>
                 <Typography variant="h3" component="h2" sx={{
                     ...pageBackgroundStyles.title,
-                    fontSize: { xs: '2rem', sm: '2.5rem', md: '2.8rem' },
-                    mb: 3,
+                    // 在移动端使用更小的字体，但保持你的响应式设计
+                    fontSize: {
+                        xs: '3rem',  // MODIFIED for mobile
+                        sm: '4rem',
+                        md: '5rem',
+                    },
+                    marginBottom: '1%',//monitor adapter
+                    textAlign: 'center',
+                    lineHeight: 1.1,
+                    maxWidth: '100vw',
+                    overflowX: 'hidden',  // 防止横向滚动
+                    overflow:"hidden",//monitor adapter
                 }}>
                     {t('productIntro.title')}
                 </Typography>
 
-                <Typography variant="body1" paragraph sx={{ mb: 4, fontSize: '1.1rem', lineHeight: 1.6 }}>
+                <Typography variant="body1" paragraph sx={{
+                    mb: "2%",
+                    fontSize: {xs:"0.9rem",md:'1.1rem'}, //monitor adapter
+                    lineHeight: 1.6
+                }}>
                     {t('productIntro.description')}
                 </Typography>
 
                 <Typography variant="h2" component="h2" id="process-section" sx={{
                     mb: 0,
-                    fontSize: '1.5rem',
+                    fontSize: '1.5rem',//monitor adapter
                     fontWeight: 400,
                     color: 'primary.main'
                 }}>
@@ -41,16 +63,21 @@ const ProductIntroduction=()=>{
                             text: t('productIntro.step1.title'),
                             secondary: t('productIntro.step1.desc'),
                             path: null,
-                            action: <Button variant="text" size="small" component={Link} to="/dashboard/tutorial" sx={{ ml: 1 }}>{t('productIntro.viewTutorial')}</Button>
+                            action: <Button variant="text" size="small" component={Link} to="/dashboard/tutorial"
+                                            sx={{
+                                                ml: "1%",//monitor adapter
+                            }}>{t('productIntro.viewTutorial')}</Button>
                         },
                         { text: t('productIntro.step2.title'), secondary: t('productIntro.step2.desc') },
                         { text: t('productIntro.step3.title'), secondary: t('productIntro.step3.desc') }
                     ].map((item, index) => (
-                        <ListItem key={index} disablePadding>
+                        <ListItem key={index}
+                                  //disablePadding //monitor adapter
+                        >
                             <ListItemButton
                                 component={item.path ? Link : 'div'}
                                 to={item.path || undefined}
-                                sx={{ py: 1.5 }}
+                                sx={{ py: "0.5%" }}
                             >
                                 <ListItemIcon sx={{ minWidth: 36 }}>
                                     <Typography color="primary">{index + 1}.</Typography>
@@ -97,5 +124,4 @@ const ProductIntroduction=()=>{
         </Box>
     )
 }
-
 export default ProductIntroduction;

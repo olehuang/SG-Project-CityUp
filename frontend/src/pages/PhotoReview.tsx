@@ -15,7 +15,8 @@ import {
     CircularProgress,
     Dialog,
     DialogContent,
-    IconButton
+    IconButton,
+    FormControlLabel,
 } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import pageBackgroundStyles from "./pageBackgroundStyles";
@@ -24,6 +25,7 @@ import { useAuthHook } from "../components/AuthProvider";
 import { photoReviewStyles } from "./PhotoReviewStyles";
 import axios from "axios"
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery, useTheme, Card, CardContent, CardMedia, CardActions } from "@mui/material";//
 
 interface PhotoItem {
     photo_id: string;
@@ -66,6 +68,9 @@ const PhotoReview = () => {
         setPreviewImage("");
         setPreviewPhotoInfo(null);
     };
+
+    const theme = useTheme(); //
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm"));//
 
     const fetchPhotos = async () => {
         try {
@@ -276,9 +281,98 @@ const PhotoReview = () => {
                         {selectMode ? t("photoReview.cancelSelection") : t("photoReview.select")}
                     </Button>
                 </Box>
+                {isMobile ? (
+                        // 卡片展示：移动端
+                        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                            {/* Select All Button*/}
+                            {selectMode && (
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            checked={selectAll}
+                                            onChange={toggleSelectAll}
+                                            indeterminate={
+                                                photos.some((p) => p.selected) && !photos.every((p) => p.selected)
+                                            }
+                                            size="small"
+                                        />
+                                    }
+                                    label="Select All"
+                                    sx={{ ml: 1 }}
+                                />
+                            )}
+                            {photos.length === 0 ? (
+                                <Typography sx={photoReviewStyles.noDataText}>
+                                    No pending photos for review, click 'Fetch Photos' to get data
+                                </Typography>
+                            ) : (
+                                photos.map((photo) => (
+                                    <Card key={photo.photo_id} sx={{ position: 'relative' }}>
+                                        {selectMode && (
+                                            <Checkbox
+                                                checked={!!photo.selected}
+                                                onChange={() => togglePhotoSelection(photo.photo_id)}
+                                                sx={{ position: 'absolute', top: 8, right: 8 }}
+                                            />
+                                        )}
 
-                {/* Photo list */}
-                <TableContainer
+                                        <CardMedia
+                                            component="img"
+                                            height="180"
+                                            image={photo.image_url}
+                                            alt="Building Photo"
+                                            onClick={() => handleImageClick(photo)}
+                                            onError={(e) => {
+                                                e.currentTarget.style.display = "none";
+                                            }}
+                                            sx={{ cursor: 'pointer' }}
+                                        />
+
+                                        <CardContent>
+                                            <Typography variant="body2" gutterBottom>
+                                                <strong>Address:</strong> {photo.building_addr}
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                <strong>Uploader:</strong> {photo.username || photo.user_id}
+                                            </Typography>
+                                            <Typography variant="body2">
+                                                <strong>Uploaded At:</strong>{" "}
+                                                {new Intl.DateTimeFormat("de-DE", {
+                                                    timeZone: "Europe/Berlin",
+                                                    dateStyle: "medium",
+                                                    timeStyle: "medium",
+                                                }).format(new Date(photo.upload_time + (photo.upload_time.includes('Z') || photo.upload_time.includes('+') ? '' : 'Z')))}
+                                            </Typography>
+                                        </CardContent>
+
+                                        <CardActions sx={{ justifyContent: 'flex-end', gap: 1, px: 2, pb: 2 }}>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                onClick={() => handleSingleReview(photo.photo_id, "success")}
+                                                disabled={loading}
+                                                sx={photoReviewStyles.approveButton}
+                                            >
+                                                Approve
+                                            </Button>
+                                            <Button
+                                                size="small"
+                                                variant="contained"
+                                                onClick={() => handleSingleReview(photo.photo_id, "fail")}
+                                                disabled={loading}
+                                                sx={photoReviewStyles.rejectButton}
+                                            >
+                                                Reject
+                                            </Button>
+                                        </CardActions>
+                                    </Card>
+                                ))
+                            )}
+                        </Box>
+                    ) :
+
+                    (
+                        <TableContainer
                     component={Paper}
                     sx={photoReviewStyles.tableContainer}
                 >
@@ -345,15 +439,19 @@ const PhotoReview = () => {
                                             </TableCell>
                                         )}
                                         <TableCell sx={photoReviewStyles.imageCell}>
-                                            <img
-                                                src={photo.image_url}
-                                                alt="Building Photo"
-                                                style={photoReviewStyles.image}
+                                            <Box
+                                                sx={photoReviewStyles.imageBox}
                                                 onClick={() => handleImageClick(photo)}
-                                                onError={(e) => {
-                                                    e.currentTarget.style.display = "none";
-                                                }}
-                                            />
+                                            >
+                                                <img
+                                                    src={photo.image_url}
+                                                    alt="Building Photo"
+                                                    style={photoReviewStyles.imageInner}
+                                                    onError={(e) => {
+                                                        e.currentTarget.style.display = "none";
+                                                    }}
+                                                />
+                                            </Box>
                                         </TableCell>
                                         <TableCell>
                                             <Typography
@@ -416,7 +514,7 @@ const PhotoReview = () => {
                             )}
                         </TableBody>
                     </Table>
-                </TableContainer>
+                </TableContainer> )}
 
                 {/* Statistical information */}
                 <Box sx={photoReviewStyles.statsContainer}>
@@ -479,10 +577,11 @@ const PhotoReview = () => {
                     </IconButton>
 
                     {previewImage && (
-                        <img
+                        <Box
+                            component="img"
                             src={previewImage}
                             alt="Photo Preview"
-                            style={photoReviewStyles.previewImage}
+                            sx={photoReviewStyles.previewImage}  // 改为sx而不是style
                             onError={(e) => {
                                 console.error("Preview image failed to load");
                             }}

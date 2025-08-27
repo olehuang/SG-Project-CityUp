@@ -1,4 +1,4 @@
-import React, {useState}from 'react';
+import React,{useState,useEffect} from 'react';
 import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
@@ -9,6 +9,7 @@ import Button from '@mui/material/Button';
 import {useNavigate,useLocation,Link} from "react-router-dom";
 import LanguageSelector from "../LanguageSelector";
 import { useTranslation } from 'react-i18next';
+import { useMediaQuery, useTheme } from "@mui/material";
 interface TopBarProps {
     onMenuClick: () => void;
 }
@@ -27,6 +28,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     const [giveLanguage,setGiveLanguage]=useState("en");
     const { t } = useTranslation();
 
+    //Mobil-End
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
     const getPageTitle = () => {
         switch (location.pathname) {
@@ -50,7 +54,6 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 return t('bar.loading');
         }
     };
-
     return (
         <AppBar position="static" sx={{
             // backgroundColor: '#1976d2',
@@ -58,7 +61,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
             marginBottom:0,
 
         }}>
-            <Toolbar  sx={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+            <Toolbar  sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
                     <IconButton
                         edge="start"
@@ -68,7 +71,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     >
                         <MenuIcon/>
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ml: 2}} onClick={handleClickToHome}>
+                    <Typography variant="h6" component="div" sx={{ ml: 2, cursor: 'pointer', fontSize: { xs: '1rem', sm: '1.25rem' } }} onClick={handleClickToHome}>
                         CityUp
                     </Typography>
                 </Box>
@@ -85,7 +88,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                          }}
                      component={Link}
                      to="/dashboard">
-                    <Typography variant="h6" component="div" sx={{justifyContent: "space-between",}}>
+                    <Typography variant="h6" component="div" sx={{fontSize: { xs: '1rem', sm: '1.25rem' }}}>
                         {getPageTitle()}
                     </Typography>
                 </Box>
@@ -94,10 +97,10 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     alignItems: 'center',
                     mr: "6%",//margin right
                 }}>
-                    <LanguageSelector
+                    {!isMobile && (<LanguageSelector
                         setLanguage={setLanguage}
                         giveLanguage={giveLanguage}
-                    />
+                    />)}
                     <Button
                         onClick={() => {
                             navigate('/dashboard');
