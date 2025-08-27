@@ -10,6 +10,7 @@ declare module 'i18next' {
             translation: {
                 getStart: string;
                 UploadPhoto: string;
+                mapdesc:string;
                 Uploaddesc:string;
                 AddAddress:string;
                 Camera:string;
@@ -232,6 +233,7 @@ declare module 'i18next' {
                         photoReview:string;
                         photoDownload: string;
                         userManagement:string;
+                        rankings:string;
                     };
                     photograph: {
                         title: string;
@@ -252,6 +254,7 @@ declare module 'i18next' {
                             title: string;
                             tooManyObstructions: string;
                             buildingWithShadow: string;
+                            description:string;
                         };
                     };
                     photoUpload: {
@@ -522,6 +525,36 @@ declare module 'i18next' {
                             viewAll: string;
                         }
                     };
+                    rankings: {
+                        title:string;
+                        howToEarn: string;
+                        points: {
+                            dailyCheckIn: {
+                                title: string;
+                                description: string;
+                            },
+                            approvedPhotos: {
+                                title:string;
+                                description1: string;
+                                description2: string;
+                            },
+                            likes: {
+                                title: string;
+                                description:string;
+                            }
+                        },
+                        leaderboard: {
+                            title: string;
+                            displayScope: {
+                                title: string;
+                                description: string;
+                            },
+                            pagination: {
+                                title:string;
+                                description: string;
+                            }
+                        }
+                    };
                 };
             };
         };
@@ -534,6 +567,7 @@ const resources: Resource = {
         translation: {
             getStart: "Get Started",
             UploadPhoto:"Upload Building Photos",
+            mapdesc:"Drag the marker to adjust the building location",
             Uploaddesc:"Please enter the address of the building to be registered (Darmstadt only)",
             AddAddress:"Type the address or click on the map to select.",
             Camera:"Camera",
@@ -573,10 +607,13 @@ const resources: Resource = {
             },
             photoRequirements: {
                 title: "Photo shooting requirements:",
-                noFaces: "NO! Face and Licence Plate",
-                noObstructions: "NO! Obstructions",
-                noShadows: "NO! Shadows on the building",
-                noDistortion: "NO! Distortion, ensuring parallelism!",
+                noFaces: "Face and Licence Plate",
+                pls:"Pls!",
+                no:"NO!",
+                desc:"Please Prioritize photographing the flesh-colored, khaki, and brown houses on the map.",
+                noObstructions: "Obstructions",
+                noShadows: "Shadows on the building",
+                noDistortion: "Distortion, ensuring parallelism!",
                 clear: "Make sure pictures are clear",
                 wholeBuilding: "Photographing the building as a whole"
             },
@@ -762,7 +799,8 @@ const resources: Resource = {
                     faq: "FAQ",
                     photoReview: "Photo Review",
                     photoDownload: "Photo Download",
-                    userManagement: "User Management"
+                    userManagement: "User Management",
+                    rankings:"Rankings"
                 },
                 photograph: {
                     title: "Photograph",
@@ -782,7 +820,8 @@ const resources: Resource = {
                     incorrectExamples: {
                         title: "Below are some incorrect examples:",
                         tooManyObstructions: "Too many obstructions",
-                        buildingWithShadow: "Building with shadow"
+                        buildingWithShadow: "Building with shadow",
+                        description:"Heavy shadows distort texture and should be avoided."
                     }
                 },
                 photoUpload: {
@@ -1052,6 +1091,36 @@ const resources: Resource = {
                         q6: "I'm having trouble logging in",
                         viewAll: "→ View All FAQ"
                     }
+                },
+                rankings: {
+                    title: "Rankings",
+                    howToEarn: "📈 How to earn points:",
+                    points: {
+                        dailyCheckIn: {
+                            title: "1. Daily check-in via photo upload",
+                            description: "You get 1 point for uploading a photo each day. If you upload photos for 7 consecutive days or more, you can earn up to 7 extra points."
+                        },
+                        approvedPhotos: {
+                            title: "2. Approved photos",
+                            description1: "Each approved photo earns you 5 points. If 5 consecutive uploaded photos are approved, you receive an extra 5 bonus points.",
+                            description2: "Example: Based on the upload sequence of photos 1 to 6, if the 3rd photo is not approved while the others are, you don’t get the extra 5 bonus points. In this case, bonus eligibility resets from photo 4 onwards. If photos 7 and 8 are approved, you can earn 5 extra bonus points starting from photo 4."
+                        },
+                        likes: {
+                            title: "3. Likes from other users",
+                            description: "Each like from other users gives you 1 point. If the like is withdrawn, the point is invalid. Likes given to your own photo won’t count, and you can only like each photo once."
+                        }
+                    },
+                    leaderboard: {
+                        title: "📊 About the leaderboard:",
+                        displayScope: {
+                            title: "1. Display scope",
+                            description: "Only the top 50 users by total points will be shown. If a user has 0 points, they won’t appear on the leaderboard."
+                        },
+                        pagination: {
+                            title: "2. Pagination",
+                            description: "If your ranking is not on the first page, use the page navigation to jump to your position, or return to the first page via the button."
+                        }
+                    }
                 }
             }
         }
@@ -1061,6 +1130,7 @@ const resources: Resource = {
             getStart: "Loslegen",
             UploadPhoto:"Gebäudefotos hochladen",
             Uploaddesc:"Bitte geben Sie die Adresse des anzumeldenden Gebäudes ein (nur Darmstadt)",
+            mapdesc:"Ziehen Sie die Markierung, um den Gebäudestandort anzupassen",
             AddAddress:"Geben Sie die Adresse ein oder klicken Sie zur Auswahl auf die Karte.",
             Camera:"Kamera",
             Album:"Album",
@@ -1094,15 +1164,18 @@ const resources: Resource = {
                 photoReview: "Fotoüberprüfung",
                 ranking: "Rangliste",
                 loading: "Lädt...",
-                exit: "Beenden",
+                exit: "Verlassen",
                 logOut:"Ausloggen",
             },
             photoRequirements: {
                 title: "Fotografierichtlinien:",
-                noFaces: "KEINE! Gesichter und Kennzeichen",
-                noObstructions: "KEINE! Hindernisse",
-                noShadows: "KEINE! Schatten auf dem Gebäude",
-                noDistortion: "KEINE! Verzerrung, Parallelität sicherstellen!",
+                noFaces: "Gesichter und Kennzeichen",
+                pls:"Bitte!",
+                no:"Nicht!",
+                desc:"Bitte fotografieren Sie vorrangig die hautfarbenen, khakifarbenen und braunen Häuser auf der Karte.",
+                noObstructions: "Hindernisse",
+                noShadows: "Schatten auf dem Gebäude",
+                noDistortion: "Verzerrung, Parallelität sicherstellen!",
                 clear: "Stellen Sie sicher, dass die Bilder klar sind",
                 wholeBuilding: "Fotografieren Sie das gesamte Gebäude"
             },
@@ -1220,7 +1293,7 @@ const resources: Resource = {
                 myPoint: "Meine Punkte",
                 notInRanking: "Nicht in der Rangliste",
                 myPosition: "Meine Position",
-                top: "Top",
+                top: "OBEN",
                 ranking: "Rang",
                 username: "Benutzername",
                 points: "Punkte",
@@ -1290,7 +1363,8 @@ const resources: Resource = {
                     faq: "FAQ",
                     photoReview: "Foto-Überprüfung",
                     photoDownload: "Foto-Download",
-                    userManagement: "Benutzerverwaltung"
+                    userManagement: "Benutzerverwaltung",
+                    rankings:"Rangliste"
                 },
                 photograph: {
                     title: "Fotografie",
@@ -1310,7 +1384,8 @@ const resources: Resource = {
                     incorrectExamples: {
                         title: "Hier sind einige falsche Beispiele:",
                         tooManyObstructions: "Zu viele Hindernisse",
-                        buildingWithShadow: "Gebäude mit Schatten"
+                        buildingWithShadow: "Gebäude mit Schatten",
+                        description:"Starke Schatten verzerren die Textur und sollten vermieden werden."
                     }
                 },
                 photoUpload: {
@@ -1408,7 +1483,7 @@ const resources: Resource = {
                             navigation: "<, > ist für vorherige/nächste Seite, |<, >| ist für erste/letzte Seite."
                         },
                         exitAndReturn: {
-                            title: "4. Beenden und zurückkehren",
+                            title: "4. Zurückkehren",
                             description: "Um diesen Abschnitt zu verlassen, verwenden Sie das Seitenmenü links oder klicken Sie auf 'Zurück zum Hauptmenü'."
                         }
                     }
@@ -1475,7 +1550,7 @@ const resources: Resource = {
                         desc2: "Klicken Sie auf ",
                         photoReview: "Fotoüberprüfung",
                         or: "oder",
-                        exit: "Beenden",
+                        exit: "Verlassen",
                         desc3: ", um zum Hauptmenü zurückzukehren."
                     }
                 },
@@ -1579,6 +1654,36 @@ const resources: Resource = {
                         q5: "Die Anwendung läuft langsam",
                         q6: "Ich habe Probleme beim Einloggen",
                         viewAll: "→ Alle FAQ anzeigen"
+                    }
+                },
+                rankings: {
+                    title: "Rangliste",
+                    howToEarn: "📈 So sammelst du Punkte:",
+                    points: {
+                        dailyCheckIn: {
+                            title: "1. Tägliches Einchecken durch Foto-Upload",
+                            description: "Du erhältst 1 Punkt für das Hochladen eines Fotos pro Tag. Wenn du 7 Tage hintereinander Fotos hochlädst, kannst du bis zu 7 zusätzliche Punkte verdienen."
+                        },
+                        approvedPhotos: {
+                            title: "2. Genehmigte Fotos",
+                            description1: "Jedes genehmigte Foto bringt dir 5 Punkte. Wenn 5 hochgeladene Fotos in Folge genehmigt werden, erhältst du zusätzlich 5 Bonuspunkte.",
+                            description2: "Beispiel: Bei der Upload-Reihenfolge der Fotos 1 bis 6 – wenn das 3. Foto nicht genehmigt wird, während die anderen genehmigt sind, erhältst du keine zusätzlichen 5 Bonuspunkte. In diesem Fall wird die Bonus-Berechnung ab Foto 4 neu gestartet. Wenn Foto 7 und 8 genehmigt werden, kannst du ab Foto 4 die 5 Bonuspunkte erhalten."
+                        },
+                        likes: {
+                            title: "3. Likes von anderen Nutzern",
+                            description: "Jedes Like von anderen Nutzern bringt dir 1 Punkt. Wenn das Like zurückgezogen wird, verfällt der Punkt. Likes für dein eigenes Foto zählen nicht, und jedes Foto kann nur einmal geliked werden."
+                        }
+                    },
+                    leaderboard: {
+                        title: "📊 Über die Rangliste:",
+                        displayScope: {
+                            title: "1. Anzeigebereich",
+                            description: "Es werden nur die Top 50 Nutzer nach Gesamtpunkten angezeigt. Nutzer mit 0 Punkten erscheinen nicht in der Rangliste."
+                        },
+                        pagination: {
+                            title: "2. Seitennavigation",
+                            description: "Wenn dein Rang nicht auf der ersten Seite erscheint, benutze die Seitennavigation, um direkt zu deiner Position zu springen, oder kehre über die Schaltfläche zur ersten Seite zurück."
+                        }
                     }
                 }
             }

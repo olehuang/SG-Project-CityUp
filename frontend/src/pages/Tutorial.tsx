@@ -231,7 +231,7 @@ const Tutorial = () => {
                                         ❌
                                     </Typography>
                                     <strong>{highlightText(t("tutorial.photograph.incorrectExamples.buildingWithShadow"), searchTerm, isSearchActive)}</strong> –{"  "}
-                                    {highlightText("Heavy shadows distort texture and should be avoided.", searchTerm, isSearchActive)}
+                                    {highlightText(t("tutorial.photograph.incorrectExamples.description"), searchTerm, isSearchActive)}
                                 </Typography>
                                 <Box
                                     component="img"
@@ -742,39 +742,39 @@ const Tutorial = () => {
                         sx={{ ...styles.tutorialModelBox, paddingBottom: '80px' }}
                     >
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Rankings", searchTerm, isSearchActive)}
+                            {highlightText(t("tutorial.rankings.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText("📈 How to earn points:", searchTerm, isSearchActive)}
+                            {highlightText(t("tutorial.rankings.howToEarn"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Box sx={styles.body}>
                             <Typography variant="body1">
-                                <strong>1. Daily check-in via photo upload</strong> –{" "}
+                                <strong>{t("tutorial.rankings.points.dailyCheckIn.title")}</strong> –{" "}
                                 {highlightText(
-                                    "You get 1 point for uploading a photo each day. If you upload photos for 7 consecutive days or more, you can earn up to 7 extra points.",
+                                    t("tutorial.rankings.points.dailyCheckIn.description"),
                                     searchTerm, isSearchActive
                                 )}
                             </Typography>
 
                             <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>2. Approved photos</strong> –{" "}
+                                <strong>{t("tutorial.rankings.points.approvedPhotos.title")}</strong> –{" "}
                                 {highlightText(
-                                    "Each approved photo earns you 5 points. If 5 consecutive uploaded photos are approved, you receive an extra 5 bonus points.",
+                                    t("tutorial.rankings.points.approvedPhotos.description1"),
                                     searchTerm, isSearchActive
                                 )}
                                 <br />
                                 {highlightText(
-                                    "Example: Based on the upload sequence of photos 1 to 6, if the 3rd photo is not approved while the others are, you don’t get the extra 5 bonus points. In this case, bonus eligibility resets from photo 4 onwards. If photos 7 and 8 are approved, you can earn 5 extra bonus points starting from photo 4.",
+                                    t("tutorial.rankings.points.approvedPhotos.description2"),
                                     searchTerm, isSearchActive
                                 )}
                             </Typography>
 
                             <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>3. Likes from other users</strong> –{" "}
+                                <strong>{t("tutorial.rankings.points.likes.title")}</strong> –{" "}
                                 {highlightText(
-                                    "Each like from other users gives you 1 point. If the like is withdrawn, the point is invalid. Likes given to your own photo won’t count, and you can only like each photo once.",
+                                    t("tutorial.rankings.points.likes.description"),
                                     searchTerm, isSearchActive
                                 )}
                             </Typography>
@@ -789,22 +789,22 @@ const Tutorial = () => {
                         </Box>
 
                         <Typography variant="body1" sx={{ ...styles.body, mt: 4 }}>
-                            {highlightText("📊 About the leaderboard:", searchTerm, isSearchActive)}
+                            {highlightText(t("tutorial.rankings.leaderboard.title"), searchTerm, isSearchActive)}
                         </Typography>
 
                         <Box sx={styles.body}>
                             <Typography variant="body1">
-                                <strong>1. Display scope</strong> –{" "}
+                                <strong>{t("tutorial.rankings.leaderboard.displayScope.title")}</strong> –{" "}
                                 {highlightText(
-                                    "Only the top 50 users by total points will be shown. If a user has 0 points, they won’t appear on the leaderboard.",
+                                    t("tutorial.rankings.leaderboard.displayScope.description"),
                                     searchTerm, isSearchActive
                                 )}
                             </Typography>
 
                             <Typography variant="body1" sx={{ mt: 2 }}>
-                                <strong>2. Pagination</strong> –{" "}
+                                <strong>{t("tutorial.rankings.leaderboard.pagination.title")}</strong> –{" "}
                                 {highlightText(
-                                    "If your ranking is not on the first page, use the page navigation to jump to your position, or return to the first page via the button.",
+                                    t("tutorial.rankings.leaderboard.pagination.description"),
                                     searchTerm, isSearchActive
                                 )}
                             </Typography>
@@ -863,7 +863,7 @@ const Tutorial = () => {
                                 </Typography>
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>t("tutorial.userinfo.step2.title")</strong> –{" "}
+                                        <strong>{t("tutorial.userinfo.step2.title")}</strong> –{" "}
                                         {highlightText(t("tutorial.userinfo.step2.content1"), searchTerm)}{" "}
                                         {highlightText( t("tutorial.userinfo.step2.click"), searchTerm, isSearchActive)}
                                         <strong>{highlightText(t("tutorial.userinfo.step2.save"), searchTerm, isSearchActive)}</strong>{" "}
@@ -1810,9 +1810,9 @@ const Tutorial = () => {
                                     key={index}
                                     disablePadding
                                     onClick={() => {
-                                        setSelectedSection(text.key);
+                                        setSelectedSection(section.key);
                                         // 新增：点击菜单项自动跳转到模块
-                                        const scrollTarget = sectionRefs.current[text.key];
+                                        const scrollTarget = sectionRefs.current[section.key];
                                         if (scrollTarget) {
                                             scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
                                         }
@@ -1837,7 +1837,7 @@ const Tutorial = () => {
                                         }}
                                     >
                                         <ListItemText
-                                            primary={highlightText(text.label, searchTerm, isSearchActive && searchResults.includes(text))} //  第三处更新：统一调用方式
+                                            primary={highlightText(section.label, searchTerm, isSearchActive && searchResults.includes(section.label))} //  第三处更新：统一调用方式
                                         />
                                     </ListItemButton>
                                 </ListItem>

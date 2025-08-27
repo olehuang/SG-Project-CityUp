@@ -108,9 +108,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         sx={{
                             ...styles.extiButton,
                             visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
-                            minWidth: '110px',
                             justifyContent: 'center',
                             textAlign: 'center',
+                            width:"120px",
                         }}
                         variant="outlined"
                     >
