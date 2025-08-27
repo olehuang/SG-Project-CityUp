@@ -54,7 +54,6 @@ async def get_photo_status_by_address():
         ]
         result_cursor = await photo.aggregate(pipeline)
         result=[]
-
         # Convenient results, skipping elements with zero number of photos
         async for doc in result_cursor:
             if doc["photo_count"] ==0: continue

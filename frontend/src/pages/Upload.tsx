@@ -542,7 +542,7 @@ const Upload: React.FC = () => {
                     width: isSmallScreen ? "100%" : "32%",
                     overflowY:isMobile? "visible":"auto",
                     padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `88px 6vw 44px 38px`), // ← 用isMobile微调padding //monitor adapter
+                        : (isSmallScreen ? "20px" : `88px 6vw 6px 38px`), // ← 用isMobile微调padding //monitor adapter
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -673,8 +673,8 @@ const Upload: React.FC = () => {
                         fontSize:  isMobile ? "0.7rem" : "0.98rem",
                         background: "#fffde7",
                         borderRadius: 12,
-                        padding: isMobile ? "10px" : "16px",
-                        marginBottom: "16px",
+                        padding: isMobile ? "10px" : "10px",
+                        marginBottom: "6px",//monitor adapter
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
@@ -682,7 +682,7 @@ const Upload: React.FC = () => {
                     }}
                 >
                     <h3 style={{
-                        margin: "0 0 12px 0",
+                        margin: "0 0 6px 0",
                         fontSize: isMobile?"0.9rem":"1.1rem",
                         display: "flex",
                         alignItems: "center",
@@ -690,16 +690,16 @@ const Upload: React.FC = () => {
                     }}>
                         <span>📋</span> {t('photoRequirements.title')}
                     </h3>
-                    <ul style={{ paddingLeft: 22, margin: 0, lineHeight: 1.6 }}>
-                        <li><strong>Pls!</strong> Please Prioritize photographing the flesh-colored, khaki, and brown houses on the map.</li>
+                    <ul style={{paddingLeft: 22, margin: 0, lineHeight: 1.6}}>
+                        <li><strong>Pls!</strong> Please Prioritize photographing the flesh-colored, khaki, and brown
+                            houses on the map.
+                        </li>
                         <li>{t('photoRequirements.noFaces')}</li>
                         <li>{t('photoRequirements.noObstructions')}</li>
                         <li>{t('photoRequirements.noShadows')}</li>
                         <li>{t('photoRequirements.noDistortion')}</li>
                         <li>{t('photoRequirements.clear')}</li>
                         <li>{t('photoRequirements.wholeBuilding')}</li>
-
-
 
                     </ul>
                 </div>
@@ -710,7 +710,7 @@ const Upload: React.FC = () => {
                             background: error.includes("successful") ? "#e1f7d5" : "#ffd6d6",
                             color: error.includes("successful") ? "#237a00" : "#b71c1c",
                             padding: "12px 16px",
-                            marginBottom: 10,
+                            marginBottom: 1,//monitor adapter
                             borderRadius: 8,
                             fontWeight: 500,
                             border: `1px solid ${error.includes("successful") ? "#a5d6a7" : "#ffcdd2"}`,
@@ -744,7 +744,7 @@ const Upload: React.FC = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         gap: "10px",
-                        marginTop:isMobile?"12px":"10px",
+                        marginTop:isMobile?"12px":"6px",//monitor adapter
                     }}
                 >
                     {isSubmitting ? (
@@ -757,7 +757,7 @@ const Upload: React.FC = () => {
                                 borderRadius: "50%",
                                 animation: "spin 1s linear infinite"
                             }}></div>
-                            t('uploadMessages.submitting')
+                            {t('uploadMessages.submitting')}
                         </>
                     ) : t('uploadMessages.submit')}
                 </button>
