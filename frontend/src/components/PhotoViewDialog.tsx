@@ -346,7 +346,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         color={isSelecting ? "error" : "primary"}
                                         sx={{visibility: roles.includes("admin") ? "visible" : "hidden",}}
                                     >
-                                        {isSelecting ? t("photoGallery.Abbrechen") : t("photoGallery.selectButton")}
+                                        {isSelecting ? t("photoGallery.cancelButton") : t("photoGallery.selectButton")}
                                     </Button>
                                 </>
                             )}

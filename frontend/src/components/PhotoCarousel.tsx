@@ -16,6 +16,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import { useMediaQuery, useTheme } from "@mui/material";
 
 import styles from "./PhotoCarouselStyles";
+
 import {useTranslation} from "react-i18next";
 
 export interface Photo {
@@ -98,14 +99,14 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
             maxWidth="lg"
             fullWidth={!isMobile}
             PaperProps={{
-                sx: isMobile ? styles.dialogMobilPopers : {}
+                sx: isMobile ? {...styles.dialogMobilPopers} : {}
             }}
         >
-            <Box sx={styles.mainBox}>
+            <Box sx={{...styles.mainBox}}>
                 {!isMobile && (
                     <>
                         {/*link Arrow area*/}
-                        <Box sx={styles.linkArrowArea} onClick={onPrev}>
+                        <Box sx={{...styles.linkArrowArea}} onClick={onPrev}>
                             <IconButton
                                 onClick={onPrev}
                                 sx={styles.linkArrorIcon}
@@ -116,9 +117,9 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     </>)}
 
                 {/*image and imageInfo Area*/}
-                <Box sx={styles.photoAndInfoArea}>
+                <Box sx={{...styles.photoAndInfoArea}}>
                     <Box
-                        sx={styles.photoArea}>
+                        sx={{...styles.photoArea}}>
                         <img
                             src={photo?.src}
                             alt={photo?.title}
@@ -128,7 +129,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
 
                     {/* info Area：only in Desktop  */}
                     {!isMobile && (
-                        <Box sx={styles.infoArea}>
+                        <Box sx={{...styles.infoArea}}>
                             <Typography variant="body2">{t("photoGallery.photoDetails.uploadUser")}: {photo?.uploader}</Typography>
                             <Typography variant="body2">{t("photoGallery.photoDetails.uploadTime")}: {photo?.uploadTime}</Typography>
                             <Typography variant="body2">{t("photoGallery.photoDetails.favoriteNr")}: {photo.likeCount}</Typography>
@@ -155,7 +156,7 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
 
                     {/* Close Icon*/}
                     <IconButton
-                        sx={styles.closeIcon}
+                        sx={{...styles.closeIcon}}
                         onClick={onClose}
                         autoFocus
                     >
@@ -163,10 +164,10 @@ const PhotoCarousel:React.FC<PhotoPreviewDialogProps>=({
                     </IconButton>
                 </Box>
                 {/*right Arrow area*/}
-                {!isMobile && (<Box sx={styles.rightArrowArea} onClick={onNext}>
+                {!isMobile && (<Box sx={{...styles.rightArrowArea}} onClick={onNext}>
                     <IconButton
                         onClick={onNext}
-                        sx={styles.rightArrow}
+                        sx={{...styles.rightArrow}}
                         autoFocus
                         tabIndex={-1}
                     >

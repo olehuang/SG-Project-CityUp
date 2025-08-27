@@ -98,6 +98,7 @@ const styles={
         transform: "translateY(-50%)",
         zIndex: 10
     },
+    test: { color: "red" },
 }
 
 export default styles
