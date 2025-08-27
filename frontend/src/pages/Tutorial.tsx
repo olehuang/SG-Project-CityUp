@@ -38,15 +38,22 @@ const Tutorial = () => {
     }, [token]);
 
     const sections = [
-        "Tutorial",
-        "Photograph",
-        "Photo Upload",
-        "Upload History",
-        "Building Photo Gallery",
-        "User Information",
-        "FAQ",
-        ...(roles.includes("admin") ? ["Photo Review", "Photo Download","User Management"] : [])
+        { key: "Tutorial", label: t("tutorial.menu.tutorial") },
+        { key: "Photograph", label: t("tutorial.menu.photograph") },
+        { key: "Photo Upload", label: t("tutorial.menu.photoUpload") },
+        { key: "Upload History", label: t("tutorial.menu.uploadHistory") },
+        { key: "Building Photo Gallery", label: t("tutorial.menu.gallery") },
+        { key: "User Information", label: t("tutorial.menu.userInfo") },
+        { key: "FAQ", label: t("tutorial.menu.faq") },
+        ...(roles.includes("admin")
+            ? [
+                { key: "Photo Review", label: t("tutorial.menu.photoReview") },
+                { key: "Photo Download", label: t("tutorial.menu.photoDownload") },
+                { key: "User Management", label: t("tutorial.menu.userManagement") },
+            ]
+            : []),
     ];
+
 
     // Search Keywords Daten
     const searchableContent = {
@@ -91,14 +98,14 @@ const Tutorial = () => {
 
 
         sections.forEach(section => {
-            if (section.toLowerCase().includes(searchLower)) {
-                results.push(section);
+            if (section.key.toLowerCase().includes(searchLower)) {
+                results.push(section.key);
             }
         });
 
         // Deposit the matching name for page display
         Object.entries(searchableContent).forEach(([sectionName, keywords]) => {
-            if (sections.includes(sectionName) && !results.includes(sectionName)) {
+            if (sections.some(sec => sec.key === sectionName) && !results.includes(sectionName)) {
                 const hasMatch = keywords.some(keyword =>
                     keyword.toLowerCase().includes(searchLower)
                 );
@@ -1035,14 +1042,11 @@ const Tutorial = () => {
                 return (
                     <Box sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Building Photo Gallery", searchTerm)}
+                            {highlightText(t("tutorial.photoDownload.title"), searchTerm)}
                         </Typography>
 
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "In this section, you will learn how to search for building-related photo uploads and download images easily.",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.photoDownload.description"), searchTerm)}
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
@@ -1057,11 +1061,8 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>1. Search by address</strong> –{" "}
-                                        {highlightText(
-                                            "Enter an address in the search bar to view the latest upload times and the number of photos related to that location.",
-                                            searchTerm
-                                        )}
+                                        <strong>{t('tutorial.photoDownload.step1.title')}</strong> –{" "}
+                                        {highlightText(t('tutorial.photoDownload.step1.description'), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1090,13 +1091,13 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>2. View Photos</strong> –{" "}
+                                        <strong>{t('tutorial.photoDownload.step2.title')}</strong> –{" "}
                                         {highlightText(
-                                            "Click on a photo with address from the right panel or click ",
+                                            t('tutorial.photoDownload.step2.description1'),
                                             searchTerm
                                         )}
-                                        <strong>{highlightText("'view all'", searchTerm)}</strong>{" "}
-                                        {highlightText("to use filter options to sort the photo gallery.", searchTerm)}
+                                        <strong>{highlightText(t('tutorial.photoDownload.step2.viewAll'), searchTerm)}</strong>{" "}
+                                        {highlightText(t('tutorial.photoDownload.step2.description2'), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1137,16 +1138,12 @@ const Tutorial = () => {
 
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
-                                        <strong>3. Download photos</strong> –{" "}
-                                        {highlightText("Click on a photo from the right panel and then ", searchTerm)}
-                                        {highlightText("click ", searchTerm)}
-                                        <strong>{highlightText("'Download'", searchTerm)}</strong>{" "}
-                                        {highlightText("to save it.", searchTerm)}
+                                        <strong>{t('tutorial.photoDownload.step3.title')}</strong> –{" "}
+                                        {highlightText(t('tutorial.photoDownload.step3.description1'), searchTerm)}
+                                        <strong>{highlightText(t('tutorial.photoDownload.step3.download'), searchTerm)}</strong>{" "}
+                                        {highlightText(t('tutorial.photoDownload.step3.description2'), searchTerm)}
                                         <br />
-                                        {highlightText(
-                                            "Multiple photos will be downloaded as a ZIP file, while single images will be saved in their original format.",
-                                            searchTerm
-                                        )}
+                                        {highlightText(t('tutorial.photoDownload.step3.description3'), searchTerm)}
                                     </Typography>
 
                                     <Box sx={{ mt: 2 }}>
@@ -1182,7 +1179,7 @@ const Tutorial = () => {
                 return (
                     <Box sx={styles.tutorialModelBox}>
                         <Typography variant="h4" sx={styles.title}>
-                            {highlightText("Frequently Asked Questions", searchTerm)}
+                            {highlightText(t("tutorial.faq.title"), searchTerm)}
                         </Typography>
                         <Box sx={{ ...styles.body, mt: 2 }}>
                             {/* 使用两列布局来节省空间 */}
@@ -1199,22 +1196,22 @@ const Tutorial = () => {
                                     {/* Photo Quality Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText("Photo Quality Issues", searchTerm)}
+                                            {highlightText(t("tutorial.faq.photoQuality.title"), searchTerm)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: Why are my photos being rejected?
+                                                {t('tutorial.faq.photoQuality.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Photos may be rejected due to shadows, obstructions, poor lighting, or incorrect perspective.", searchTerm)}
+                                                 {highlightText(t("tutorial.faq.photoQuality.a1"), searchTerm)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: What about unavoidable obstructions?
+                                                {t('tutorial.faq.photoQuality.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Try different angles or note the obstruction in your submission.", searchTerm)}
+                                                 {highlightText(t("tutorial.faq.photoQuality.a2"), searchTerm)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1222,22 +1219,22 @@ const Tutorial = () => {
                                     {/* Upload Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText("Upload Issues", searchTerm)}
+                                            {highlightText(t("tutorial.faq.upload.title"), searchTerm)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: Upload is failing. What to do?
+                                                {t('tutorial.faq.upload.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Check internet connection and ensure file size is under 10MB. Supported: JPG, PNG.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.upload.a1'), searchTerm)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: How long for approval?
+                                                {t('tutorial.faq.upload.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("1-3 business days. Check status in Upload History.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.upload.a2'), searchTerm)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1248,22 +1245,22 @@ const Tutorial = () => {
                                     {/* Address Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText("Address Issues", searchTerm)}
+                                            {highlightText(t("tutorial.faq.address.title"), searchTerm)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: Can't find correct address?
+                                                {t('tutorial.faq.address.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Use the auto location function of the upload page. Submit request to add missing addresses.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.address.a1'), searchTerm)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: Multiple buildings at once?
+                                                {t('tutorial.faq.address.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Yes, but each photo needs its specific building address.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.address.a2'), searchTerm)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1271,22 +1268,22 @@ const Tutorial = () => {
                                     {/* Technical Issues */}
                                     <Box sx={{ mb: 3 }}>
                                         <Typography variant="h6" sx={{ fontWeight: 'bold', mb: 1.5, color: '#1976d2', fontSize: '1rem' }}>
-                                            {highlightText("Technical Issues", searchTerm)}
+                                            {highlightText(t("tutorial.faq.technical.title"), searchTerm)}
                                         </Typography>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: App running slowly?
+                                                {t('tutorial.faq.technical.q1')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Clear browser cache, check internet connection, use latest Chrome or Safari.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.technical.a1'), searchTerm)}
                                             </Typography>
                                         </Box>
                                         <Box sx={{ mb: 2 }}>
                                             <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                                                Q: Login troubles?
+                                                {t('tutorial.faq.technical.q2')}
                                             </Typography>
                                             <Typography variant="body2" sx={{ fontSize: '0.9rem' }}>
-                                                A: {highlightText("Check credentials or contact administrator for password reset.", searchTerm)}
+                                                {highlightText(t('tutorial.faq.technical.a2'), searchTerm)}
                                             </Typography>
                                         </Box>
                                     </Box>
@@ -1300,23 +1297,20 @@ const Tutorial = () => {
                 return (
                     <Box>
                         <Typography variant="h2" sx={styles.title}>
-                            {highlightText("CityUp Tutorial", searchTerm)}
+                            {highlightText(t("tutorial.main.title"), searchTerm)}
                         </Typography>
                         <Divider sx={styles.divider} />
                         <Typography variant="body1" sx={styles.body}>
-                            {highlightText(
-                                "Welcome to the CityUp tutorial. Select a topic on the left to get started.",
-                                searchTerm
-                            )}
+                            {highlightText(t("tutorial.main.welcome"), searchTerm)}
                         </Typography>
 
                         {/* 常见问题快速链接 */}
                         <Box sx={{ ...styles.body, mt: 4 }}>
                             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
-                                {highlightText("Quick Help - Common Questions", searchTerm)}
+                                {highlightText(t("tutorial.main.quickHelpTitle"), searchTerm)}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2 }}>
-                                {highlightText("Click on any question below to jump directly to the answer:", searchTerm)}
+                                {highlightText(t("tutorial.main.quickHelpIntro"), searchTerm)}
                             </Typography>
 
                             <Box sx={{ ml: 2 }}>
@@ -1329,7 +1323,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("Why are my photos being rejected?", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q1"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1342,7 +1336,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("My photo upload is failing. What should I do?", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q2"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1355,7 +1349,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("How long does it take for photos to be approved?", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q3"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1368,7 +1362,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("I can't find the correct address for my building", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q4"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1381,7 +1375,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("The application is running slowly", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q5"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1394,7 +1388,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1">
-                                        • {highlightText("I'm having trouble logging in", searchTerm)}
+                                        • {highlightText(t("tutorial.main.faqLinks.q6"), searchTerm)}
                                     </Typography>
                                 </Box>
 
@@ -1407,7 +1401,7 @@ const Tutorial = () => {
                                     onClick={() => setSelectedSection("FAQ")}
                                 >
                                     <Typography variant="body1" sx={{ fontWeight: 'bold', color: '#1976d2' }}>
-                                        {highlightText("→ View All FAQ", searchTerm)}
+                                        {highlightText(t("tutorial.main.faqLinks.viewAll"), searchTerm)}
                                     </Typography>
                                 </Box>
                             </Box>
@@ -1487,13 +1481,13 @@ const Tutorial = () => {
 
                     {/* 菜单列表 */}
                     <List>
-                        {sections.map((text, index) => {
-                            const isHighlighted = searchResults.includes(text);
+                        {sections.map((section, index) => {
+                            const isHighlighted = searchResults.includes(section.key);
                             return (
                                 <ListItem
                                     key={index}
                                     disablePadding
-                                    onClick={() => setSelectedSection(text)}
+                                    onClick={() => setSelectedSection(section.key)}
                                     sx={{
                                         backgroundColor: isHighlighted ? '#e3f2fd' : 'transparent',
                                         borderRadius: '4px',
@@ -1502,24 +1496,24 @@ const Tutorial = () => {
                                 >
                                     <ListItemButton
                                         sx={{
-                                            backgroundColor: selectedSection === text ? '#1976d2' : 'transparent',
-                                            color: selectedSection === text ? 'white' : 'inherit',
+                                            backgroundColor: selectedSection === section.key ? '#1976d2' : 'transparent',
+                                            color: selectedSection === section.key ? 'white' : 'inherit',
                                             '&:hover': {
-                                                backgroundColor: selectedSection === text ? '#1565c0' : '#f5f5f5',
+                                                backgroundColor: selectedSection === section.key ? '#1565c0' : '#f5f5f5',
                                             }
                                         }}
                                     >
                                         <ListItemText
                                             primary={
                                                 <span>
-                                                    {isHighlighted && searchTerm ? (
-                                                        <span style={{ fontWeight: 'bold' }}>
-                                                            {highlightText(text, searchTerm)}
-                                                        </span>
-                                                    ) : (
-                                                        text
-                                                    )}
-                                                </span>
+                                {isHighlighted && searchTerm ? (
+                                    <span style={{ fontWeight: 'bold' }}>
+                                        {highlightText(section.label, searchTerm)}
+                                    </span>
+                                ) : (
+                                    section.label
+                                )}
+                            </span>
                                             }
                                         />
                                     </ListItemButton>
@@ -1527,6 +1521,7 @@ const Tutorial = () => {
                             );
                         })}
                     </List>
+
 
                     {/* 无搜索结果提示 */}
                     {searchTerm && searchResults.length === 0 && (

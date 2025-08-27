@@ -221,6 +221,18 @@ declare module 'i18next' {
                     logOut:string;
                 };
                 tutorial: {
+                    menu: {
+                        tutorial: string;
+                        photograph: string;
+                        photoUpload:string;
+                        uploadHistory:string;
+                        gallery: string;
+                        userInfo: string;
+                        faq: string;
+                        photoReview:string;
+                        photoDownload: string;
+                        userManagement:string;
+                    };
                     photograph: {
                         title: string;
                         description: string;
@@ -442,7 +454,74 @@ declare module 'i18next' {
                             leave: string;
                             description7: string;
                         };
-                    }
+                    };
+                    photoDownload: {
+                        title: string;
+                        description: string;
+                        step1: {
+                            title: string;
+                            description: string;
+                        },
+                        step2: {
+                            title:string;
+                            description1: string;
+                            viewAll: string;
+                            description2:string;
+                        },
+                        step3: {
+                            title: string;
+                            description1: string;
+                            download: string;
+                            description2: string;
+                            description3: string;
+                        }
+                    };
+                    faq: {
+                        title:string;
+                        photoQuality: {
+                            title:string;
+                            q1: string;
+                            a1: string;
+                            q2: string;
+                            a2:string;
+                        },
+                        upload: {
+                            title: string;
+                            q1: string;
+                            a1: string;
+                            q2: string;
+                            a2: string;
+                        },
+                        address: {
+                            title: string;
+                            q1: string;
+                            a1: string;
+                            q2: string;
+                            a2:string;
+                        },
+                        technical: {
+                            title: string;
+                            q1: string;
+                            a1: string;
+                            q2: string;
+                            a2: string;
+                        }
+                    };
+                    main: {
+                        title: string;
+                        welcome: string;
+                        quickHelpTitle:string;
+                        quickHelpIntro: string;
+                        faqLinks: {
+                            q1: string;
+                            q2: string;
+                            q3: string;
+                            q4: string;
+                            q5: string;
+                            q6: string;
+                            viewAll: string;
+                        }
+                    };
                 };
             };
         };
@@ -673,6 +752,18 @@ const resources: Resource = {
                 },
             },
             tutorial: {
+                menu: {
+                    tutorial: "Tutorial",
+                    photograph: "Photograph",
+                    photoUpload: "Photo Upload",
+                    uploadHistory: "Upload History",
+                    gallery: "Building Photo Gallery",
+                    userInfo: "User Information",
+                    faq: "FAQ",
+                    photoReview: "Photo Review",
+                    photoDownload: "Photo Download",
+                    userManagement: "User Management"
+                },
                 photograph: {
                     title: "Photograph",
                     description: "In this section, you will learn how to take proper building photographs. Please follow these essential requirements:",
@@ -718,7 +809,7 @@ const resources: Resource = {
                     },
                     uploadPhotos: {
                         title: "2. Upload photos",
-                        click:"Click",
+                        click:"Click ",
                         shootingUpload: {
                             description: ", navigate to the folder containing the uploaded image, select the image, and click Open. Please note that only PNG and JPG file formats are supported.",
                             buttonText: "Shooting and Upload"
@@ -753,8 +844,8 @@ const resources: Resource = {
                                 enterKeywords: "Enter keywords and click",
                                 clickSearch: "Search",
                                 clickClear: "Clear",
-                                desc1:"; the results will appear below the search box.",
-                                desc2:"to clear the search content."
+                                desc1:" ; the results will appear below the search box.",
+                                desc2:" to clear the search content."
                             },
                             statusFilter: {
                                 title: "Status filter includes four options:",
@@ -893,6 +984,73 @@ const resources: Resource = {
                         description6: "After joining, you can remove users from the admin group if needed by clicking",
                         leave: " Leave",
                         description7: ", then confirm. A success message will appear once the removal is complete.",
+                    }
+                },
+                photoDownload: {
+                    title: "Building Photo Gallery",
+                    description: "In this section, you will learn how to search for building-related photo uploads and download images easily.",
+                    step1: {
+                        title: "1. Search by address",
+                        description: "Enter an address in the search bar to view the latest upload times and the number of photos related to that location."
+                    },
+                    step2: {
+                        title: "2. View Photos",
+                        description1: "Click on a photo with address from the right panel or click ",
+                        viewAll: "'view all'",
+                        description2: "to use filter options to sort the photo gallery."
+                    },
+                    step3: {
+                        title: "3. Download photos",
+                        description1: "Click on a photo from the right panel and then click ",
+                        download: "'Download'",
+                        description2: "to save it.",
+                        description3: "Multiple photos will be downloaded as a ZIP file, while single images will be saved in their original format."
+                    }
+                },
+                faq: {
+                    title: "Frequently Asked Questions",
+                    photoQuality: {
+                        title: "Photo Quality Issues",
+                        q1: "Q: Why are my photos being rejected?",
+                        a1: "A: Photos may be rejected due to shadows, obstructions, poor lighting, or incorrect perspective.",
+                        q2: "Q: What about unavoidable obstructions?",
+                        a2: "A: Try different angles or note the obstruction in your submission."
+                    },
+                    upload: {
+                        title: "Upload Issues",
+                        q1: "Q: Upload is failing. What to do?",
+                        a1: "A: Check internet connection and ensure file size is under 10MB. Supported: JPG, PNG.",
+                        q2: "Q: How long for approval?",
+                        a2: "A: 1-3 business days. Check status in Upload History."
+                    },
+                    address: {
+                        title: "Address Issues",
+                        q1: "Q: Can't find correct address?",
+                        a1: "A: Use the auto location function of the upload page. Submit request to add missing addresses.",
+                        q2: "Q: Multiple buildings at once?",
+                        a2: "A: Yes, but each photo needs its specific building address."
+                    },
+                    technical: {
+                        title: "Technical Issues",
+                        q1: "Q: App running slowly?",
+                        a1: "A: Clear browser cache, check internet connection, use latest Chrome or Safari.",
+                        q2: "Q: Login troubles?",
+                        a2: "A: Check credentials or contact administrator for password reset."
+                    }
+                },
+                main: {
+                    title: "CityUp Tutorial",
+                    welcome: "Welcome to the CityUp tutorial. Select a topic on the left to get started.",
+                    quickHelpTitle: "Quick Help - Common Questions",
+                    quickHelpIntro: "Click on any question below to jump directly to the answer:",
+                    faqLinks: {
+                        q1: "Why are my photos being rejected?",
+                        q2: "My photo upload is failing. What should I do?",
+                        q3: "How long does it take for photos to be approved?",
+                        q4: "I can't find the correct address for my building",
+                        q5: "The application is running slowly",
+                        q6: "I'm having trouble logging in",
+                        viewAll: "→ View All FAQ"
                     }
                 }
             }
@@ -1122,6 +1280,18 @@ const resources: Resource = {
                 },
             },
             tutorial: {
+                menu: {
+                    tutorial: "Anleitung",
+                    photograph: "Fotografieren",
+                    photoUpload: "Foto-Upload",
+                    uploadHistory: "Upload-Verlauf",
+                    gallery: "Gebäudefoto-Galerie",
+                    userInfo: "Benutzerinformationen",
+                    faq: "FAQ",
+                    photoReview: "Foto-Überprüfung",
+                    photoDownload: "Foto-Download",
+                    userManagement: "Benutzerverwaltung"
+                },
                 photograph: {
                     title: "Fotografie",
                     description: "In diesem Abschnitt lernen Sie, wie Sie ordnungsgemäße Gebäudefotos aufnehmen. Bitte befolgen Sie diese wesentlichen Anforderungen:",
@@ -1167,7 +1337,7 @@ const resources: Resource = {
                     },
                     uploadPhotos: {
                         title: "2. Fotos hochladen",
-                        click:"Klicken",
+                        click:"Klicken ",
                         shootingUpload: {
                             description: ", navigieren Sie zum Ordner mit dem hochgeladenen Bild, wählen Sie das Bild aus und klicken Sie auf Öffnen. Bitte beachten Sie, dass nur PNG- und JPG-Dateiformate unterstützt werden.",
                             buttonText: "Aufnahme und Upload"
@@ -1202,8 +1372,8 @@ const resources: Resource = {
                                 enterKeywords: "Geben Sie Schlüsselwörter ein und klicken Sie auf",
                                 clickSearch: "Suchen",
                                 clickClear: "Löschen",
-                                desc1:"; Die Ergebnisse werden unter dem Suchfeld angezeigt.",
-                                desc2:"um den Suchinhalt zu löschen."
+                                desc1:" ; Die Ergebnisse werden unter dem Suchfeld angezeigt.",
+                                desc2:" ,um den Suchinhalt zu löschen."
                             },
                             statusFilter: {
                                 title: "Der Statusfilter umfasst vier Optionen:",
@@ -1230,7 +1400,7 @@ const resources: Resource = {
                             description: "um vollständige Informationen über ein Foto zu erhalten.",
                             closeButton: "SCHLIESSEN",
                             viewDetails:" 'Details anzeigen' ",
-                            desc:"Zurück zum vorherigen Schritt."
+                            desc:" , um zum vorherigen Schritt zurückzukehren."
                         },
                         pagination: {
                             title: "3. Seitennavigation",
@@ -1343,9 +1513,74 @@ const resources: Resource = {
                         leave: " Verlassen ",
                         description7: "klicken und bestätigen. Eine Erfolgsmeldung wird nach Abschluss angezeigt.",
                     }
+                },
+                photoDownload: {
+                    title: "Gebäudefoto-Galerie",
+                    description: "In diesem Abschnitt erfahren Sie, wie Sie nach hochgeladenen Gebäudefotos suchen und Bilder einfach herunterladen können.",
+                    step1: {
+                        title: "1. Suche nach Adresse",
+                        description: "Geben Sie eine Adresse in die Suchleiste ein, um die neuesten Upload-Zeiten und die Anzahl der Fotos zu dieser Adresse anzuzeigen."
+                    },
+                    step2: {
+                        title: "2. Fotos ansehen",
+                        description1: "Klicken Sie auf ein Foto mit Adresse im rechten Bereich oder klicken Sie auf ",
+                        viewAll: "'Alle anzeigen'",
+                        description2: "um Filteroptionen zu verwenden und die Fotogalerie zu sortieren."
+                    },
+                    step3: {
+                        title: "3. Fotos herunterladen",
+                        description1: "Klicken Sie auf ein Foto im rechten Bereich und anschließend auf ",
+                        download: "'Herunterladen'",
+                        description2: "um es zu speichern.",
+                        description3: "Mehrere Fotos werden als ZIP-Datei heruntergeladen, während einzelne Bilder im Originalformat gespeichert werden."
+                    }
+                },
+                faq: {
+                    title: "Häufig gestellte Fragen",
+                    photoQuality: {
+                        title: "Probleme mit der Fotoqualität",
+                        q1: "F: Warum werden meine Fotos abgelehnt?",
+                        a1: "A: Fotos können aufgrund von Schatten, Hindernissen, schlechter Beleuchtung oder falscher Perspektive abgelehnt werden.",
+                        q2: "F: Was ist mit unvermeidbaren Hindernissen?",
+                        a2: "A: Versuchen Sie verschiedene Blickwinkel oder vermerken Sie das Hindernis in Ihrer Einreichung."
+                    },
+                    upload: {
+                        title: "Upload-Probleme",
+                        q1: "F: Der Upload schlägt fehl. Was tun?",
+                        a1: "A: Überprüfen Sie die Internetverbindung und stellen Sie sicher, dass die Dateigröße unter 10 MB liegt. Unterstützt: JPG, PNG.",
+                        q2: "F: Wie lange dauert die Freigabe?",
+                        a2: "A: 1–3 Werktage. Überprüfen Sie den Status im Upload-Verlauf."
+                    },
+                    address: {
+                        title: "Adressprobleme",
+                        q1: "F: Kann die richtige Adresse nicht finden?",
+                        a1: "A: Verwenden Sie die automatische Standortfunktion auf der Upload-Seite. Reichen Sie eine Anfrage ein, um fehlende Adressen hinzuzufügen.",
+                        q2: "F: Mehrere Gebäude auf einmal?",
+                        a2: "A: Ja, aber jedes Foto benötigt die spezifische Adresse des Gebäudes."
+                    },
+                    technical: {
+                        title: "Technische Probleme",
+                        q1: "F: App läuft langsam?",
+                        a1: "A: Löschen Sie den Browser-Cache, überprüfen Sie die Internetverbindung, verwenden Sie die neueste Version von Chrome oder Safari.",
+                        q2: "F: Probleme bei der Anmeldung?",
+                        a2: "A: Überprüfen Sie Ihre Zugangsdaten oder wenden Sie sich an den Administrator, um das Passwort zurückzusetzen."
+                    }
+                },
+                main: {
+                    title: "CityUp Anleitung",
+                    welcome: "Willkommen zur CityUp-Anleitung. Wählen Sie ein Thema auf der linken Seite, um zu beginnen.",
+                    quickHelpTitle: "Schnellhilfe - Häufige Fragen",
+                    quickHelpIntro: "Klicken Sie auf eine der folgenden Fragen, um direkt zur Antwort zu gelangen:",
+                    faqLinks: {
+                        q1: "Warum werden meine Fotos abgelehnt?",
+                        q2: "Mein Foto-Upload schlägt fehl. Was soll ich tun?",
+                        q3: "Wie lange dauert es, bis Fotos genehmigt werden?",
+                        q4: "Ich finde die richtige Adresse für mein Gebäude nicht",
+                        q5: "Die Anwendung läuft langsam",
+                        q6: "Ich habe Probleme beim Einloggen",
+                        viewAll: "→ Alle FAQ anzeigen"
+                    }
                 }
-
-
             }
         }
     }

@@ -105,6 +105,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         sx={{
                             ...styles.extiButton,
                             visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
+                            minWidth: '110px',
+                            justifyContent: 'center',
+                            textAlign: 'center',
                         }}
                         variant="outlined"
                     >
@@ -120,6 +123,7 @@ const styles = {
         justifyContent: "space-between",
         borderRadius: 10,
         borderColor: "white",
+        // border: 'none',
         margin:"auto 5% auto auto",
         color:"white",
         fontWeight: "bold",
