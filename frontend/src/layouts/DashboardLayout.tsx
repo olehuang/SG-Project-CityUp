@@ -5,6 +5,7 @@ import Box from '@mui/material/Box';
 import { Outlet } from 'react-router-dom';
 import useMediaQuery from '@mui/material/useMediaQuery'; // new
 import { useTheme } from '@mui/material/styles'; // new
+import KeycloakClient from '../components/keycloak';
 
 const DashboardLayout = () => {
     const [sidebarOpen, setSidebarOpen] = useState(false);

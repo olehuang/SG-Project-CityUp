@@ -11,18 +11,18 @@ interface LanguageSelectorProps {
 const LanguageSelector : React.FC<LanguageSelectorProps> = ({setLanguage,giveLanguage}:any) => {
 
     const { i18n } = useTranslation();
+
     const toggleLanguage = () => {
-        const currentLang = i18n.language;
-        const newLang = currentLang === 'en' ? 'de' : 'en';
-        i18n.changeLanguage(newLang);
+        const newLang = i18n.language === 'en' ? 'de' : 'en';
         setLanguage(newLang);
     };
 
     //from backend give storaged User used Language,
     useEffect(() => {
-        i18n.changeLanguage(giveLanguage);//set language
-        setLanguage(giveLanguage) //set aktuelle language Singal send to MongoDB
-    }, [giveLanguage]);
+        if (giveLanguage) {
+            i18n.changeLanguage(giveLanguage);
+        }
+    }, []);
 
     return (
         <Box>

@@ -39,12 +39,13 @@ class MongoDB:
 
 # User information table
 class User:
-    def __init__(self, user_id: str, username: str, email: str, role: str,point=0):
+    def __init__(self, user_id: str, username: str, email: str, role: str,point=0, language: str = "en"):
         self.user_id = user_id
         self.username = username
         self.email = email
         self.role = "user"
         self.point = point
+        self.language = language if language else "en"
 
     def to_dict(self):
         return {
@@ -52,7 +53,8 @@ class User:
             "username": self.username,
             "email": self.email,
             "role": self.role,
-            "point": self.point
+            "point": self.point,
+            "language": self.language
         }
 
     @classmethod
@@ -62,7 +64,8 @@ class User:
             username=data["username"],
             email=data["email"],
             role=data["role"],
-            point=data["point"]
+            point=data["point"],
+            language = data.get("language", "en")
         )
 
 
@@ -167,15 +170,18 @@ class Photo:
 class PhotoResponse(BaseModel):
     photo_id: str
     user_id: str
+    # upload_time: str
+    upload_time: datetime
+    status: str
+
     username: Optional[str] = None
     building_addr: Optional[str] = None
     lat: Optional[float] = None  # 新增：纬度
     lng: Optional[float] = None  # 新增：经度
-    # upload_time: str
-    upload_time: datetime
+
     image_url: Optional[str]
     #image_data: Photo=None
-    status: str
+
     feedback: Optional[str]
     reviewer_id: Optional[str]
     review_time: Optional[datetime]

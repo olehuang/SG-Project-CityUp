@@ -12,7 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from routes import photo_routes, user_routes, building_routes,rankings
 from fastapi.staticfiles import StaticFiles
 from fastapi.routing import APIRoute
-
+from db_entities import MongoDB
 
 app = FastAPI()
 

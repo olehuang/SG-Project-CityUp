@@ -29,7 +29,14 @@ async def save_user_or_create(user: User):
                   time_stamp=datetime.now())
         raise
 
-
+# async def save_user(user: User):
+#     users = MongoDB.get_instance().get_collection('users')
+#     # TODO: Error Handling
+#     try:
+#         await users.insert_one(user)
+#     except Exception as e:
+#         log_error("Error from save_user with: {}".format(user),e)
+#         raise
 """
 @user_id: string
 brief: import user_id can delete user from DB
@@ -198,9 +205,40 @@ async def get_userRanking(user_id:str):
                   time_stamp=datetime.now().isoformat())
         raise
 
+async def update_user_language(user_id: str, language: str):
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id": user_id}
+        new_value = {"$set": {"language": language}}
 
+        result = await users.update_one(query, new_value)
+        return {"details": "Language successfully set"}
+    except Exception as e:
+        log_error("Error from update_user_language with: {}".format(user_id),e)
+        raise
 
+async def get_or_create_user(user_id: str):
+    try:
+        query = {"user_id": user_id}
+        users = MongoDB.get_instance().get_collection('users')
+        result = await users.find_one(query)
+        if result is None:
+            new_user_dict = {
+                "user_id": user_id,
+                "username": "default_username",
+                "email": "default@email.com",
+                "role": "user",
+                "language": "en",
+                "point": 0
+            }
+            await users.insert_one(new_user_dict)
+            return new_user_dict
+        else:
+            return result
 
+    except Exception as e:
+        log_error("Error from get_or_create_user with: {}".format(user_id),e)
+        raise
 
 if __name__ == '__main__':
     dotenv.load_dotenv()
