@@ -69,13 +69,13 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
 
               # user already like this photo or not
               is_like= user_id in photo_doc["like"]
-              print("is_like",is_like)
+
               photo_doc["is_like"] = is_like
 
               # user is photo owner or not
               canLike= owner.get("user_id") !=user_id
               photo_doc["canLike"]= canLike
-              print("photo_doc canLike",photo_doc["canLike"])
+
 
               #count how many people like
               photo_doc["likeCount"] =len(photo_doc["like"])
@@ -123,7 +123,7 @@ async def isLike(photo_id:str,user_id:str):
             raise ValueError("Photo not found or user has not liked it")
         islike =user_id in photo.get("like",[])
         if photo.get("user_id") == user_id:return True
-        print("isLike:",islike)
+
         return islike
     except Exception as e:
         log_error('Error bei function isLike', stack_data=traceback.format_exc())

@@ -157,7 +157,10 @@ const KeycloakInit = () => {
     <ReactKeycloakProvider // Keycloak Provider beginn
         authClient={KeycloakClient.creatKeycloak}
         onTokens={onKeycloakTokens}
-        initOptions={{onload:"login-required", checkLoginIframe:"true"}}
+        initOptions={{
+            onload:"login-required",
+            //checkLoginIframe:"true"
+        }}
     >
         <Outlet/>
     </ReactKeycloakProvider>
