@@ -12,7 +12,7 @@ import traceback
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
 import math
-
+from bson import json_util
 
 router = APIRouter()
 
@@ -25,6 +25,10 @@ class User(BaseModel):
 class RoleUpdate(BaseModel):
     user_id: str
     role: str = "user"
+
+class UpdateLanguageRequest(BaseModel):
+    language: str
+
 @router.post("/save_user")
 async def save_user(user: User):
     try:
@@ -200,4 +204,35 @@ async def disLike(photo_id:str,user_id:str):
         print("Exception while dislike",traceback.format_exc())
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
+@router.post("/update_language")
+async def update_language(user_id: str, request: UpdateLanguageRequest):
+    try:
+        print(user_id,request)
+        result = await db_userEntities.update_user_language(user_id,
+                                                                request.language)
+
+        return result
+    except ConnectionError as conn_err:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Database connection error. Please try again later.")
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="An unexpected error occurred while updating dark mode.")
+
+@router.get("/get_or_create_user")
+async def get_or_create_user(user_id: str):
+    try:
+        # Attempt to get or create the user in the database
+        response = await db_userEntities.get_or_create_user(user_id)
+        # Return the user data as a JSON response
+        return jsonable_encoder(response)
+
+    except ConnectionError as conn_err:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="Database connection error. Please try again later.")
+
+    except Exception as e:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                            detail="An unexpected error occurred while retrieving or creating the user.")
 

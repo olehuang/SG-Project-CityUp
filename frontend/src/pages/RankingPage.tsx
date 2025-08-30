@@ -13,7 +13,7 @@ import {
 import WorkspacePremiumRoundedIcon from '@mui/icons-material/WorkspacePremiumRounded';
 import pageBackgroundStyles from "./pageBackgroundStyles";
 
-
+import { useTranslation } from 'react-i18next';
 /**
  * a class form user, because user ranking in DBMS storage
  * */
@@ -69,6 +69,7 @@ const RankingPage =()=>{
     const top3 = userRanking?.users.slice(0, 3) || [];//
     const restUsers = userRanking?.users.slice(3) || [];//
 
+    const { t } = useTranslation();
     useEffect(() => {
 
         get_users(page,limit)
@@ -97,7 +98,7 @@ const RankingPage =()=>{
 
             setUserRanking(usersR);
         }catch(error:any){
-            setGetRankingError("get Ranking Error: "+(error.message || "Unknown error"))
+            setGetRankingError(t("ranking.getRankingError")+(error.message || t("ranking.unknownError")))
         } finally {
             setUsersLoading(false);
         }
@@ -123,7 +124,7 @@ const RankingPage =()=>{
             setRanking(re.data)
 
         }catch (e:any) {
-            setPrivateUserError("get private User Error: "+(e.message || "Unknown error"));
+            setPrivateUserError(t("ranking.getUserError")+(e.message || t("ranking.unknownError")));
         }finally {
             setUserLoading(false)
         }
@@ -193,13 +194,13 @@ const RankingPage =()=>{
                     marginLeft: { xs: 0, sm: "2%" }  // 网页端恢复原始marginLeft
                 }}>
                     {/* 根据屏幕大小显示不同的标签 */}
-                    {isMobile ? `Username: ${user.username}` : `User Name: ${user.username}`}
+                    {isMobile ? t('ranking.userName')+`: ${user.username}` : t('ranking.userName')+`: ${user.username}`}
                 </Typography>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
                     margin: { xs: 0, sm: "auto auto auto 17%" }  // 网页端恢复原始marginLeft
                 }}>
-                    My Ranking: {user.rank !== -1 && +user.point !== 0 ? user.rank : "not in Ranking"}
+                    {t('ranking.myRanking')}: {user.rank !== -1 && +user.point !== 0 ? user.rank : "not in Ranking"}
                 </Typography>
 
                 <Box sx={{
@@ -212,7 +213,7 @@ const RankingPage =()=>{
                     fontWeight: "bold",
                     //marginLeft: { xs: 0, sm: "auto" }  // 网页端恢复原始marginLeft
                 }}>
-                    My Point: {user.point}
+                    {t("ranking.myPoint")}: {user.point}
                 </Typography>
                 <Button
                     size= "small"
@@ -225,7 +226,7 @@ const RankingPage =()=>{
                     }}
                     onClick={toMyPosition}
                 >
-                    {showingMyPosition ? "Top" : "My Position"}
+                    {showingMyPosition ? t("ranking.top") : t("ranking.myPosition")}
                 </Button>
                 </Box>
             </Box>
@@ -250,9 +251,9 @@ const RankingPage =()=>{
                         <Table stickyHeader >
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>Ranking</TableCell>
-                                    <TableCell>Username</TableCell>
-                                    <TableCell>Points</TableCell>
+                                    <TableCell >{t("ranking.ranking")}</TableCell>
+                                    <TableCell >{t("ranking.username")}</TableCell>
+                                    <TableCell >{t("ranking.points")}</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -327,9 +328,9 @@ const RankingPage =()=>{
                         <TableHead >
                             <TableRow sx={{ backgroundColor: "#F1EFEC",//"#abd1e6",
                             }}>
-                                <TableCell sx={styles.headerCell(25)}>Ranking</TableCell>
-                                <TableCell sx={styles.headerCell(30)}>Username</TableCell>
-                                <TableCell sx={styles.headerCell(25)}>Points</TableCell>
+                                <TableCell sx={styles.headerCell(25)}>{t("ranking.ranking")}</TableCell>
+                                <TableCell sx={styles.headerCell(30)}>{t("ranking.username")}</TableCell>
+                                <TableCell sx={styles.headerCell(25)}>{t("ranking.points")}</TableCell>
                             </TableRow>
                         </TableHead>
 
@@ -345,7 +346,7 @@ const RankingPage =()=>{
                                             margin:"auto",textAlign: "center"}}>
                                             <CircularProgress color={"primary"}></CircularProgress>
                                             <Typography variant="h6" sx={{ fontWeight: "bold",marginLeft:"auto"}}>
-                                                Loading...
+                                                {t("ranking.loading")}
                                             </Typography>
                                             {getRankingError  &&
                                                 <Alert variant={"filled"} severity="error">{getRankingError}</Alert>

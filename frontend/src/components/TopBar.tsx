@@ -10,13 +10,16 @@ import {useNavigate,useLocation,Link} from "react-router-dom";
 import LanguageSelector from "../LanguageSelector";
 import { useTranslation } from 'react-i18next';
 import { useMediaQuery, useTheme } from "@mui/material";
+import axios from "axios";
+import {useAuthHook} from "../components/AuthProvider";
 interface TopBarProps {
     onMenuClick: () => void;
 }
 
 const TopBar = ({ onMenuClick }: TopBarProps) => {
-
+    const {user_id}=useAuthHook();
     const navigate=useNavigate();
+    const { t, i18n } = useTranslation();
     const handleClickToHome=()=>{//temp to homepage
         navigate("/");
     }
@@ -26,34 +29,73 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
 
     //user language to accept from backend default value EN(language) and light(theme)
     const [giveLanguage,setGiveLanguage]=useState("en");
-    const { t } = useTranslation();
+
 
     //Mobil-End
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
+    useEffect(() => {
+        async function fetchUserSetting() {
+            if (!user_id) return;
+            try {
+                const res = await fetch(`http://127.0.0.1:8000/users/get_or_create_user?user_id=${user_id}`);
+                const user = await res.json();
+                if (user && user.language) {
+                    setGiveLanguage(user.language);
+                    setLanguage(user.language);
+                    i18n.changeLanguage(user.language);
+                }
+            } catch (err) {
+                console.error("Failed to get user settings:", err);
+            }
+        }
+        fetchUserSetting();
+    }, [user_id, i18n]);
+
+    const handleLanguageChange = async (lang: string) => {
+        setLanguage(lang);
+        i18n.changeLanguage(lang);
+        console.log(user_id,lang);
+        if (!user_id) return;
+        console.log(user_id,lang)
+        try {
+            await axios.post(
+                `http://127.0.0.1:8000/users/update_language`,
+                { language: lang },
+                { params: { user_id },headers: { "Content-Type": "application/json" } }
+            );
+
+            setGiveLanguage(lang);
+        } catch (err) {
+            console.error("Failed to update language:", err);
+        }
+    };
+
     const getPageTitle = () => {
         switch (location.pathname) {
             case '/dashboard':
-                return 'Dashboard';
+                return t('bar.dashboard');
             case '/dashboard/upload':
-                return 'Upload';
+                return t('bar.upload');
             case '/dashboard/tutorial':
-                return 'Tutorial';
+                return t('bar.tutorial');
             case '/dashboard/photoGallery':
-                return 'Photo Gallery';
+                return t('bar.photoGallery');
             case '/dashboard/uploadHistory':
-                return 'Upload History';
+                return t('bar.uploadHistory');
             case '/dashboard/productIntroduction':
-                return 'Product Introduction';
+                return t('bar.productIntroduction');
             case '/dashboard/photoReview':
-                return 'Photo Review';
+                return t('bar.photoReview');
             case '/dashboard/ranking':
-                return 'Rankings';
+                return t('bar.ranking');
             default:
-                return 'Loading...';
+                return t('bar.loading');
         }
     };
+
+
     return (
         <AppBar position="static" sx={{
             // backgroundColor: '#1976d2',
@@ -98,7 +140,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     mr: "6%",//margin right
                 }}>
                     {!isMobile && (<LanguageSelector
-                        setLanguage={setLanguage}
+                        setLanguage={handleLanguageChange}
                         giveLanguage={giveLanguage}
                     />)}
                     <Button
@@ -108,10 +150,13 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                         sx={{
                             ...styles.extiButton,
                             visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
+                            justifyContent: 'center',
+                            textAlign: 'center',
+                            width:"120px",
                         }}
                         variant="outlined"
                     >
-                        Exit
+                        {t('bar.exit')}
                     </Button>
                 </Box>
             </Toolbar>
@@ -123,6 +168,7 @@ const styles = {
         justifyContent: "space-between",
         borderRadius: 10,
         borderColor: "white",
+        // border: 'none',
         margin:"auto 5% auto auto",
         color:"white",
         fontWeight: "bold",

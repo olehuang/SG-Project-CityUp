@@ -12,11 +12,11 @@ import AccountBoxIcon from '@mui/icons-material/AccountBox';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import SupervisorAccountIcon from '@mui/icons-material/SupervisorAccount';
 
-
+import { useTranslation } from 'react-i18next';
 const Profile = ({ token }: { token: string })=>{
     const [openProfile, setOpenProfile] = useState(false);
     const [roles, setRoles] = useState<string[]>([]);
-
+    const {t} = useTranslation();
     const handleClick = (event: React.MouseEvent) => {
         event.stopPropagation();//
         setOpenProfile(!openProfile);
@@ -53,7 +53,7 @@ const Profile = ({ token }: { token: string })=>{
             <ListItemButton onClick={handleClick} >
                 <ListItemIcon><AccountBoxIcon/>
                 </ListItemIcon>
-                <ListItemText primary="Profile" />
+                <ListItemText primary={t('bar.profile')} />
                 {openProfile ? <ExpandLess /> : <ExpandMore />}
             </ListItemButton>
             <Collapse in={openProfile} >
@@ -61,13 +61,13 @@ const Profile = ({ token }: { token: string })=>{
                     <ListItemButton sx={{ pl: 4 }} onClick={handleToProfile} >
                         <ListItemIcon><AccountCircleIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="User Information" />
+                        <ListItemText primary={t('bar.userInformation')} />
                     </ListItemButton>
                     {roles.includes('admin') &&
                         <ListItemButton sx={{ pl: 4 }} onClick={hanldAdminPanel}>
                         <ListItemIcon><SupervisorAccountIcon/>
                         </ListItemIcon>
-                        <ListItemText primary="Admin Panel" />
+                        <ListItemText primary={t('bar.adminPanel')} />
                     </ListItemButton>}
                 </List>
             </Collapse>

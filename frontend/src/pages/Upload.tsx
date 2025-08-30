@@ -425,7 +425,7 @@ const Upload: React.FC = () => {
                                 type="text"
                                 value={address}
                                 onChange={(e) => setAddress(e.target.value)}
-                                placeholder="Type the address or click on the map to select."
+                                placeholder={t('AddAddress')}
                                 style={{
                                     flex: 1,
                                     fontSize: "0.9rem",
@@ -532,7 +532,7 @@ const Upload: React.FC = () => {
                     fontSize: isMobile?"0.5rem":"0.9rem",
                     color: "#666"
                 }}>
-                    Drag the marker to adjust the building location
+                    {t('mapdesc')}
                 </div>
             </div>
             {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
@@ -691,15 +691,14 @@ const Upload: React.FC = () => {
                         <span>📋</span> {t('photoRequirements.title')}
                     </h3>
                     <ul style={{paddingLeft: 22, margin: 0, lineHeight: 1.6}}>
-                        <li><strong>Pls!</strong> Please Prioritize photographing the flesh-colored, khaki, and brown
-                            houses on the map.
+                        <li><strong>{t('photoRequirements.pls')}</strong> {t('photoRequirements.desc')}
                         </li>
-                        <li>{t('photoRequirements.noFaces')}</li>
-                        <li>{t('photoRequirements.noObstructions')}</li>
-                        <li>{t('photoRequirements.noShadows')}</li>
-                        <li>{t('photoRequirements.noDistortion')}</li>
-                        <li>{t('photoRequirements.clear')}</li>
-                        <li>{t('photoRequirements.wholeBuilding')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noFaces')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noObstructions')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noShadows')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noDistortion')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.clear')}</li>
+                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.wholeBuilding')}</li>
 
                     </ul>
                 </div>
