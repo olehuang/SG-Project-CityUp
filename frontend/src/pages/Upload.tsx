@@ -343,7 +343,7 @@ const Upload: React.FC = () => {
                 justifyContent: "stretch",
                 boxSizing: "border-box",
                 position: "relative",
-                padding: isSmallScreen ? "1% 20px 1% 20px" : "0",//monitor adapter
+                padding: isSmallScreen ? "20px" : "0",
                 paddingBottom: isMobile ? "20px" : "0"
             }}
         >
@@ -353,7 +353,7 @@ const Upload: React.FC = () => {
                 style={{
                     flex: isSmallScreen ? "none" : 2,
                     width: isSmallScreen ? "100%" : "68%",
-                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 1% 6vw"),//monitor adapter
+                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 44px 6vw"),
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -365,7 +365,7 @@ const Upload: React.FC = () => {
                     style={{
                         fontSize: isMobile ? "1.3rem" : "2rem",
                         fontWeight: 700,
-                        margin: "0 0 1% 0",//monitor adapter
+                        margin:"0 0 22px 0",
                         whiteSpace: "nowrap", // 不换行
                         textOverflow: "ellipsis"
                     }}
@@ -460,7 +460,7 @@ const Upload: React.FC = () => {
                 </div>
                 {/* 缺失门牌号提示 Missing door number alert*/}
                 {houseNumberMissing && (
-                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8}}>
+                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8 }}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
@@ -469,7 +469,7 @@ const Upload: React.FC = () => {
                     ref={mapDivRef}
                     style={{
                         width: "100%",
-                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "53vh"),//monitor adapter
+                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "60vh"),
                         maxHeight: 500,
                         minHeight: isMobile ? 150 : (isSmallScreen ? 300 : 350),
                         borderRadius: 16,
@@ -542,7 +542,7 @@ const Upload: React.FC = () => {
                     width: isSmallScreen ? "100%" : "32%",
                     overflowY:isMobile? "visible":"auto",
                     padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `88px 6vw 6px 38px`), // ← 用isMobile微调padding //monitor adapter
+                        : (isSmallScreen ? "20px" : `119px 6vw 44px 38px`), // ← 用isMobile微调padding
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -560,7 +560,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "7.5px 12px",
+                            padding: "10px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -589,7 +589,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "7.5px 12px",
+                            padding: "10px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -673,8 +673,8 @@ const Upload: React.FC = () => {
                         fontSize:  isMobile ? "0.7rem" : "0.98rem",
                         background: "#fffde7",
                         borderRadius: 12,
-                        padding: isMobile ? "10px" : "10px",
-                        marginBottom: "6px",//monitor adapter
+                        padding: isMobile ? "10px" : "16px",
+                        marginBottom: "16px",
                         border: "1px solid #f5e79e",
                         boxSizing: "border-box",
                         boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
@@ -682,7 +682,7 @@ const Upload: React.FC = () => {
                     }}
                 >
                     <h3 style={{
-                        margin: "0 0 6px 0",
+                        margin: "0 0 12px 0",
                         fontSize: isMobile?"0.9rem":"1.1rem",
                         display: "flex",
                         alignItems: "center",
@@ -709,7 +709,7 @@ const Upload: React.FC = () => {
                             background: error.includes("successful") ? "#e1f7d5" : "#ffd6d6",
                             color: error.includes("successful") ? "#237a00" : "#b71c1c",
                             padding: "12px 16px",
-                            marginBottom: 1,//monitor adapter
+                            marginBottom: 10,
                             borderRadius: 8,
                             fontWeight: 500,
                             border: `1px solid ${error.includes("successful") ? "#a5d6a7" : "#ffcdd2"}`,
@@ -743,7 +743,7 @@ const Upload: React.FC = () => {
                         justifyContent: "center",
                         alignItems: "center",
                         gap: "10px",
-                        marginTop:isMobile?"12px":"6px",//monitor adapter
+                        marginTop:isMobile?"12px":"16px",
                     }}
                 >
                     {isSubmitting ? (
