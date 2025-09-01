@@ -157,7 +157,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             justifyContent: 'center',
                             textAlign: 'center',
                             width: {sx:"90%",sm:"100%"},
-                            minWidth: "110px",
+                            minWidth: "120px",
                         }}
                         variant="outlined"
                     >
