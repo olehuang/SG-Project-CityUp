@@ -70,10 +70,10 @@ def haversine(lat1, lon1, lat2, lon2):
     """
 
     lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])# 将经纬度转换为弧度 Converting latitude and longitude to radians
-    # 计算经纬度差Calculation of latitude/longitude differences
+    # Calculation of latitude/longitude differences
     dlat = lat2 - lat1
     dlon = lon2 - lon1
-    # 应用Haversine公式 Applying the Haversine formula
+    # Applying the Haversine formula
     a = math.sin(dlat / 2) ** 2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2) ** 2
     c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
     R = 6371000  # Radius of the Earth in metres
@@ -101,7 +101,7 @@ def check_photo_location(photo_gps, building_gps, threshold=100):
    Usually the threshold is around 700 if you want to see the texture details clearly. 
    如果觉得不够清晰把threshold调大就好 一般看清楚纹理细节的话 @threshold 在700左右
    """
-def is_image_blurry(image_bytes, threshold=350):
+def is_image_blurry(image_bytes, threshold=400):
     """
     2. 检测图片是否清晰，拉普拉斯方差法。
     :param image_bytes: Image binary data

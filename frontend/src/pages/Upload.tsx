@@ -4,7 +4,6 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
 import { useTranslation } from 'react-i18next';
-// 默认达姆施塔特市中心 Default Darmstadt city centre
 
 // 默认Audimax Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
 const DEFAULT_CENTER: [number, number] = [49.874727, 8.656193];
