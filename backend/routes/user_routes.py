@@ -225,6 +225,8 @@ async def get_or_create_user(user_id: str):
     try:
         # Attempt to get or create the user in the database
         response = await db_userEntities.get_or_create_user(user_id)
+        if response and "_id" in response:
+            response["_id"] = str(response["_id"])
         # Return the user data as a JSON response
         return jsonable_encoder(response)
 
