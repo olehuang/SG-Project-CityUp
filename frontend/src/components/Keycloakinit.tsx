@@ -3,7 +3,7 @@ import {ReactKeycloakProvider} from "@react-keycloak/web";
 import {Outlet} from "react-router-dom";
 import {useAuthHook} from "./AuthProvider";
 import {useEffect, useState} from "react";
-import {routes} from "@keycloak/keycloak-account-ui/lib/routes";
+
 
 import axios from "axios";
 

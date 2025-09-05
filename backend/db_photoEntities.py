@@ -217,3 +217,16 @@ async def initalLike():
         log_error('Error in function initalLike', stack_data=traceback.format_exc())
         raise
 
+
+async def delet_all_photos():
+    """
+     :brief : cleare all Photos in DBMS
+     WARNING: This operation is irreversible
+                and should only be used for testing or maintenance.
+    """
+    print("delete all photos")
+    result =  await photo_collection.delete_many({})
+    print(f"Deleted {result.deleted_count} photos")
+
+
+

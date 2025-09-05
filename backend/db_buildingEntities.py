@@ -95,3 +95,11 @@ async def update_addr_from_photo():
         raise
 
 
+async def delete_all_addr():
+    """
+    Clear all Address from Database
+    WARNING: This will delete all Address from Database
+    """
+    buildings=MongoDB.get_instance().get_collection("buildings")
+    result = await buildings.delete_many({})
+    print(f"Deleted {result.deleted_count} building Address")
