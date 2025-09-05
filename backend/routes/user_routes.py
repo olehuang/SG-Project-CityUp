@@ -8,6 +8,7 @@ from . import rankings
 import db_photoEntities
 from db_entities import User,MongoDB
 import db_userEntities
+import db_buildingEntities
 import traceback
 from fastapi import FastAPI
 from fastapi.encoders import jsonable_encoder
