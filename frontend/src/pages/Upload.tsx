@@ -4,13 +4,12 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
 import { useTranslation } from 'react-i18next';
-// 默认达姆施塔特市中心 Default Darmstadt city centre
 
 // 默认Audimax Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
 const DEFAULT_CENTER: [number, number] = [49.874727, 8.656193];
 const MAX_BOUNDS: [[number, number], [number, number]] = [
-    [49.8723750961, 8.6504056457], [49.8860459490, 8.6629604999],];
-const VIEWBOX = [8.6504056457, 49.8723750961, 8.6629604999, 49.8860459490];
+    [49.8723750961, 8.6504056457], [49.88100119490, 8.6629604999],];
+const VIEWBOX = [8.6504056457, 49.8723750961, 8.6629604999, 49.88100119490];
 
 interface UploadPhoto {
     id: string;
@@ -542,7 +541,7 @@ const Upload: React.FC = () => {
                     width: isSmallScreen ? "100%" : "32%",
                     overflowY:isMobile? "visible":"auto",
                     padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `119px 6vw 44px 38px`), // ← 用isMobile微调padding
+                        : (isSmallScreen ? "20px" : `118px 6vw 44px 38px`), // ← 用isMobile微调padding
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
