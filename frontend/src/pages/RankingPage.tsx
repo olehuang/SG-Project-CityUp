@@ -184,21 +184,21 @@ const RankingPage =()=>{
         }}>
             <Box sx={{
                 ...styles.personInfo,
-                flexDirection: { xs: "column", sm: "row" },  // 保持响应式
-                alignItems: { xs: "flex-start", sm: "center" },  // 保持响应式
-                //textAlign: { xs: "left", sm: "baseline" },  // 保持响应式
-                gap: { xs: 1, sm: 0 },  // 移动端有gap，网页端无gap
+                flexDirection: { xs: "column", sm: "row" },
+                alignItems: { xs: "flex-start", sm: "center" },
+                //textAlign: { xs: "left", sm: "baseline" },
+                gap: { xs: 1, sm: 0 },  // There is a gap on the mobile side, but not on the web side
             }}>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
-                    marginLeft: { xs: 0, sm: "2%" }  // 网页端恢复原始marginLeft
+                    marginLeft: { xs: 0, sm: "2%" }  // Restore the original marginLeft on the web page
                 }}>
-                    {/* 根据屏幕大小显示不同的标签 */}
+                    {/* Display different labels according to screen size */}
                     {isMobile ? t('ranking.userName')+`: ${user.username}` : t('ranking.userName')+`: ${user.username}`}
                 </Typography>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
-                    margin: { xs: 0, sm: "auto auto auto 17%" }  // 网页端恢复原始marginLeft
+                    margin: { xs: 0, sm: "auto auto auto 17%" }  //  Restore the original marginLeft on the web page
                 }}>
                     {t('ranking.myRanking')}: {user.rank !== -1 && +user.point !== 0 ? user.rank : "not in Ranking"}
                 </Typography>
@@ -211,7 +211,7 @@ const RankingPage =()=>{
                 }}>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
-                    //marginLeft: { xs: 0, sm: "auto" }  // 网页端恢复原始marginLeft
+                    //marginLeft: { xs: 0, sm: "auto" }  //  Restore the original marginLeft on the web page
                 }}>
                     {t("ranking.myPoint")}: {user.point}
                 </Typography>
@@ -221,7 +221,7 @@ const RankingPage =()=>{
                     sx={{
                         alignSelf: { xs: "flex-end", sm: "center" },
                         visibility: totalPages > 1 ? "visible" : "hidden",
-                        // 网页端恢复原始margin样式
+                        //  Restore the original margin Styles on the web page
                         margin: { xs: "0 2% 0 auto", sm: "1% 2% 0.5% auto" },
                     }}
                     onClick={toMyPosition}
@@ -239,15 +239,11 @@ const RankingPage =()=>{
                     <Box
                         sx={{
                             width: '100%',
-                            //maxWidth: '100vw',            // 避免内容超出视口
-                            //px: 2,                         // 保留内边距但不要 pl+px 同时用
-                            //mx: 'auto',                    // 强制居中
-                            //boxSizing: 'border-box',
-                            overflowX: 'hidden'           // 禁止横向滚动
+                            overflowX: 'hidden'           // Disable horizontal scrolling
                         }}
                     >
 
-                        {/* 移除原来的top 3卡片区域，改为统一表格 */}
+
                         <Table stickyHeader >
                             <TableHead>
                                 <TableRow>
@@ -422,12 +418,12 @@ const styles={
     personInfo:{
         display:"flex",
         justifyContent:"space-between",
-        width: { xs: '100%', sm: '90%' },  // 响应式宽度
+        width: { xs: '100%', sm: '90%' },
         height: {xs:"18%",sm:"10%"},
-        margin:  "0 0 1% 0",  // 响应式margin
-        maxWidth: { xs: '100%' },  // 响应式最大宽度
+        margin:  "0 0 1% 0",
+        maxWidth: { xs: '100%' },
         marginBottom:  { xs: 2 },
-        padding: { xs: "1rem", sm: "1% 0% 1% 0%" },  // 响应式padding
+        padding: { xs: "1rem", sm: "1% 0% 1% 0%" },
         //border:"1px solid black",
         borderRadius:"10px",
         backgroundColor: "#FAF6E9",

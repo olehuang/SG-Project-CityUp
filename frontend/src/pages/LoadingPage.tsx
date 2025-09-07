@@ -49,11 +49,11 @@ const LoadingPage=()=>{
             // color: "#0d3b66",
             color: "#3E2723",
             fontSize: {
-                xs: "4rem",    // 手机端
-                sm: "6rem",    // 平板端
-                md: "8rem",    // 中等屏幕
-                lg: "10rem",   // 大屏幕
-                xl: "12rem"    // 超大屏幕
+                xs: "4rem",    // Mobil
+                sm: "6rem",    // Table
+                md: "8rem",    // Medium screen
+                lg: "10rem",   // large
+                xl: "12rem"    // Extra-large screen
             },
             marginBottom: { xs: "1rem", sm: "1.25rem", md: "1.5rem" },
             lineHeight: { xs: 0.9, sm: 1, md: 1.1 },
@@ -152,7 +152,7 @@ const LoadingPage=()=>{
                 opacity: 0;
               }
             }
-            /* 移动端优化 */
+            /* Mobile optimization */
             @media (max-width: 600px) {
                 body {
                     -webkit-text-size-adjust: 100%;
