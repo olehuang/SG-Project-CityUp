@@ -4,17 +4,18 @@ import { Box, Select, MenuItem, SelectChangeEvent, Button } from '@mui/material'
 
 //defined what can this component accept
 interface LanguageSelectorProps {
-    setLanguage: (lang: string) => void;
-    giveLanguage:  string;
+    setLanguage: (lang: string) => void; // Function to change language，which passed from parent
+    giveLanguage:  string; // Initial language from backend (user preference)
 }
 
 const LanguageSelector : React.FC<LanguageSelectorProps> = ({setLanguage,giveLanguage}:any) => {
 
-    const { i18n } = useTranslation();
+    const { i18n } = useTranslation(); // Access i18n instance
 
+    // Toggle between English and German
     const toggleLanguage = () => {
         const newLang = i18n.language === 'en' ? 'de' : 'en';
-        setLanguage(newLang);
+        setLanguage(newLang); // Call parent function to update language state + backend
     };
 
     //from backend give storaged User used Language,

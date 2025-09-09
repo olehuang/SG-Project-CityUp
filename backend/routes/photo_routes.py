@@ -252,9 +252,18 @@ async def download_photos_zip(photo_ids: List[str] = Query(...)):
 
 @router.get("/review/batch_fetch")
 async def fetch_photos_for_review(reviewer_id:str, request: Request):
+    """
+        Fetch up to 30 photos for a reviewer to review.
+        - Locks photos (status -> Reviewing) for the current reviewer.
+        - Ensures no conflicts with other reviewers.
+        - If a photo has been "reviewing" for over 1 hour, it becomes available again.
+        """
     try:
         timeout_threshold = datetime.now(timezone.utc) - timedelta(hours=1)
-
+        # Find potential photos to review:
+        # - Pending photos
+        # - Already locked by this reviewer
+        # - Locked by others but expired
         potential_photos_cursor = photo_collection.find(
             {
                 "$or": [
@@ -271,7 +280,7 @@ async def fetch_photos_for_review(reviewer_id:str, request: Request):
 
         if not photo_ids_to_attempt_lock:
             raise HTTPException(status_code=404, detail="No pending photos found for review at this moment.")
-
+        # Attempt to lock these photos for this reviewer
         update_result = await photo_collection.update_many(
             {
                 "_id": {"$in": photo_ids_to_attempt_lock},
@@ -289,13 +298,14 @@ async def fetch_photos_for_review(reviewer_id:str, request: Request):
                 "$currentDate": {"review_time": True}
             }
         )
-
+        # Fetch the successfully locked photos
         locked_photos_cursor = photo_collection.find(
             {"_id": {"$in": photo_ids_to_attempt_lock}, "status": ReviewStatus.Reviewing.value, "reviewer_id": reviewer_id}
         )
         locked_photos = []
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
+            # Generate image URL for frontend to fetch photo data
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
             del photo_doc["_id"]
 
@@ -308,7 +318,7 @@ async def fetch_photos_for_review(reviewer_id:str, request: Request):
             except Exception as e:
                 print(f"Failed to get username for user_id {photo_doc['user_id']}: {e}")
                 photo_doc["username"] = photo_doc["user_id"]
-
+            # Remove large binary image data from response
             if "image_data" in photo_doc:
                 del photo_doc["image_data"]
             locked_photos.append(PhotoResponse(**photo_doc))
@@ -328,10 +338,16 @@ async def fetch_photos_for_review(reviewer_id:str, request: Request):
 
 @router.post("/review/single")
 async def review_single_photo(request: PhotoReviewRequest):
+    """
+        Review a single photo.
+        - Reviewer sets final status (Approved / Rejected).
+        - Updates the photo document with feedback and timestamp.
+        - Rewards points if approved.
+    """
     try:
         final_status = ReviewStatus.Approved if request.status_result == "success" else ReviewStatus.Rejected
         current_time = datetime.now(timezone.utc)
-
+        # Ensure photo is locked by this reviewer and update it
         updated_photo_doc = await photo_collection.find_one_and_update(
             {
                 "_id": ObjectId(request.photo_id),
@@ -354,7 +370,7 @@ async def review_single_photo(request: PhotoReviewRequest):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Photo not found or not in 'reviewing' state for this reviewer."
             )
-
+        # Reward points if approved
         if final_status == ReviewStatus.Approved:
             await reward_photo_approval(updated_photo_doc["user_id"], request.photo_id)
         updated_photo_doc["photo_id"] = str(updated_photo_doc["_id"])
@@ -373,6 +389,12 @@ async def review_single_photo(request: PhotoReviewRequest):
 
 @router.post("/review/batch_submit", response_model=List[PhotoResponse])
 async def review_batch_photos(request: BatchReviewRequest):
+    """
+        Review multiple photos in batch.
+        - All selected photos must be in "reviewing" state by this reviewer.
+        - Updates status, feedback, and timestamps.
+        - Rewards points if approved.
+    """
     try:
         if not request.ids:
             raise HTTPException(status_code=400, detail="No photo IDs provided")
@@ -381,7 +403,7 @@ async def review_batch_photos(request: BatchReviewRequest):
         current_time = datetime.now(timezone.utc)
 
         object_ids = [ObjectId(photo_id) for photo_id in request.ids]
-
+        # Update all matching photos
         update_result = await photo_collection.update_many(
             {
                 "_id": {"$in": object_ids},
@@ -403,7 +425,7 @@ async def review_batch_photos(request: BatchReviewRequest):
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No photos found or updated. They might not be in 'reviewing' state by this reviewer."
             )
-
+        # Return updated photos
         updated_photos_cursor = photo_collection.find(
             {"_id": {"$in": object_ids},
              "status": final_status.value,
@@ -428,6 +450,12 @@ async def review_batch_photos(request: BatchReviewRequest):
 
 @router.post("/review/release_all")
 async def release_all_reviewing_photos(request: ReleasePhotosRequest):
+    """
+        Release all photos currently locked by a specific reviewer.
+        - Resets status back to Pending.
+        - Clears reviewer info and review time.
+        - Useful if reviewer quits or session expires.
+        """
     try:
         update_result = await photo_collection.update_many(
             {

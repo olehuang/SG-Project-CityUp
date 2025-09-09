@@ -35,6 +35,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
 
+    // Fetch user settings from backend,language preference etc.
     useEffect(() => {
         async function fetchUserSetting() {
             if (!user_id) return;
@@ -42,9 +43,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 const res = await fetch(`http://127.0.0.1:8000/users/get_or_create_user?user_id=${user_id}`);
                 const user = await res.json();
                 if (user && user.language) {
-                    setGiveLanguage(user.language);
+                    setGiveLanguage(user.language); // Update state with user preference
                     setLanguage(user.language);
-                    i18n.changeLanguage(user.language);
+                    i18n.changeLanguage(user.language);  // Apply language change in i18n
                 }
             } catch (err) {
                 console.error("Failed to get user settings:", err);
@@ -53,13 +54,15 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         fetchUserSetting();
     }, [user_id, i18n]);
 
+    // Handle language change，which triggered from LanguageSelector
     const handleLanguageChange = async (lang: string) => {
         setLanguage(lang);
-        i18n.changeLanguage(lang);
+        i18n.changeLanguage(lang); // Apply immediately
         console.log(user_id,lang);
         if (!user_id) return;
         console.log(user_id,lang)
         try {
+            // Send update request to backend
             await axios.post(
                 `http://127.0.0.1:8000/users/update_language`,
                 { language: lang },
@@ -72,6 +75,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
         }
     };
 
+    // Return different page titles depending on current route
     const getPageTitle = () => {
         switch (location.pathname) {
             case '/dashboard':

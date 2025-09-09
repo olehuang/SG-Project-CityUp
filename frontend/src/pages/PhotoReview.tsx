@@ -48,7 +48,7 @@ const PhotoReview = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string>("");
     const [success, setSuccess] = useState<string>("");
-
+    // Preview state
     const [previewOpen, setPreviewOpen] = useState(false);
     const [previewImage, setPreviewImage] = useState<string>("");
     const [previewPhotoInfo, setPreviewPhotoInfo] = useState<PhotoItem | null>(null);
@@ -57,12 +57,14 @@ const PhotoReview = () => {
     const { auth, user_id } = useAuthHook();
     const { t } = useTranslation();
 
+    // Handle image preview open
     const handleImageClick = (photo: PhotoItem) => {
         setPreviewImage(photo.image_url);
         setPreviewPhotoInfo(photo);
         setPreviewOpen(true);
     };
 
+    // Close preview dialog
     const handleClosePreview = () => {
         setPreviewOpen(false);
         setPreviewImage("");
@@ -72,6 +74,7 @@ const PhotoReview = () => {
     const theme = useTheme(); //
     const isMobile = useMediaQuery(theme.breakpoints.down("sm"));//
 
+    // Fetch photos from backend
     const fetchPhotos = async () => {
         try {
             setLoading(true);
@@ -90,6 +93,7 @@ const PhotoReview = () => {
 
             console.log("Fetched photo data:", data);
 
+            // Add selection flag
             const photosWithSelected = data.map(photo => ({
                 ...photo,
                 selected: false
@@ -105,6 +109,7 @@ const PhotoReview = () => {
         }
     };
 
+    // Handle single photo review
     const handleSingleReview = async (photo_id: string, result: "success" | "fail") => {
         try {
             setLoading(true);
@@ -141,6 +146,7 @@ const PhotoReview = () => {
         }
     };
 
+    // Handle batch review
     const handleBatchReview = async (result: "success" | "fail") => {
         const selectedPhotos = photos.filter((p) => p.selected);
 
@@ -172,6 +178,7 @@ const PhotoReview = () => {
                 throw new Error(`HTTP error! status: ${res.status}`);
             }
 
+            // Remove reviewed photos from list
             setPhotos((prev) => prev.filter((p) => !p.selected));
             setSuccess(result === "success"
                 ? t('photoReview.batchReviewApprovedSuccess', { count: selectedIds.length })
@@ -204,12 +211,14 @@ const PhotoReview = () => {
         };
     }, [user_id]);
 
+    // Toggle "Select All"
     const toggleSelectAll = () => {
         const newSelect = !selectAll;
         setSelectAll(newSelect);
         setPhotos((prev) => prev.map((p) => ({ ...p, selected: newSelect })));
     };
 
+    // Toggle selection mode
     const toggleSelectMode = () => {
         setSelectMode((prev) => !prev);
         if (selectMode) {
@@ -236,7 +245,7 @@ const PhotoReview = () => {
         setSelectAll(allSelected);
     };
 
-    // Clear Message
+    // Clear error/success messages after 3s
     useEffect(() => {
         if (error || success) {
             const timer = setTimeout(() => {
