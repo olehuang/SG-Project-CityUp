@@ -123,7 +123,7 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
-    // order method change
+    // Sort method change
     useEffect(() => {
         const toggleSortOrder = (selectOrder: string) => {
             let order = 'tasc';

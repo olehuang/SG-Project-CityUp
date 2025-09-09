@@ -101,7 +101,6 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
             // backgroundColor: '#1976d2',
             backgroundColor: '#5D4037',
             marginBottom:0,
-
         }}>
             <Toolbar  sx={{ display: 'flex', justifyContent: 'space-between' }}>
                 <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -113,14 +112,19 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                     >
                         <MenuIcon/>
                     </IconButton>
-                    <Typography variant="h6" component="div" sx={{ ml: 2, cursor: 'pointer', fontSize: { xs: '1rem', sm: '1.25rem' } }} onClick={handleClickToHome}>
+                    <Typography variant="h6" component="div"
+                                sx={{
+                                    ml: {xs:1,sm:2},
+                                    cursor: 'pointer',
+                                    fontSize: { xs: '1rem', sm: '1.25rem' }}}
+                                onClick={handleClickToHome}>
                         CityUp
                     </Typography>
                 </Box>
                 <Box sx=
                          {{
                              position: 'absolute',
-                             left: '50%',
+                             left: location.pathname=== '/dashboard/productIntroduction'?'47%' : '50%',
                              transform: 'translateX(-50%)',
                              color: "#fff",
                              textDecoration: 'none',
@@ -137,7 +141,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                 <Box sx={{
                     display: 'flex',
                     alignItems: 'center',
-                    mr: "6%",//margin right
+                    mr: {sx:"0.1%",sm:"3%"},//margin right
                 }}>
                     {!isMobile && (<LanguageSelector
                         setLanguage={handleLanguageChange}
@@ -152,7 +156,8 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
                             justifyContent: 'center',
                             textAlign: 'center',
-                            width:"120px",
+                            width: {sx:"90%",sm:"100%"},
+                            minWidth: "120px",
                         }}
                         variant="outlined"
                     >
@@ -169,7 +174,7 @@ const styles = {
         borderRadius: 10,
         borderColor: "white",
         // border: 'none',
-        margin:"auto 5% auto auto",
+        margin:"auto 1% auto auto",
         color:"white",
         fontWeight: "bold",
         ml:2,

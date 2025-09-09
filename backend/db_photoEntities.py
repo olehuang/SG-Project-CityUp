@@ -21,10 +21,11 @@ photo_collection = MongoDB.get_instance().get_collection('photos')
 user_collection = MongoDB.get_instance().get_collection('users')
 buildings_collection = MongoDB.get_instance().get_collection('buildings')
 
-"""
-:return a photo list under same address and status= Approved
-"""
+
 async def get_all_photos_under_same_address(address:str,request:Request,user_id:str=None):
+    """(Photo Gallery)
+    :return a photo list under same address and status= Approved
+    """
     try:
         return await get_photo_list(address,request,user_id=user_id)
     except Exception as e:
@@ -35,6 +36,13 @@ async def get_all_photos_under_same_address(address:str,request:Request,user_id:
 
 
 async def get_first_upload_time(address:str,request:Request):
+    """
+    (Photo Gallery)
+    Sort photos by time and return the most recent time
+    :param address: which address to sort by time
+    :param request:
+    :return:
+    """
     try:
         photo_list = await get_photo_list(address,request)
         if not photo_list:return None
@@ -46,6 +54,14 @@ async def get_first_upload_time(address:str,request:Request):
         raise
 
 async def get_photo_list(address:str,request:Request,user_id:str=None):
+    """
+    (Photo Gallery)
+    Sort photos by time and return the most recent time
+    :param address: which address to request
+    :param request:
+    :param user_id: which user has request
+    :return:
+    """
     try:
 
         collection = MongoDB.get_instance().get_collection('photos')
@@ -69,13 +85,13 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
 
               # user already like this photo or not
               is_like= user_id in photo_doc["like"]
-              print("is_like",is_like)
+
               photo_doc["is_like"] = is_like
 
               # user is photo owner or not
               canLike= owner.get("user_id") !=user_id
               photo_doc["canLike"]= canLike
-              print("photo_doc canLike",photo_doc["canLike"])
+
 
               #count how many people like
               photo_doc["likeCount"] =len(photo_doc["like"])
@@ -92,6 +108,13 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
         raise
 
 async def get_first_nine_photo(address:str,request:Request,user_id:str=None):
+    """
+    Select the 9 most recently uploaded photos for preview(Photo Gallery)
+    :param address:
+    :param request:
+    :param user_id:
+    :return:
+    """
     try:
         photo_list = await get_photo_list(address,request,user_id=user_id)
         if not photo_list:return None
@@ -106,6 +129,7 @@ async def get_first_nine_photo(address:str,request:Request,user_id:str=None):
 
 async def isLike(photo_id:str,user_id:str):
     """
+    (Photo Gallery)
     :brief : check user has been this photo already like or not
     :param photo_id: _id of photo
     :param user_id: use to check if photo is like should be in like[] of photo.get("like“)
@@ -123,7 +147,7 @@ async def isLike(photo_id:str,user_id:str):
             raise ValueError("Photo not found or user has not liked it")
         islike =user_id in photo.get("like",[])
         if photo.get("user_id") == user_id:return True
-        print("isLike:",islike)
+
         return islike
     except Exception as e:
         log_error('Error bei function isLike', stack_data=traceback.format_exc())
@@ -134,6 +158,7 @@ async def isLike(photo_id:str,user_id:str):
 
 async def like_photo(photo_id:str,user_id:str):
     """
+    (Photo Gallery)
     :brief : if frontend click like button, this function will be call,
              than user_id of which user click like button will add in like[] of photo.
              than photo owner 1 point add
@@ -172,6 +197,7 @@ async def like_photo(photo_id:str,user_id:str):
 
 async def disLike(photo_id:str,user_id:str):
     """
+    (Photo Gallery)
     :brief: delete like for this photo
     :param photo_id: which photo marke
     :param user_id: which user wants to delete like
@@ -207,6 +233,7 @@ async def disLike(photo_id:str,user_id:str):
 
 async def initalLike():
     """
+    (Photo Gallery)
     :brief : init photo like[] of all photos as [] !!! do not easy reference
     :return: none
     """
@@ -216,4 +243,18 @@ async def initalLike():
     except Exception as e:
         log_error('Error in function initalLike', stack_data=traceback.format_exc())
         raise
+
+
+async def delet_all_photos():
+    """
+    (Photo Gallery)
+     :brief : cleare all Photos in DBMS
+     WARNING: This operation is irreversible
+                and should only be used for testing or maintenance.
+    """
+    print("delete all photos")
+    result =  await photo_collection.delete_many({})
+    print(f"Deleted {result.deleted_count} photos")
+
+
 

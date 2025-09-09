@@ -1153,7 +1153,7 @@ const resources: Resource = {
             },
             bar:{
                 profile: "Profil",
-                userInformation: "Benutzerinformationen",
+                userInformation: "Benutzerinformation",
                 adminPanel: "Admin-Panel",
                 dashboard: "Dashboard",
                 upload: "Hochladen",

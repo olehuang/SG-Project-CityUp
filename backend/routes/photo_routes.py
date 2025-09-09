@@ -195,6 +195,11 @@ async def get_photo(photo_id: str):
 
 @router.get("/download_photo/{photo_id}")
 async def download_photo(photo_id: str):
+    """
+    frontend request from Photo Gallery
+    :param photo_id: which photo will be download(only one photo)
+    :return: from DBMS get Photo and send it to Frontend devices
+    """
     try:
         collection = MongoDB.get_instance().get_collection('photos')
         photo = await collection.find_one({"_id": ObjectId(photo_id)})
@@ -217,6 +222,11 @@ async def download_photo(photo_id: str):
 
 @router.get("/download_zip")
 async def download_photos_zip(photo_ids: List[str] = Query(...)):
+    """
+     frontend request from by Photo Gallery
+    :param photo_id: which photos will be as a zip download
+    :return: from DBMS get Photo and send it to Frontend devices
+    """
     try:
         #photo_id_list = photo_ids.split(",")
         zip_stream = BytesIO()
@@ -471,6 +481,14 @@ async def get_user_photos(user_id: str):
 
 @router.get("/get_photo_list")
 async def get_photo_list(address: str,request:Request,user_id:str=None):
+    """
+    entrance by frontend request photos in Photo preview in Photo Gallery
+    :param address: which address be choosed by frontend
+    :param request: request from frontend
+    :param user_id: which user requested photo list
+    ( with status by photo can like/not give back to frontend)
+    :return: photo list
+    """
     try:
         photo_list= await db_photoEntities.get_all_photos_under_same_address(address,request,user_id=user_id)
         return photo_list
@@ -480,6 +498,14 @@ async def get_photo_list(address: str,request:Request,user_id:str=None):
 
 @router.get("/get_first_9_photo")
 async def get_first_9_photo(address: str,request: Request,user_id:str=None):
+    """
+     entrance from frontend request max.9 photos in Photo preview in Photo Gallery
+    :param address: which address be choosed by frontend
+    :param request: request from frontend
+    :param user_id: which user requested photo list
+    ( with status by photo can like/not give back to frontend)
+    :return: photo list
+    """
     try:
         photo_list= await db_photoEntities.get_first_nine_photo(address,request,user_id=user_id)
         return photo_list
@@ -490,6 +516,12 @@ async def get_first_9_photo(address: str,request: Request,user_id:str=None):
 
 @router.get("/photoNumber")
 async def get_photo_number(address: str,request:Request):
+    """
+    old function not use it,to get the number of photos stored under the same address
+    :param address:which address be choosed by frontend
+    :param request: request from frontend
+    :return: photo number
+    """
     try:
        photo_list= await db_photoEntities.get_photo_list(address,request)
        return len(photo_list)
@@ -499,6 +531,13 @@ async def get_photo_number(address: str,request:Request):
 
 @router.get("/get_first_upload_time")
 async def get_first_upload_time(address: str,request:Request):
+    """
+   old function not use it,
+   to get the time of the most recently uploaded photo at the same address
+   :param address:which address be choosed by frontend
+   :param request: request from frontend
+   :return: least recently uploaded photo time
+   """
     try:
         return await db_photoEntities.get_first_upload_time(address,request)
     except Exception as e:

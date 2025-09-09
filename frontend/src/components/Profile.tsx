@@ -61,7 +61,7 @@ const Profile = ({ token }: { token: string })=>{
                     <ListItemButton sx={{ pl: 4 }} onClick={handleToProfile} >
                         <ListItemIcon><AccountCircleIcon/>
                         </ListItemIcon>
-                        <ListItemText primary={t('bar.userInformation')} />
+                        <ListItemText  primary={t('bar.userInformation')} />
                     </ListItemButton>
                     {roles.includes('admin') &&
                         <ListItemButton sx={{ pl: 4 }} onClick={hanldAdminPanel}>

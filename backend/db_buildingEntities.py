@@ -7,11 +7,12 @@ from error_logging import log_error
 import traceback
 
 
-"""
-@:parameter building : Building object include(building_id, building_address,geo information)
-brief: save/create Building Information into DB
-"""
+
 async def save_building(building: Building):
+    """
+    @:parameter building : Building object include(building_id, building_address,geo information)
+    brief: save/create Building Information into DB
+    """
     query={"address": building.address}
     try:
         buildings = MongoDB.get_instance().get_collection("buildings")
@@ -29,11 +30,12 @@ async def save_building(building: Building):
         raise
 
 
-"""
-@:parameter string : address of building
-brief: whith address can take Building Information from DB
-"""
+
 async def take_building_info(address:str):
+    """
+    @:parameter string : address of building
+    brief: whith address can take Building Information from DB
+    """
     query={"address":address}
     try:
         buildings=MongoDB.get_instance().get_collection("buildings")
@@ -48,10 +50,11 @@ async def take_building_info(address:str):
                   time_stamp=datetime.now())
         raise
 
-"""
-brief: give back all Building address from DB
-"""
+
 async def take_all_building_address():
+    """
+    brief: give back all Building address from DB
+    """
     try:
         buildings=MongoDB.get_instance().get_collection("buildings")
         building_list= await buildings.find({}, {"address": 1, "_id": 0}).sort("address",1).to_list(length=None)
@@ -64,10 +67,10 @@ async def take_all_building_address():
         raise
 
 
-"""
-@brief: save addresse from photo collection
-"""
 async def update_addr_from_photo():
+    """
+    @brief: save addresse from photo collection
+    """
     try:
         photos_collection=MongoDB.get_instance().get_collection("photos")  #table of photos
         photos= photos_collection.find({}, batch_size=1000)
@@ -95,3 +98,11 @@ async def update_addr_from_photo():
         raise
 
 
+async def delete_all_addr():
+    """
+    Clear all Address from Database
+    WARNING: This will delete all Address from Database
+    """
+    buildings=MongoDB.get_instance().get_collection("buildings")
+    result = await buildings.delete_many({})
+    print(f"Deleted {result.deleted_count} building Address")

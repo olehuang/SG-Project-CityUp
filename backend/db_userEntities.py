@@ -6,11 +6,12 @@ import traceback
 BASE_URL = "http://localhost:8000"
 
 
-"""
-@:param user Props want to storag im DB include user_id, username and email
-brief: save user information in DB
-"""
+
 async def save_user_or_create(user: User):
+    """
+    @:param user Props want to storag im DB include user_id, username and email
+    brief: save user information in DB
+    """
     query={'user_id': user.user_id}
     try:
         users = MongoDB.get_instance().get_collection('users')
@@ -37,13 +38,14 @@ async def save_user_or_create(user: User):
 #     except Exception as e:
 #         log_error("Error from save_user with: {}".format(user),e)
 #         raise
-"""
-@user_id: string
-brief: import user_id can delete user from DB
-!!! all user information in DB will be deleted !!!
-do not easy use it. can maker Error
-"""
+
 async def delete_user(user_id: str):
+    """
+    @user_id: string
+    brief: import user_id can delete user from DB
+    !!! all user information in DB will be deleted !!!
+    do not easy use it. can maker Error
+    """
     try:
         query = {"user_id":user_id}
         users = MongoDB.get_instance().get_collection('users')
@@ -55,12 +57,13 @@ async def delete_user(user_id: str):
                   time_stamp=datetime.now().isoformat())
         raise
 
-"""
-@:user_id: userid
-brief: input user_id give back user information
-@:return user in DB storaged information
-"""
+
 async def get_user(user_id:str):
+    """
+    @:user_id: userid
+    brief: input user_id give back user information
+    @:return user in DB storaged information
+    """
     query = {"user_id": user_id}
     try:
         users = MongoDB.get_instance().get_collection('users')
@@ -73,6 +76,11 @@ async def get_user(user_id:str):
         raise
 
 async def get_user_role_in_DB(user_id:str):
+    """
+    Determine user roles
+    :param user_id:which user will be take
+    :return:
+    """
     query = {"user_id":user_id}
     try:
         user=await get_user(user_id)
@@ -84,10 +92,11 @@ async def get_user_role_in_DB(user_id:str):
         raise
 
 
-"""
-brief: give back all user information from DB
-"""
+
 async def get_all_users():
+    """
+    brief: give back all user information from DB
+    """
     try:
         users = MongoDB.get_instance().get_collection('users')
         return await users.find().to_list()
@@ -98,15 +107,16 @@ async def get_all_users():
         raise
 
 
-"""
-@:user_id: userid,which user role will be update
-@:role: role= "user"(default)/ "admin"
-brief: user role can change from user to admin or reverse
-for example: 
-if a user wants change to  admin, role = "admin"
-if a admin wants change to user, noly need inport user_id
-"""
 async def update_user_role(user_id:str, role="user"):
+
+    """
+    @:user_id: userid,which user role will be update
+    @:role: role= "user"(default)/ "admin"
+    brief: user role can change from user to admin or reverse
+    for example:
+    if a user wants change to  admin, role = "admin"
+    if a admin wants change to user, noly need inport user_id
+    """
     try:
         users = MongoDB.get_instance().get_collection('users')
         query = {"user_id": user_id}
@@ -124,6 +134,10 @@ async def update_user_role(user_id:str, role="user"):
         raise
 
 async def initial_user_point():
+    """
+    Initialize all users' points
+    :return:
+    """
     try:
         users=MongoDB.get_instance().get_collection("users")
         result = await users.update_many({},{"$set":{"point": 0}})

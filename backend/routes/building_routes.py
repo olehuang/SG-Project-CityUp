@@ -16,6 +16,9 @@ class Building(BaseModel):
 
 @router.get("/get_all_build_addr")
 async def get_all_build_addr():
+    """
+    :return: as entrance give frontend address of building address
+    """
     try:
         await db_buildingEntities.update_addr_from_photo() # fresh_building_addresses
         response = await db_buildingEntities.take_all_building_address()
@@ -72,6 +75,9 @@ async def get_photo_status_by_address():
 
 @router.get("/get_addr_with_status")
 async def get_addr_with_status():
+    """
+    :return: as entrance give frontend address of building address and photo status
+    """
     try:
          return await get_photo_status_by_address()
     except Exception as e:

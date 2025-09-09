@@ -13,7 +13,7 @@ services:
     command: -v start-dev --import-realm
     volumes:
       # local path hangt in container
-      # Order Path: z.B: /host_mnt/d/sherad/7semester/BP/import/
+      # Order Path: z.B: /host_mnt/d/../import/
       # or under same Order: ./import
       - ./import/:/opt/keycloak/data/import
 
