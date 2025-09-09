@@ -439,7 +439,7 @@ const styles={
     headerCell:(width:number) =>({
         width:`${width}%`,
         fontWeight:"bold",
-        fontSize: { xs: "0.8rem"},
+        fontSize: { xs: "1.2rem"},
     }),
     loadingZone:{},
     tableRowHiligh:{
