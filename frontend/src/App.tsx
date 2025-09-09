@@ -21,6 +21,10 @@ import axios from "axios";
 import RankingPage from "./pages/RankingPage";
 import './i18n';
 
+
+/*
+* Basic web page structure
+* */
 function App() {
   return (
     <AuthProvider>
