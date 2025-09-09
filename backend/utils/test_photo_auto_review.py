@@ -8,7 +8,7 @@ image_path = r"E:\anyFile\Louvre_test.jpg"
 # Der offizielle Breiten- und Längengrad der Pyramide des Louvre
 building_gps = (48.86105, 2.33586)
 
-# 读取图片为二进制
+# Read the image as binary
 with open(image_path, "rb") as f:
     image_bytes = f.read()
 
