@@ -64,7 +64,7 @@ const Sidebar = ({ open, onClose, variant }: SidebarProps) => {
                     <Divider />
                     <List>
 
-                        {/* Upload 页面入口 */}
+                        {/* Upload Page entry */}
                         <ListItem disablePadding>
                             <ListItemButton component={Link} to="/dashboard/upload">
                                 <ListItemIcon><UploadIcon/></ListItemIcon>

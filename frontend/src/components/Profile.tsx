@@ -58,13 +58,13 @@ const Profile = ({ token }: { token: string })=>{
             </ListItemButton>
             <Collapse in={openProfile} >
                 <List component="div" disablePadding>
-                    <ListItemButton sx={{ pl: 4 }} onClick={handleToProfile} >
+                    <ListItemButton sx={{ pl: 2 }} onClick={handleToProfile} >
                         <ListItemIcon><AccountCircleIcon/>
                         </ListItemIcon>
                         <ListItemText  primary={t('bar.userInformation')} />
                     </ListItemButton>
                     {roles.includes('admin') &&
-                        <ListItemButton sx={{ pl: 4 }} onClick={hanldAdminPanel}>
+                        <ListItemButton sx={{ pl: 2 }} onClick={hanldAdminPanel}>
                         <ListItemIcon><SupervisorAccountIcon/>
                         </ListItemIcon>
                         <ListItemText primary={t('bar.adminPanel')} />

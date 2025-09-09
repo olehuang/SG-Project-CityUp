@@ -6,6 +6,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
+import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import {useNavigate,useLocation,Link} from "react-router-dom";
 import LanguageSelector from "../LanguageSelector";
 import { useTranslation } from 'react-i18next';
@@ -120,7 +121,9 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                                 sx={{
                                     ml: {xs:1,sm:2},
                                     cursor: 'pointer',
-                                    fontSize: { xs: '1rem', sm: '1.25rem' }}}
+                                    fontSize: { xs: '1rem', sm: '1.25rem' },
+                                    visibility:{xs:"hidden",sm:"visible"},
+                                }}
                                 onClick={handleClickToHome}>
                         CityUp
                     </Typography>
@@ -160,12 +163,11 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             visibility: location.pathname === '/dashboard' ? 'hidden' : 'visible',
                             justifyContent: 'center',
                             textAlign: 'center',
-                            width: {sx:"90%",sm:"100%"},
-                            minWidth: "120px",
+                            border:isMobile? "none" : "",
                         }}
                         variant="outlined"
                     >
-                        {t('bar.exit')}
+                        {isMobile ? <ExitToAppIcon/> : t('bar.exit')}
                     </Button>
                 </Box>
             </Toolbar>
@@ -176,11 +178,12 @@ const styles = {
     extiButton: {
         justifyContent: "space-between",
         borderRadius: 10,
-        borderColor: "white",
         // border: 'none',
         margin:"auto 1% auto auto",
         color:"white",
         fontWeight: "bold",
+        width: {sx:"90%",sm:"100%"},
+        minWidth: {sx:"100px",sm:"120px"},
         ml:2,
     }
 }

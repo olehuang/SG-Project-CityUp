@@ -2,11 +2,7 @@
 import React, {JSX, useState} from "react";
 import {Navigate, Outlet, useNavigate} from "react-router-dom";
 import { useAuthHook } from "./AuthProvider";
-import CircularProgress from '@mui/material/CircularProgress';
-import Stack from '@mui/material/Stack';
-import  Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import {Typography} from "@mui/material";
+
 import LoadingPage from "../pages/LoadingPage";
 
 /**
