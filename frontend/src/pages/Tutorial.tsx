@@ -1722,7 +1722,7 @@ const Tutorial = () => {
                     width: isMobile ? `${drawerWidth * 0.8}px` : `${drawerWidth}px`, // 移动端稍微窄一点
                     height: "calc(100vh - 64px)", // 修改：减去顶部菜单栏高度
                     borderRight: "1px solid #ddd",
-                    backgroundColor: "#fdfdfb",
+                    backgroundColor: "#FFF8E1",
                     overflowY: "auto",
                     zIndex: 900, // 修改：降低z-index，确保不遮住顶部菜单栏
                     padding: 0,
@@ -1832,7 +1832,7 @@ const Tutorial = () => {
                                             backgroundColor: selectedSection === section.key ? '#1976d2' : 'transparent',
                                             color: selectedSection === section.key ? 'white' : 'inherit',
                                             '&:hover': {
-                                                backgroundColor: selectedSection === section.key ? '#1565c0' : '#f5f5f5',
+                                                backgroundColor: selectedSection === section.key ? '#1565c0' : '#e6e3e3',
                                             }
                                         }}
                                     >
@@ -1911,7 +1911,7 @@ const Tutorial = () => {
                     height: "100vh",
                     padding: isMobile ? 2 : 3,
                     //padding: 3,
-                    backgroundColor: "#fdfdfb",
+                    backgroundColor: "#FFF8E1",
                     overflowY: "auto",
                     paddingBottom: '80px'
                 }}
