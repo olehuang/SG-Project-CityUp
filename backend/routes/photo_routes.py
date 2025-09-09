@@ -30,11 +30,11 @@ photo_collection = MongoDB.get_instance().get_collection("photos")
 users_collection = MongoDB.get_instance().get_collection("users")
 buildings = MongoDB.get_instance().get_collection("buildings")
 
-# 上传目录
+# Upload Directory
 UPLOAD_DIR = os.getenv("UPLOAD_DIR", "uploads/photos")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
-# 访问URL的基础路径
+# Base path for accessing the URL
 UPLOAD_URL_PATH = os.getenv("UPLOAD_URL_PATH", "static/photos")
 BASE_URL = os.getenv("BASE_URL", "http://localhost:8000")
 
@@ -54,7 +54,7 @@ class BatchReviewRequest(BaseModel):
     feedback: Optional[str] = ""
     reviewer_id: str
 
-# 新增 upload History
+# New upload history
 class UploadHistoryResponse(BaseModel):
     photos: List[PhotoResponse]
     total_count: int
@@ -63,7 +63,7 @@ class UploadHistoryResponse(BaseModel):
     total_pages: int
 
 
-#储存格式（用户id，建筑id,纬度，经度，图片组）
+#Storage Format (User ID, Building ID, Latitude, Longitude, Image Group)
 @router.post("/", status_code=201)
 async def upload_photo(
         user_id: str = Form(...),
@@ -78,40 +78,46 @@ async def upload_photo(
         uploaded_photos = []
         auto_checkin_result = None
         for photo in photos:
-            # 验证文件类型
+            # Verify file type
             if not photo.content_type.startswith("image/"):
                 raise HTTPException(status_code=400,
                                     detail=f"The uploaded file '{photo.filename}' must be in image format")
             image_binary_data = await photo.read()
-            # 生成唯一文件名
+            # Generate a unique filename
             file_extension = os.path.splitext(photo.filename)[1]
             unique_filename = f"{user_id}_{int(time.time() * 1000)}_{uuid.uuid4().hex}{file_extension}"
             file_path = os.path.join(UPLOAD_DIR, unique_filename)
-            # 保存文件
+            # Save File
             with open(file_path, "wb") as buffer:
                 shutil.copyfileobj(photo.file, buffer)
-            # 生成访问URL
+            # Generate access URL
             image_url = f"{BASE_URL}/{UPLOAD_URL_PATH}/{unique_filename}"
 
             # ======== Auto review START =========
 
             # 1. get pic's EXIF GPS
             exif_gps = get_exif_gps(image_binary_data)
-            result_auto_check = ReviewStatus.Pending #审查的状态
+            result_auto_check = ReviewStatus.Pending #Review Status
 
             if exif_gps is None:
-                # pic without EXIF，check blurry 无exif的图片检查清晰度
+                """
+                For images without EXIF data, only check image sharpness.
+                Only when the sharpness check passes should the status be set to pending.
+                """
                 blurry_ok, lap_var = is_image_blurry(image_binary_data)
                 if not blurry_ok:
                     result_auto_check = ReviewStatus.Rejected
             else:
-                # pic with EXIF，check location 有exif的图片检查地址后检查清晰度，全部合格才设status为pending
+                """ 
+                For images with EXIF data, verify the URL first, then check image clarity. 
+                Only set the status to pending if all checks pass.
+                """
                 building_gps = (lat, lng)
                 location_ok, dist = check_photo_location(exif_gps, building_gps, threshold=100)
                 if not location_ok:
                     result_auto_check = ReviewStatus.Rejected
                 else:
-                    # Test clarity after position passes 位置合格后，再检测清晰度
+                    # Test clarity after position passes
                     blurry_ok, lap_var = is_image_blurry(image_binary_data)
                     if not blurry_ok:
                         result_auto_check = ReviewStatus.Rejected
@@ -197,7 +203,7 @@ async def get_photo(photo_id: str):
 async def download_photo(photo_id: str):
     """
     frontend request from Photo Gallery
-    :param photo_id: which photo will be download(only one photo)
+    :param photo_id: which photo will be downloaded(only one photo)
     :return: from DBMS get Photo and send it to Frontend devices
     """
     try:
@@ -511,7 +517,7 @@ async def get_user_photos(user_id: str):
 async def get_photo_list(address: str,request:Request,user_id:str=None):
     """
     entrance by frontend request photos in Photo preview in Photo Gallery
-    :param address: which address be choosed by frontend
+    :param address: which address be chosen by frontend
     :param request: request from frontend
     :param user_id: which user requested photo list
     ( with status by photo can like/not give back to frontend)
@@ -528,7 +534,7 @@ async def get_photo_list(address: str,request:Request,user_id:str=None):
 async def get_first_9_photo(address: str,request: Request,user_id:str=None):
     """
      entrance from frontend request max.9 photos in Photo preview in Photo Gallery
-    :param address: which address be choosed by frontend
+    :param address: which address be chosen by frontend
     :param request: request from frontend
     :param user_id: which user requested photo list
     ( with status by photo can like/not give back to frontend)
@@ -546,7 +552,7 @@ async def get_first_9_photo(address: str,request: Request,user_id:str=None):
 async def get_photo_number(address: str,request:Request):
     """
     old function not use it,to get the number of photos stored under the same address
-    :param address:which address be choosed by frontend
+    :param address:which address be chosen by frontend
     :param request: request from frontend
     :return: photo number
     """
@@ -562,18 +568,18 @@ async def get_first_upload_time(address: str,request:Request):
     """
    old function not use it,
    to get the time of the most recently uploaded photo at the same address
-   :param address:which address be choosed by frontend
+   :param address:which address be chosen by frontend
    :param request: request from frontend
    :return: least recently uploaded photo time
    """
     try:
         return await db_photoEntities.get_first_upload_time(address,request)
     except Exception as e:
-        print(f"get_firsh_upload_time error:", traceback.format_exc())
+        print(f"get_first_upload_time error:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 
-# 新增：上传历史记录接口
+# New: Upload History Interface
 @router.get("/history", response_model=UploadHistoryResponse)
 async def get_upload_history(
         request: Request,
@@ -583,13 +589,13 @@ async def get_upload_history(
         status: Optional[str] = Query(None, description="筛选状态: pending, reviewing, approved, rejected")
 ):
     """
-    获取用户的上传历史记录，支持分页和状态筛选
+    Retrieve the user's upload history, supporting pagination and status filtering.
     """
     try:
-        # 构建查询条件
+        # Build query conditions
         query = {"user_id": user_id}
         if status:
-            # 将状态字符串转换为对应的枚举值
+            # Convert the status string to the corresponding enumeration value
             status_mapping = {
                 "pending": ReviewStatus.Pending.value,
                 "reviewing": ReviewStatus.Reviewing.value,
@@ -601,7 +607,7 @@ async def get_upload_history(
             else:
                 raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
 
-        # 计算总数
+        # Calculate the total
         total_count = await photo_collection.count_documents(query)
 
         if total_count == 0:
@@ -613,15 +619,15 @@ async def get_upload_history(
                 total_pages=0
             )
 
-        # 计算分页
+        # Calculate Paging
         total_pages = math.ceil(total_count / limit)
 
-        # 计算跳过的文档数
+        # Calculate the number of skipped documents
         skip = (page - 1) * limit
         print(f"DEBUG: Total count: {total_count}, Page: {page}, Limit: {limit}")
         print(f"DEBUG: Query conditions: {query}")
 
-        # 查询数据
+        # Query Data
         photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
         print("Query for history:", query)
 
@@ -631,19 +637,19 @@ async def get_upload_history(
             photo_id = str(photo_doc["_id"])
             del photo_doc["_id"]
 
-            # 兼容旧数据
+            # Compatible with legacy data
             if "building_id" in photo_doc and "building_addr" not in photo_doc:
                 photo_doc["building_addr"] = photo_doc["building_id"]
 
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_id}/data"
-            # 拼接完整图片 URL
+            # Stitching Complete Image URL
             # filename = photo_doc.get("filename")
             # if filename:
             #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
             print(f"DEBUG: Successfully processed {len(photos)} photos")
 
             # For the system to automatically rejected photos show admin as reviewer
-            # ======为系统自动rejected的照片设置reviewer为admin ======
+            # ======Set the reviewer to admin for photos automatically rejected by the system ======
             if (
                     photo_doc.get("status") == ReviewStatus.Rejected.value
                     and not photo_doc.get("reviewer_id")
@@ -666,14 +672,14 @@ async def get_upload_history(
         print(f"get_upload_history error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching upload history.")
 
-# 新增：获取照片统计信息
+# New: Retrieve photo statistics
 @router.get("/stats/{user_id}")
 async def get_user_photo_stats(user_id: str):
     """
-    获取用户照片统计信息
+    Retrieve user photo statistics
     """
     try:
-        # 使用聚合管道统计各状态照片数量
+        # Use an aggregation pipeline to count the number of photos in each status.
         pipeline = [
             {"$match": {"user_id": user_id}},
             {"$group": {

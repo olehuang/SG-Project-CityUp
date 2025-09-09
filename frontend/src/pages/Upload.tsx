@@ -5,7 +5,7 @@ import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
 import { useTranslation } from 'react-i18next';
 
-// 默认Audimax Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
+//  Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
 const DEFAULT_CENTER: [number, number] = [49.874727, 8.656193];
 const MAX_BOUNDS: [[number, number], [number, number]] = [
     [49.8723750961, 8.6504056457], [49.88100119490, 8.6629604999],];
@@ -16,7 +16,7 @@ interface UploadPhoto {
     file: File;
     previewUrl: string;
 }
-// 光标样式
+// Mouse pointer style for mapse
 const markerIcon = L.icon({
     iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
     iconSize: [25, 41],
@@ -24,19 +24,26 @@ const markerIcon = L.icon({
 });
 
 /**
- * 建筑照片上传组件（Upload_Page）
- * 实现地址定位、地图选点、照片选择/预览及上传，辅助3D城市模型优化。
+ * Upload Component
  *
- * Component for uploading building photos: supports map/location selection, photo preview and upload for 3D city modeling.
+ * This component is responsible for uploading building photos,
+ * combined with map-based location selection. It provides the following:
+ *
+ * - Select location by clicking or dragging a marker on the map
+ * - Perform reverse geocoding to get the building address
+ * - Manually input missing house numbers
+ * - Upload up to 5 photos (via camera or gallery)
+ * - Preview and delete photos
+ * - Submit photos and location information to the backend
  */
 const Upload: React.FC = () => {
-    // 布局相关状态
+    // Layout-related states
     const [mapRect, setMapRect] = useState({ top: 0, height: 0 });
     const mapDivRef = useRef<HTMLDivElement | null>(null);
     const leftSectionRef = useRef<HTMLDivElement | null>(null);
     const [windowWidth, setWindowWidth] = useState(window.innerWidth);
 
-    //用户id，经纬度，地址，相片，处理错误，地址获取权限以及上传操作
+    //User ID, latitude/longitude, address, photo, error handling, address access permissions, and upload operations
     const { user_id, auth } = useAuthHook();
     const [latlng, setLatlng] = useState<[number, number] | null>(null);
     const [address, setAddress] = useState<string>("");
@@ -45,18 +52,17 @@ const Upload: React.FC = () => {
     const [locating, setLocating] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    // 门牌号相关组件
+    // House Number-Related Components
     const [houseNumber, setHouseNumber] = useState<string>("");
     const [houseNumberMissing, setHouseNumberMissing] = useState<boolean>(false);
     const houseNumberRef = useRef<HTMLInputElement>(null);
 
-    // 地图组件引用
+    // Map Component Reference
     const fileInputRef = useRef<HTMLInputElement>(null);
     const mapRef = useRef<any>(null);
     const { t } = useTranslation();
-    // 1. 页面加载，请求定位，自动定位
 
-    // 1. 原有窗口宽度监听，决定isSmallScreen
+    //Original window width monitoring determines isSmallScreen
     useEffect(() => {
         const handleResize = () => {
             setWindowWidth(window.innerWidth);
@@ -64,10 +70,10 @@ const Upload: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    // 判断是否为小屏幕
+    // Determine if it is a small screen
     const isSmallScreen = windowWidth < 1200;
 
-    // 2. 新增 isMobile 状态
+    // 2. Added isMobile status
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     useEffect(() => {
         const handleResize = () => setIsMobile(window.innerWidth <= 768);
@@ -76,7 +82,7 @@ const Upload: React.FC = () => {
         return () => window.removeEventListener("resize", handleResize);
     }, []);
 
-    // 1. 地图页面加载，请求定位，自动定位设备
+    // Map page loads, requests location, automatically locates device
     useEffect(() => {
         setLocating(true);
         if (navigator.geolocation) {
@@ -95,7 +101,7 @@ const Upload: React.FC = () => {
             setLocating(false);
         }
     }, []);
-    // 2. 反向地理编码：marker移动后刷新地址Reverse geocoding (coordinates to address)
+    // Reverse geocoding: Refresh address after marker movement Reverse geocoding (coordinates to address)
     const reverseGeocode = async (lat: number, lng: number, fromMapClick=false) => {
         try {
             const res = await fetch(
@@ -103,7 +109,7 @@ const Upload: React.FC = () => {
             );
             const data = await res.json();
             const addr = data.address || {};
-            // addr handle 处理地址
+            // addr handle
             const locationString = [
                 addr.city,
                 addr.town,
@@ -118,7 +124,7 @@ const Upload: React.FC = () => {
                 .filter(Boolean)
                 .join(", ")
                 .toLowerCase();
-            //地址不在地图内时处理addr not in  our Model's Map
+            // addr not in  our Model's Map
             const isInDarmstadt = locationString.includes("darmstadt");
             if (!isInDarmstadt) {
                 setAddress("");
@@ -146,7 +152,7 @@ const Upload: React.FC = () => {
             setError(t('uploadMessages.addressResolutionFailure'));
         }
     };
-    // 地图点击事件 + 光标marker拖拽 Process user map clicks, update markers and addresses.
+    // Process user map clicks, update markers and addresses.
     function LocationPicker() {
         useMapEvents({
             click(e) {
@@ -157,21 +163,21 @@ const Upload: React.FC = () => {
         });
         return null;
     }
-    // mapRef get current map object mapRef获取当前map对象
+    // mapRef get current map object mapRef
     function SetMapRef() {
         const map = useMap();
         useEffect(() => {
             mapRef.current = map;
-            //地图挂载后 & 下一轮渲染时刷新尺寸
+            //After the map is mounted & refreshed during the next rendering cycle
             setTimeout(() => map.invalidateSize(), 0);
-            // 窗口变化时也刷新
+            // Refresh when the window changes
             const onResize = () => map.invalidateSize();
             window.addEventListener("resize", onResize);
             return () => window.removeEventListener("resize", onResize);
         }, [map]);
         return null;
     }
-    // 3. 地址输入搜索地址和光标行动到指定地址 Address Input and Search
+    // Address Input and Search
     const handleAddressSearch = async () => {
         if (!address) {
             setError(t('uploadMessages.enterAddress'));
@@ -199,7 +205,7 @@ const Upload: React.FC = () => {
             setError(t('uploadMessages.addressSearchFailed'));
         }
     };
-    /* 4. marker拖拽行动用户拖动 marker 后，自动反查新位置地址并校验范围。
+    /*
      After the user drags the marker, the new location address is automatically
      back-checked and the range is verified.
      */
@@ -214,20 +220,20 @@ const Upload: React.FC = () => {
     // camera upload
     const handleTakePhoto = () => {
         if (fileInputRef.current) {
-            // 先移除原有的capture，防止多次兼容多种浏览器
+            // First remove the existing capture to prevent multiple instances and ensure compatibility across various browsers.
             fileInputRef.current.removeAttribute("capture");
             fileInputRef.current.setAttribute("capture", "environment");
             fileInputRef.current.click();
         }
     };
-    // 相册上传 Album Upload
+    // Album Upload
     const handleSelectFromGallery = () => {
         if (fileInputRef.current) {
             fileInputRef.current.removeAttribute("capture");
             fileInputRef.current.click();
         }
     };
-    // 选择照片：限制上传照片的数量为五张 Select photos： Limit the number of photos uploaded to 5
+    // Select photos： Limit the number of photos uploaded to 5
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const maxPhotos = 5;
         if (!e.target.files || e.target.files.length === 0) {
@@ -250,12 +256,12 @@ const Upload: React.FC = () => {
         }));
         setPhotos([...photos, ...newPhotos]);
     };
-    // delete photos 删除略缩图中选取了的照片
+    // Delete photos: Delete the photos selected in the thumbnails.
     const removePhoto = (id: string) => {
         setPhotos(photos.filter((p) => p.id !== id));
     };
 
-    // submit 提交照片本身以及其信息到后端
+    // Submit the photo itself along with its information to the backend.
     const handleSubmit = async () => {
         setError(null);
         if (!auth || !user_id) {
@@ -282,13 +288,13 @@ const Upload: React.FC = () => {
         setIsSubmitting(true);
 
         try {
-            // FormData里有建筑的经纬度门牌号和照片
+            // The FormData contains the building's latitude, longitude, address, and photos.
             const formData = new FormData();
             formData.append("user_id", user_id);//用户id
             formData.append("lat", latlng[0].toString());//纬度 Latitude
             formData.append("lng", latlng[1].toString());//经度 Longitude
             formData.append("building_addr", address); //门牌号作为 building_addr
-            photos.forEach((photo) => { //照片组
+            photos.forEach((photo) => { //照片组 Photo Set
                 formData.append("photos", photo.file, photo.file.name);
             });
 
@@ -309,7 +315,7 @@ const Upload: React.FC = () => {
         setIsSubmitting(false);
     };
 
-    // 监控地图高度Monitor map height
+    // Monitor map height
     useLayoutEffect(() => {
         const updateMapRect = () => {
             if (mapDivRef.current && leftSectionRef.current) {
@@ -321,11 +327,11 @@ const Upload: React.FC = () => {
                 });
             }
         };
-        // 首次渲染和latlng变化时更新一次
+        // Update once during initial rendering and when latlng changes.
         updateMapRect();
-        // 添加窗口尺寸变化时的监听
+        // Add a listener for window size changes
         window.addEventListener('resize', updateMapRect);
-        // 组件卸载时移除监听
+        // Remove listeners when the component is unmounted.
         return () => window.removeEventListener('resize', updateMapRect);
     }, [latlng]);
 
@@ -334,7 +340,7 @@ const Upload: React.FC = () => {
             style={{
                 width: "100%",
                 height: isMobile ? "90dvh" : undefined,
-                overflowY: isMobile ? "auto" : "hidden",//手机端滚动显示，pc不动
+                overflowY: isMobile ? "auto" : "hidden",//Mobile devices scroll to display content; desktop versions remain static.
                 background: "#FFF8E1",
                 display: "flex",
                 flexDirection: isMobile ? "column" : "row",
@@ -346,7 +352,7 @@ const Upload: React.FC = () => {
                 paddingBottom: isMobile ? "20px" : "0"
             }}
         >
-            {/* 左侧 2/3：地址输入和地图 */}
+            {/* Left 2/3: Address input and map */}
             <div
                 ref={leftSectionRef}
                 style={{
@@ -357,7 +363,7 @@ const Upload: React.FC = () => {
                     display: "flex",
                     flexDirection: "column",
                     justifyContent: "flex-start",
-                    position: "relative" // 用于定位分割线
+                    position: "relative"
                 }}
             >
                 <h1
@@ -365,13 +371,13 @@ const Upload: React.FC = () => {
                         fontSize: isMobile ? "1.3rem" : "2rem",
                         fontWeight: 700,
                         margin:"0 0 22px 0",
-                        whiteSpace: "nowrap", // 不换行
+                        whiteSpace: "nowrap",
                         textOverflow: "ellipsis"
                     }}
                 >
                     {t('UploadPhoto')}
                 </h1>
-                {/* 地址输入和搜索 Address entry and search */}
+                {/* Address entry and search */}
                 <div style={{ marginBottom: 16 }}>
                     <label htmlFor="address"
                            style={{
@@ -383,7 +389,7 @@ const Upload: React.FC = () => {
                         {t('Uploaddesc')}
                     </label>
                     <div style={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: 8, alignItems: "center", width: "100%" }}>
-                        {/* 门牌号输入框Door number input box */}
+                        {/* Door number input box */}
                         {houseNumberMissing && (
                             <input
                                 ref={houseNumberRef}
@@ -394,7 +400,7 @@ const Upload: React.FC = () => {
                                     setHouseNumber(value);
                                     const parts = address.split(", ");
                                     const streetOnly = parts[0]?.replace(/\s+\d+[a-zA-Z]?$/, "") ?? parts[0];
-                                    // 重新拼 “街道 + 新门牌号”
+                                    // Reassemble “Street + New House Number”
                                     parts[0] = value ? `${streetOnly} ${value}` : streetOnly;
                                     setAddress(parts.filter(Boolean).join(", "));
                                     //setHouseNumber(e.target.value);
@@ -417,7 +423,7 @@ const Upload: React.FC = () => {
                                 required
                             />
                         )}
-                        {/* 地址输入框和搜索按钮 Address input box and search button*/}
+                        {/* Address input box and search button*/}
                         <div style={{ display: "flex", flex: 1, width: "100%", gap: 8 }}>
                             <input
                                 id="address"
@@ -457,13 +463,13 @@ const Upload: React.FC = () => {
                         </div>
                     </div>
                 </div>
-                {/* 缺失门牌号提示 Missing door number alert*/}
+                {/* Missing door number alert*/}
                 {houseNumberMissing && (
                     <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8 }}>
                         The house number for this building is not available. Please enter it manually.
                     </div>
                 )}
-                {/* 地图Map */}
+                {/* Map */}
                 <div
                     ref={mapDivRef}
                     style={{
@@ -489,7 +495,8 @@ const Upload: React.FC = () => {
                             maxBoundsViscosity={1}
                             worldCopyJump={false}
                         >
-                            {/* 换来源的话改url，但这里仅是符合Leaflet的情况。属性改成来源 osm来源是 "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" */}
+                            {/* To change the source, modify the URL, but this applies only to Leaflet. The property should be changed to the source.
+                            For OSM sources, the URL is “https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png”. */}
                             <TileLayer
                                 url="/tiles/{z}/{x}/{y}.png"
                                 noWrap
@@ -524,7 +531,7 @@ const Upload: React.FC = () => {
                         </div>
                     )}
                 </div>
-                {/* 地图操作提示Map operation */}
+                {/* Map operation */}
                 <div style={{
                     textAlign: "center",
                     marginTop: "10px",
@@ -534,7 +541,7 @@ const Upload: React.FC = () => {
                     {t('mapdesc')}
                 </div>
             </div>
-            {/* 右侧区域 - 照片上传 Right Area - Photo Upload*/}
+            {/* Right Area - Photo Upload*/}
             <div
                 style={{
                     flex: isSmallScreen ? "none" : 1,
@@ -548,7 +555,7 @@ const Upload: React.FC = () => {
                     background: "transparent",
                 }}
             >
-                {/* 拍照/相册按钮 Photo/Album button*/}
+                {/*Photo/Album button*/}
                 <div style={{ marginBottom: isMobile? "opx" : 16, display: "flex", flexWrap: "wrap", gap: "10px" }}>
                     <button
                         onClick={handleTakePhoto}
@@ -618,7 +625,7 @@ const Upload: React.FC = () => {
                     />
                 </div>
 
-                {/* 照片缩略图区域 Photo thumbnail area*/}
+                {/* Photo thumbnail area*/}
                 <div style={{
                     display: "flex",
                     gap: 10,
@@ -666,7 +673,7 @@ const Upload: React.FC = () => {
                         </div>
                     ))}
                 </div>
-                {/* 拍摄要求说明 Explanation of filming requirements */}
+                {/* Explanation of filming requirements */}
                 <div
                     style={{
                         fontSize:  isMobile ? "0.7rem" : "0.98rem",
@@ -701,7 +708,7 @@ const Upload: React.FC = () => {
 
                     </ul>
                 </div>
-                {/* 错误提示 error handle*/}
+                {/* error handle*/}
                 {error && (
                     <div
                         style={{
@@ -722,7 +729,7 @@ const Upload: React.FC = () => {
                     </div>
                 )}
 
-                {/* 提交按钮 Submit button*/}
+                {/* Submit button*/}
                 <button
                     onClick={handleSubmit}
                     disabled={isSubmitting}
@@ -761,7 +768,7 @@ const Upload: React.FC = () => {
                 </button>
             </div>
 
-            {/* 添加动画样式 */}
+            {/* Add animation style */}
             <style>{`
                 @keyframes spin {
                     0% { transform: rotate(0deg); }
