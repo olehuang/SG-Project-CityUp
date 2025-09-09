@@ -32,6 +32,11 @@ class UpdateLanguageRequest(BaseModel):
 
 @router.post("/save_user")
 async def save_user(user: User):
+    """
+    entrance by frontend and save a user into the database
+    :param user: user informations
+    :return:
+    """
     try:
         response= await db_userEntities.save_user_or_create(user)
         print(response)
@@ -42,6 +47,11 @@ async def save_user(user: User):
 
 @router.post("/update_user")
 async def update_user(data:RoleUpdate):
+    """
+    entrance by frontend,Update a user information into the database
+    :param data: user role information(admin/Ordinary users)
+    :return:
+    """
     try:
         response= await db_userEntities.update_user_role(data.user_id,data.role)
         return jsonable_encoder(response)
@@ -52,6 +62,12 @@ async def update_user(data:RoleUpdate):
 
 @router.post("/delete_user")
 async def delete_user(user_id:str):
+    """
+    entrance by frontend,Delete a user information from the database
+    WARNING: DO NOT EASY USE THIS FUNCTION
+    :param user_id: which user will be deleted
+    :return:
+    """
     try:
         response= await db_userEntities.delete_user(user_id)
         return jsonable_encoder(response)
@@ -62,6 +78,11 @@ async def delete_user(user_id:str):
 
 @router.get("/check_user")
 async def check_user(user_id:str):
+    """
+    frontend,Check a user information already or not in the database
+    :param user_id:which user will be checked
+    :return: bool
+    """
     try:
         response= await db_userEntities.get_user(user_id)
         if response is None:
@@ -75,6 +96,12 @@ async def check_user(user_id:str):
 
 @router.get("/check_role")
 async def check_role(user_id:str):
+    """
+    Determine whether the user role is consistent with the DBMS,
+    because the user role is provided by Keycloak
+    :param user_id:which user will be checked
+    :return: bool
+    """
     try:
         response= await db_userEntities.get_user_role_in_DB(user_id)
         if response is None:
@@ -87,6 +114,12 @@ async def check_role(user_id:str):
 
 @router.get("/get_user_name")
 async def get_user_name(user_id:str):
+    """
+     entrance by frontend,Get a user name from the database.
+     this also by keycloak,get a user name from Keycloak
+    :param user_id: which user be request
+    :return: user name
+    """
     try:
         user= await db_userEntities.get_user(user_id)
         return user.get("username")
@@ -130,6 +163,11 @@ async def update_point(user_id:str,point:int):
 
 @router.get("/get_user")
 async def get_user(user_id:str):
+    """
+    entrance by frontend,Get a user information from the database.
+    :param user_id: which user will be give back
+    :return:
+    """
     try:
         user = await db_userEntities.get_user(user_id)
         if user:
@@ -142,6 +180,11 @@ async def get_user(user_id:str):
 
 @router.get("/get_user_rank")
 async def get_user_rank(user_id:str):
+    """
+    entrance by frontend,Get a user points from the database.
+    :param user_id: which user will be give back
+    :return: number
+    """
     try:
         # return await db_userEntities.get_userRanking(user_id)
         return await rankings.get_user_ranking(user_id)
@@ -155,6 +198,14 @@ async def get_all_user_after_order(
         page: int = Query(1, ge=1),
         limit: int = Query(10, ge=1, le=50)
 ):
+    """
+    (Ranking page)
+    Paginate the user's points,
+    sort them from high to low and return them to the frontend
+    :param page:
+    :param limit:
+    :return:
+    """
     try:
         result = await rankings.get_leaderboard_data(page, limit, include_checkin_info=False)
 
@@ -191,6 +242,12 @@ async def canLike(photo_id:str,user_id:str):
 
 @router.post("/like")
 async def like(photo_id:str,user_id:str):
+    """
+    frontend request triggered by a user(exp. like the photo)
+    :param photo_id: which photo to be like
+    :param user_id:  which user like photo
+    :return:
+    """
     try:
         return await db_photoEntities.like_photo(photo_id,user_id)
     except Exception as e:
@@ -199,6 +256,12 @@ async def like(photo_id:str,user_id:str):
 
 @router.post("/dislike")
 async def disLike(photo_id:str,user_id:str):
+    """
+    frontend request triggered by a user(exp. delete like the photo)
+    :param photo_id: which photo to be dislike
+    :param user_id: which user dislike photo
+    :return:
+    """
     try:
         return await db_photoEntities.disLike(photo_id,user_id)
     except Exception as e:
