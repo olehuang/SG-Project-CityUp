@@ -6,6 +6,8 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import MenuIcon from '@mui/icons-material/Menu';
 import Button from '@mui/material/Button';
+import CloseIcon from '@mui/icons-material/Close';
+
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import {useNavigate,useLocation,Link} from "react-router-dom";
 import LanguageSelector from "../LanguageSelector";
@@ -164,6 +166,7 @@ const TopBar = ({ onMenuClick }: TopBarProps) => {
                             justifyContent: 'center',
                             textAlign: 'center',
                             border:isMobile? "none" : "",
+
                         }}
                         variant="outlined"
                     >
@@ -181,9 +184,10 @@ const styles = {
         // border: 'none',
         margin:"auto 1% auto auto",
         color:"white",
-        fontWeight: "bold",
         width: {sx:"90%",sm:"100%"},
         minWidth: {sx:"100px",sm:"120px"},
+        borderColor:"white",
+        fontWeight: "bold",
         ml:2,
     }
 }
