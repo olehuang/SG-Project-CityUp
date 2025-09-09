@@ -391,7 +391,6 @@ const RankingPage =()=>{
                         </TableBody>
                     </Table>
                 )}
-
             </TableContainer>
             {userRanking && (
                 <Pagination
@@ -440,7 +439,7 @@ const styles={
     headerCell:(width:number) =>({
         width:`${width}%`,
         fontWeight:"bold",
-        fontSize: { xs: "0.2rem"},
+        fontSize: { xs: "0.8rem"},
     }),
     loadingZone:{},
     tableRowHiligh:{
