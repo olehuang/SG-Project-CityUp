@@ -7,7 +7,7 @@ from bson import ObjectId,Binary
 from pymongo import MongoClient
 from pymongo import AsyncMongoClient
 from typing import Set
-# MongoDB初始化
+# MongoDB inital
 from pydantic import BaseModel,Field
 from bson.binary import Binary
 
@@ -92,13 +92,13 @@ class Building:
 
 # 审核状态
 class ReviewStatus(Enum):
-    Pending = "pending"  #待审核
-    Reviewing = "reviewing"  # 审核中
-    Approved = "approved" #成功
-    Rejected = "rejected"  #失败
+    Pending = "pending" #Awaiting review
+    Reviewing = "reviewing"  # Under review
+    Approved = "approved" #success
+    Rejected = "rejected"  #fail
 
 
-# 上传的照片信息
+# photo information
 class Photo:
     def __init__(self, user_id: str, building_addr: str,
                  lat:Optional[float]=None,
@@ -176,8 +176,8 @@ class PhotoResponse(BaseModel):
 
     username: Optional[str] = None
     building_addr: Optional[str] = None
-    lat: Optional[float] = None  # 新增：纬度
-    lng: Optional[float] = None  # 新增：经度
+    lat: Optional[float] = None  # New: Latitude
+    lng: Optional[float] = None  # New: Longitude
 
     image_url: Optional[str]
     #image_data: Photo=None

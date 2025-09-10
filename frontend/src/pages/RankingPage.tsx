@@ -187,10 +187,14 @@ const RankingPage =()=>{
                 flexDirection: { xs: "column", sm: "row" },
                 alignItems: { xs: "flex-start", sm: "center" },
                 //textAlign: { xs: "left", sm: "baseline" },
-                gap: { xs: 1, sm: 0 },  // There is a gap on the mobile side, but not on the web side
+
             }}>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
+                    mb:{xs:0,sm:{}},
+                    mt:0,
+                    maxWidth: { xs: "180px", sm: "250px" },
+                    textOverflow: "ellipsis",
                     marginLeft: { xs: 0, sm: "2%" }  // Restore the original marginLeft on the web page
                 }}>
                     {/* Display different labels according to screen size */}
@@ -198,6 +202,8 @@ const RankingPage =()=>{
                 </Typography>
                 <Typography variant="h6" sx={{
                     fontWeight: "bold",
+                    maxWidth: { xs: "180px", sm: "250px" },
+                    textOverflow: "ellipsis",
                     margin: { xs: 0, sm: "auto auto auto 17%" }  //  Restore the original marginLeft on the web page
                 }}>
                     {t('ranking.myRanking')}: {user.rank !== -1 && +user.point !== 0 ? user.rank : "not in Ranking"}
@@ -365,7 +371,9 @@ const RankingPage =()=>{
                                                 alignItems:"center",
                                                 justifyContent: "flex-start",
                                                 //maxHeight:"10%",
-                                            }}>
+                                            }}
+                                                 title={rowUser.username}
+                                            >
                                                 {(() => {
                                                     const rank = rowUser.rank;
                                                     if (rank <= 3) {
@@ -383,7 +391,6 @@ const RankingPage =()=>{
                         </TableBody>
                     </Table>
                 )}
-
             </TableContainer>
             {userRanking && (
                 <Pagination
@@ -423,7 +430,7 @@ const styles={
         margin:  "0 0 1% 0",
         maxWidth: { xs: '100%' },
         marginBottom:  { xs: 2 },
-        padding: { xs: "1rem", sm: "1% 0% 1% 0%" },
+        padding: { xs: "0 1rem 1.5rem 1rem", sm: "1% 0% 1% 0%" },
         //border:"1px solid black",
         borderRadius:"10px",
         backgroundColor: "#FAF6E9",

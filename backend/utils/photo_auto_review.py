@@ -6,12 +6,6 @@ from PIL import Image
 from PIL.ExifTags import TAGS, GPSTAGS
 
 """
-# utils/photo_auto_review.py 用于检测图片是否符合贴图要求
-1：所选照片是否属于目标建筑
-  (harversine + check_photo_location）)
-2：检查图片清晰度(Laplacian 方差（Var）> 350)
-准备工作：提取EXIF内经纬度信息；get_exif_gps
------------ english version -----------
 # utils/photo_auto_review.py 
 Used to check whether the uploaded photo meets the requirements for texture mapping
 1: Whether the selected photo belongs to the target building
@@ -40,13 +34,13 @@ def get_exif_gps(image_bytes):
                     gps_info[sub_decoded] = value[t]
         if not gps_info or 'GPSLatitude' not in gps_info or 'GPSLongitude' not in gps_info:
             return None
-        # 兼容Pillow的IFDRational Compatible with Pillow's IFDRational
+        # Compatible with Pillow's IFDRational
         def to_float(x):
                 try:
                     return float(x)
                 except Exception:
                     return x[0] / x[1]
-        #DMS（度分秒）转为十进制度 degrees minutes seconds to decimal degrees
+        #DMS degrees minutes seconds to decimal degrees
         def dms_to_dd(dms, ref):
             degrees = to_float(dms[0])
             minutes = to_float(dms[1])
@@ -65,11 +59,11 @@ def get_exif_gps(image_bytes):
 
 
 def haversine(lat1, lon1, lat2, lon2):
-    """ 1.1 Haversine距离算法（用于经纬度距离判断）
+    """ 1.1 Haversine
     Haversine distance algorithm (for latitude and longitude distance determination)
     """
 
-    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])# 将经纬度转换为弧度 Converting latitude and longitude to radians
+    lat1, lon1, lat2, lon2 = map(math.radians, [lat1, lon1, lat2, lon2])# Converting latitude and longitude to radians
     # Calculation of latitude/longitude differences
     dlat = lat2 - lat1
     dlon = lon2 - lon1
@@ -81,10 +75,12 @@ def haversine(lat1, lon1, lat2, lon2):
 
     return distance
 
-
-def check_photo_location(photo_gps, building_gps, threshold=100):
+"""
+   A deviation value of 100 to 150 for GPS in urban areas is acceptable.Here we use the most lenient value of 150.
+"""
+def check_photo_location(photo_gps, building_gps, threshold=150):
     """
-    1.2 check_photo_location检查照片与目标建筑GPS信息是否在偏差值内
+    1.2 check_photo_location
     Check if the latitude and longitude distance between the photo and the target building is within the specified threshold value
     :param photo_gps: (lat, lng) tuple from get_exif_gps
     :param building_gps: (lat, lng) tuple from DB
@@ -97,21 +93,21 @@ def check_photo_location(photo_gps, building_gps, threshold=100):
     return dist <= threshold, dist
 
 """ 
+   A resolution of 180 is sufficient for the required texture mapping.
    If you think it's not clear enough, just turn up the threshold. 
-   Usually the threshold is around 700 if you want to see the texture details clearly. 
-   如果觉得不够清晰把threshold调大就好 一般看清楚纹理细节的话 @threshold 在700左右
+   Usually the threshold is around 180~700+ if you want to see the texture details clearly. 
    """
-def is_image_blurry(image_bytes, threshold=400):
+def is_image_blurry(image_bytes, threshold=180):
     """
-    2. 检测图片是否清晰，拉普拉斯方差法。
+    2. Detecting image clarity using the Laplacian variance method.
     :param image_bytes: Image binary data
     :param threshold: Variance threshold, below which it is considered fuzzy
     :return: (bool, variance)
-    如果觉得不够清晰，把threshold调大就好
+    If it doesn't look clear enough, just increase the threshold.
     """
-    # 将二进制转换为numpy数组
+    # Convert binary to a NumPy array
     nparr = np.frombuffer(image_bytes, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)  # 只取灰度
+    img = cv2.imdecode(nparr, cv2.IMREAD_GRAYSCALE)  # Grayscale only
     if img is None:
         raise ValueError("Image cannot be decoded, please change the image")
 
