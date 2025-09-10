@@ -291,7 +291,7 @@ const PhotoReview = () => {
                     </Button>
                 </Box>
                 {isMobile ? (
-                        // 卡片展示：移动端
+                        // Card display: mobile
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {/* Select All Button*/}
                             {selectMode && (
@@ -590,7 +590,7 @@ const PhotoReview = () => {
                             component="img"
                             src={previewImage}
                             alt="Photo Preview"
-                            sx={photoReviewStyles.previewImage}  // 改为sx而不是style
+                            sx={photoReviewStyles.previewImage}
                             onError={(e) => {
                                 console.error("Preview image failed to load");
                             }}
