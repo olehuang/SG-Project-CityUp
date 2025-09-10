@@ -99,7 +99,9 @@ const PhotoReview = () => {
                 selected: false
             }));
             setPhotos(photosWithSelected);
-            setSuccess(t('photoReview.photosFetchedSuccess', { count: data.length }));
+            if (!isMobile) {
+                setSuccess(t('photoReview.photosFetchedSuccess', { count: data.length }));
+            }
         } catch (err) {
             console.error("Failed to fetch photos", err);
             setError(t('photoReview.fetchPhotosFailed'));
@@ -291,7 +293,6 @@ const PhotoReview = () => {
                     </Button>
                 </Box>
                 {isMobile ? (
-                        // 卡片展示：移动端
                         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                             {/* Select All Button*/}
                             {selectMode && (

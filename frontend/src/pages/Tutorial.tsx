@@ -20,22 +20,22 @@ import MenuIcon from '@mui/icons-material/Menu';
 import CloseIcon from '@mui/icons-material/Close';
 import { useTranslation } from 'react-i18next';
 
-const Tutorial = () => {
-    const drawerWidth = 240;
-    const { token } = useAuthHook();
-    const [roles, setRoles] = useState<string[]>([]);
-    const [selectedSection, setSelectedSection] = useState("Tutorial");
-    const [searchTerm, setSearchTerm] = useState("");
-    const [searchResults, setSearchResults] = useState<string[]>([]);
-    // 用于挂载每个模块的 DOM 引用，读取 innerText
-    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
-    const isSearchActive = searchTerm.trim().length > 0;
-    const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // sm: 600px
-    const [mobileOpen, setMobileOpen] = useState(false); // 控制 Drawer 打开关闭
 
-    const {t} = useTranslation();
-    // Take user from KeycloakClient and if token exist take into roles
+const Tutorial = () => {
+    const drawerWidth = 240;// Width of the sidebar drawer
+    const { token } = useAuthHook();  // Get authentication token from custom hook
+    const [roles, setRoles] = useState<string[]>([]);    // Store user roles
+    const [selectedSection, setSelectedSection] = useState("Tutorial"); // Track which tutorial section is currently selected
+    const [searchTerm, setSearchTerm] = useState("");  // Store the current search input value
+    const [searchResults, setSearchResults] = useState<string[]>([]);// Store matched section keys based on search
+    const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});// Store references to each section's DOM node for scrolling
+    const isSearchActive = searchTerm.trim().length > 0;// Determine if search is active (non-empty input)
+    const theme = useTheme();// Get current theme object from MUI
+    const isMobile = useMediaQuery(theme.breakpoints.down("sm")); //Check if screen size is mobile (below 600px)
+    const [mobileOpen, setMobileOpen] = useState(false); // Control whether mobile drawer is open
+    const {t} = useTranslation();    // Translation hook for internationalization
+
+    //  Fetch user roles from Keycloak if token is available
     useEffect(() => {
         const fetchRoles = async () => {
             const userInfo = await KeycloakClient.extractUserInfo(token);
@@ -47,6 +47,7 @@ const Tutorial = () => {
         }
     }, [token]);
 
+    // Define all tutorial sections, including admin-only sections
     const sections = [
         { key: "Tutorial", label: t("tutorial.menu.tutorial") },
         { key: "Photograph", label: t("tutorial.menu.photograph") },
@@ -67,7 +68,7 @@ const Tutorial = () => {
 
 
 
-    // Based on the search content it looks for matches in the sections and searchableContent and updates the search results.
+    // Search handler: filters sections based on title or content match.
     const handleSearch = () => {
         if (!searchTerm.trim()) {
             setSearchResults([]);
@@ -89,7 +90,7 @@ const Tutorial = () => {
 
         setSearchResults(results);
 
-        // 使用 setTimeout 确保状态更新后再跳转
+        // Scroll to first matched section after state update
         setTimeout(() => {
             if (results.length > 0) {
                 const firstMatch = results[0];
@@ -102,9 +103,8 @@ const Tutorial = () => {
         }, 0);
     };
 
-    // 修复后的 highlightText 函数
+    // Highlight matched search terms in section content
     const highlightText = (text: string, searchTerm: string, isSearchActive: boolean = true) => {
-        // 修复bug1：当搜索词为空或不处于搜索状态时，返回原始文本
         if (!searchTerm.trim() || !isSearchActive) return text;
 
         const regex = new RegExp(`(${searchTerm})`, 'gi');
@@ -134,6 +134,7 @@ const Tutorial = () => {
         switch (selectedSection) {
             case "Photograph":
                 return (
+                    // Photograph section content
                     <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Photograph"] = el;}} // 新增
                         sx={{ ...styles.tutorialModelBox, paddingBottom: "80px" }}>
                         <Typography variant="h4" sx={styles.title}>
@@ -144,7 +145,7 @@ const Tutorial = () => {
                             {highlightText(t("tutorial.photograph.description"), searchTerm, isSearchActive)}
                         </Typography>
 
-                        {/* ✅ 正面示例 */}
+                        {/* ✅ correct examples */}
                         <Typography variant="h6" sx={{ mt: 4 }}>
                             {highlightText("Correct photo examples:", searchTerm, isSearchActive)}
                         </Typography>
@@ -193,7 +194,7 @@ const Tutorial = () => {
                             </Box>
                         </Box>
 
-                        {/* ❌ 负面示例 */}
+                        {/* ❌ false examples */}
                         <Typography variant="h6" sx={{ mt: 6 }}>
                             {highlightText(t("tutorial.photograph.incorrectExamples.title"), searchTerm, isSearchActive)}
                         </Typography>
@@ -272,11 +273,11 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
-                                            src="/assets/Get%20geolocation.png"
+                                            src="/assets/getLocation.png"
                                             alt="Get location example"
                                             style={{
-                                                width: '100%',      // ← 改动
-                                                maxWidth: 800,      // ← 最大不超过 800px
+                                                width: '100%',
+                                                maxWidth: 800,
                                                 borderRadius: 8
                                             }}
                                         />
@@ -323,11 +324,11 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
-                                            src="/assets/Choose%20photos.png"
+                                            src="/assets/selectPhotos.png"
                                             alt="Choose photo example"
                                             style={{
-                                                width: '100%',          // 自动适配容器
-                                                maxWidth: 800,          // 控制最大宽度
+                                                width: '100%',
+                                                maxWidth: 800,
                                                 borderRadius: 8
                                             }}
                                         />
@@ -361,21 +362,21 @@ const Tutorial = () => {
                                         <strong>{t("tutorial.photoUpload.finalizeUpload.title")}</strong>
                                     </Typography>
 
-                                    {/* 图1：提交按钮示例图 */}
+                                    {/* Bild 1：Submit */}
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
-                                            src="/assets/Submit.png"
+                                            src="/assets/submit.png"
                                             alt="Choose photo example"
                                             style={{
-                                                width: '100%',       //  改为自适应容器宽度
-                                                maxWidth: 800,       //  限制最大宽度
+                                                width: '100%',
+                                                maxWidth: 800,
                                                 borderRadius: 8,
-                                                objectFit: 'cover'   //  防止图像变形
+                                                objectFit: 'cover'
                                             }}
                                         />
                                     </Box>
 
-                                    {/* 描述文字 */}
+                                    {/* describe content */}
                                     <Typography variant="body1" sx={{ mt: 1.5 }}>
                                         {highlightText(t("tutorial.photoUpload.uploadPhotos.click"), searchTerm, isSearchActive)}
                                         <strong>{highlightText(`'${t("tutorial.photoUpload.finalizeUpload.submit.buttonText")}'`, searchTerm, isSearchActive)}</strong>
@@ -386,13 +387,13 @@ const Tutorial = () => {
                                         {highlightText(t("tutorial.photoUpload.finalizeUpload.remove.description"), searchTerm)}
                                     </Typography>
 
-                                    {/* 图2：上传成功的界面图 */}
+                                    {/* bild 2：sucessfully unploaded */}
                                     <Box sx={{ mt: 1.5 }}>
                                         <img
-                                            src="/assets/Uploadsucess.png"
+                                            src="/assets/uploadedsucessfully.png"
                                             alt="Upload success example"
                                             style={{
-                                                width: '100%',       // ✅ 与图1保持一致
+                                                width: '100%',
                                                 maxWidth: 800,
                                                 borderRadius: 8,
                                                 objectFit: 'cover'
@@ -412,18 +413,18 @@ const Tutorial = () => {
 
             case "Upload History":
                 return (
-                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Upload History"] = el;}} // 新增
+                    <Box ref={(el: HTMLDivElement | null) => {sectionRefs.current["Upload History"] = el;}}
                         sx={{
                             ...styles.tutorialModelBox,
-                            paddingBottom: "80px",      // ← 确保底部留白
+                            paddingBottom: "80px",
                         }}
                     >
-                        {/* 标题 */}
+                        {/* Subtitle */}
                         <Typography variant="h4" sx={styles.title}>
                             {highlightText(t("tutorial.uploadHistory.title"), searchTerm, isSearchActive)}
                         </Typography>
 
-                        {/* 段落说明 */}
+                        {/* describtion */}
                         <Typography variant="body1" sx={styles.body}>
                             {highlightText(
                                 t("tutorial.uploadHistory.description"),
@@ -431,7 +432,7 @@ const Tutorial = () => {
                             )}
                         </Typography>
 
-                        {/* 各步骤列表 */}
+                        {/* Liste */}
                         <Box sx={{ ...styles.body, mt: 2 }}>
                             {/* 1 */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
@@ -458,13 +459,13 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Search.png"
+                                            src="/assets/search.png"
                                             alt="Search photo example"
                                             style={{
                                                 width: '100%',
-                                                maxWidth: 800,         // 不超过 800px
+                                                maxWidth: 800,
                                                 borderRadius: 8,
-                                                display: 'block'       // 避免图片靠边留空
+                                                display: 'block'
                                             }}
                                         />
                                     </Box>
@@ -482,7 +483,7 @@ const Tutorial = () => {
                                     </Typography>
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Filter.png"
+                                            src="/assets/filter.png"
                                             alt="Filter status example"
                                             style={{
                                                 width: '100%',
@@ -503,7 +504,7 @@ const Tutorial = () => {
                                     📷
                                 </Typography>
 
-                                {/* 内容区包一层 Box：保证结构统一 */}
+                                {/* Content Box */}
                                 <Box sx={{ flex: 1 }}>
                                     <Typography variant="body1">
                                         <strong>{t("tutorial.uploadHistory.steps.viewDetails.title")}</strong>
@@ -519,13 +520,13 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Details.png"
+                                            src="/assets/details.png"
                                             alt="Photo details example"
                                             style={{
-                                                width: '100%',          //宽度适应容器
-                                                maxWidth: 800,          //限制最大宽度
+                                                width: '100%',
+                                                maxWidth: 800,
                                                 borderRadius: 8,
-                                                objectFit: 'cover'      //防止压缩变形
+                                                objectFit: 'cover'
                                             }}
                                         />
                                     </Box>
@@ -553,41 +554,11 @@ const Tutorial = () => {
                                         )}
                                     </Typography>
 
-                                    {/* ✅ 图片放进内容块内部 */}
+                                    {/* ✅ Bild */}
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Pagination.png"
+                                            src="/assets/pagination.png"
                                             alt="Pagination example"
-                                            style={{
-                                                width: '100%',
-                                                maxWidth: 800,
-                                                borderRadius: 8,
-                                                objectFit: 'cover'
-                                            }}
-                                        />
-                                    </Box>
-                                </Box>
-                            </Box>
-                            {/* 4. Exit and return */}
-                            <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
-                                <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
-                                    🔙
-                                </Typography>
-
-                                <Box sx={{ flex: 1 }}>
-                                    <Typography variant="body1">
-                                        <strong>{t("tutorial.uploadHistory.steps.exitAndReturn.title")}</strong> –{' '}
-                                        {highlightText(
-                                            t("tutorial.uploadHistory.steps.exitAndReturn.description"),
-                                            searchTerm, isSearchActive
-                                        )}
-                                    </Typography>
-
-                                    {/* ✅ 内嵌图像块统一格式 */}
-                                    <Box sx={{ mt: 2 }}>
-                                        <img
-                                            src="/assets/Exit.png"
-                                            alt="Exit example"
                                             style={{
                                                 width: '100%',
                                                 maxWidth: 800,
@@ -620,7 +591,7 @@ const Tutorial = () => {
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
-                            {/* ✅ Step 1. Search by address */}
+                            {/* Step 1. Search by address */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     🔍
@@ -678,7 +649,7 @@ const Tutorial = () => {
                                     >
                                         <Box sx={{ flex: 1 }}>
                                             <img
-                                                src="/assets/Selectone.png"
+                                                src="/assets/viewAll.png"
                                                 alt="Select Photo"
                                                 style={{
                                                     width: "100%",
@@ -692,14 +663,15 @@ const Tutorial = () => {
                                         </Box>
                                         <Box sx={{ flex: 1 }}>
                                             <img
-                                                src="/assets/bpg3.png"
-                                                alt="View Photo"
+                                                src="/assets/viewFilter.png"
+                                                alt="Select Photo"
                                                 style={{
                                                     width: "100%",
                                                     maxWidth: 800,
                                                     borderRadius: 8,
                                                     objectFit: "cover",
                                                     display: "block",
+                                                    marginBottom: 16
                                                 }}
                                             />
                                         </Box>
@@ -720,13 +692,26 @@ const Tutorial = () => {
                                             searchTerm,
                                             isSearchActive
                                         )}
-                                        <br /> {/* 新增换行标记 */}
+                                        <br />
                                         {highlightText(
                                             "Note: Each user can only like the same photo once. Giving a like to your own photo won’t earn any points.",
                                             searchTerm,
                                             isSearchActive
                                         )}
                                     </Typography>
+                                    <Box sx={{ flex: 1 }}>
+                                        <img
+                                            src="/assets/like.png"
+                                            alt="View Photo"
+                                            style={{
+                                                width: "100%",
+                                                maxWidth: 800,
+                                                borderRadius: 8,
+                                                objectFit: "cover",
+                                                display: "block",
+                                            }}
+                                        />
+                                    </Box>
                                 </Box>
                             </Box>
                         </Box>
@@ -825,7 +810,7 @@ const Tutorial = () => {
                         </Typography>
 
                         <Box sx={{ ...styles.body, mt: 2 }}>
-                            {/* 1️⃣ Navigate to User Information page */}
+                            {/* Navigate to User Information page */}
                             <Box sx={{ display: "flex", alignItems: "flex-start", mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: "#2196f3", mr: 1, fontWeight: "bold" }}>
                                     📂
@@ -846,7 +831,7 @@ const Tutorial = () => {
                                             alt="User Information navigation"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,            //与其他步骤统一
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 objectFit: "cover",
                                                 display: "block",
@@ -878,7 +863,7 @@ const Tutorial = () => {
                                             alt="Edit user information"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,            // 原来是1000 → 改为800以统一
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 objectFit: "cover",
                                                 display: "block",
@@ -1048,7 +1033,7 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Back.png"
+                                            src="/assets/back.png"
                                             alt="Review progress example"
                                             style={{
                                                 width: "100%",
@@ -1099,7 +1084,7 @@ const Tutorial = () => {
                                             alt="Admin panel example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,          // 与其他图像统一
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 objectFit: "cover",
                                                 display: "block"
@@ -1128,7 +1113,7 @@ const Tutorial = () => {
                                             alt="User search example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,          // ✅ 原来是1000 → 修改为统一800
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 objectFit: "cover",
                                                 display: "block"
@@ -1156,7 +1141,7 @@ const Tutorial = () => {
                                             alt="Delete user example"
                                             style={{
                                                 width: "100%",
-                                                maxWidth: 800,              // ✅ 统一宽度
+                                                maxWidth: 800,
                                                 borderRadius: 8,
                                                 display: "block",
                                                 objectFit: "cover"
@@ -1166,7 +1151,6 @@ const Tutorial = () => {
                                 </Box>
                             </Box>
 
-                            {/* Step 4: Add User as Admin */}
                             {/* Step 4: Add User as Admin */}
                             <Box sx={{ display: 'flex', alignItems: 'flex-start', mb: 1.5 }}>
                                 <Typography variant="body1" sx={{ color: '#2196f3', mr: 1, fontWeight: 'bold' }}>
@@ -1361,7 +1345,7 @@ const Tutorial = () => {
                                                 borderRadius: 8,
                                                 display: "block",
                                                 objectFit: "cover",
-                                                marginBottom: 12           // 与多张图片保持底部间距一致
+                                                marginBottom: 12
                                             }}
                                         />
                                     </Box>
@@ -1390,7 +1374,7 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Selectone.png"
+                                            src="/assets/viewAll.png"
                                             alt="Photo Selectone"
                                             style={{
                                                 width: "100%",
@@ -1402,7 +1386,7 @@ const Tutorial = () => {
                                             }}
                                         />
                                         <img
-                                            src="/assets/Selecttwo.png"
+                                            src="/assets/viewFilter.png"
                                             alt="Photo Selecttwo"
                                             style={{
                                                 width: "100%",
@@ -1441,7 +1425,7 @@ const Tutorial = () => {
 
                                     <Box sx={{ mt: 2 }}>
                                         <img
-                                            src="/assets/Viewphotoone.png"
+                                            src="/assets/viewphoto.png"
                                             alt="Viewphoto example"
                                             style={{
                                                 width: "100%",
@@ -1453,7 +1437,7 @@ const Tutorial = () => {
                                             }}
                                         />
                                         <img
-                                            src="/assets/download4.png"
+                                            src="/assets/download.png"
                                             alt="Download example"
                                             style={{
                                                 width: "100%",
@@ -1489,7 +1473,7 @@ const Tutorial = () => {
                                 overflowY: 'auto',
                                 pr: 1
                             }}>
-                                {/* 左列 */}
+                                {/* Left List */}
                                 <Box>
                                     {/* Photo Quality Issues */}
                                     <Box sx={{ mb: 3 }}>
@@ -1538,7 +1522,7 @@ const Tutorial = () => {
                                     </Box>
                                 </Box>
 
-                                {/* 右列 */}
+                                {/* Right List */}
                                 <Box>
                                     {/* Address Issues */}
                                     <Box sx={{ mb: 3 }}>
@@ -1605,7 +1589,7 @@ const Tutorial = () => {
                             )}
                         </Typography>
 
-                        {/* 常见问题快速链接 */}
+                        {/* Quick Q&A */}
                         <Box sx={{ ...styles.body, mt: 4 }}>
                             <Typography variant="h5" sx={{ mb: 2, fontWeight: 'bold', color: '#1976d2' }}>
                                 {highlightText(t("tutorial.main.quickHelpTitle"), searchTerm, isSearchActive)}
@@ -1712,27 +1696,36 @@ const Tutorial = () => {
         }
     };
     return (
-        <Box sx={pageBackgroundStyles.container} style={{ justifyContent: "flex-start", height: "100vh", alignItems: "stretch", overflow: "hidden" }}>
-            {/* 左侧菜单栏 - 桌面端和移动端都显示 */}
+        <Box
+            sx={{
+                ...pageBackgroundStyles.container,
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-start",
+                alignItems: "stretch",
+                minHeight: "100vh",
+                overflow: "hidden",
+            }}
+        >
+            {/* Sidebar menu — visible on both desktop and mobile */}
             <Box
                 sx={{
                     position: "fixed",
-                    top: "64px", // 修改：从顶部菜单栏下方开始
+                    top: "64px",
                     left: 0,
-                    width: isMobile ? `${drawerWidth * 0.8}px` : `${drawerWidth}px`, // 移动端稍微窄一点
-                    height: "calc(100vh - 64px)", // 修改：减去顶部菜单栏高度
+                    width: isMobile ? `${drawerWidth * 0.8}px` : `${drawerWidth}px`,
+                    height: "calc(100vh - 64px)",
                     borderRight: "1px solid #ddd",
                     backgroundColor: "#FFF8E1",
-                    overflowY: "auto",
-                    zIndex: 900, // 修改：降低z-index，确保不遮住顶部菜单栏
+                    overflowY: "hidden",
+                    zIndex: 900,
                     padding: 0,
-                    // 移动端可以滑动隐藏/显示
                     transform: isMobile && !mobileOpen ? `translateX(-${drawerWidth * 0.8}px)` : 'translateX(0)',
                     transition: 'transform 0.3s ease-in-out',
                 }}
             >
-                <Box sx={{ overflow: "auto", p: 2 }}>
-                    {/* 移动端添加关闭按钮 */}
+                <Box sx={{ overflow: "hidden", p: 2 }}>
+                    {/* Close button for mobile sidebar */}
                     {isMobile && (
                         <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
                             <IconButton
@@ -1745,7 +1738,7 @@ const Tutorial = () => {
                         </Box>
                     )}
 
-                    {/* 搜索框 */}
+                    {/* Search input field */}
                     <Box sx={{ mb: 2 }}>
                         <TextField
                             fullWidth
@@ -1792,7 +1785,7 @@ const Tutorial = () => {
                         />
                     </Box>
 
-                    {/* 搜索结果提示 */}
+                    {/* Search result */}
                     {searchTerm && searchResults.length > 0 && (
                         <Box sx={{ mb: 1, px: 1 }}>
                             <Typography variant="caption" color="primary">
@@ -1801,7 +1794,7 @@ const Tutorial = () => {
                         </Box>
                     )}
 
-                    {/* 菜单列表 */}
+                    {/* Sidebar menu list */}
                     <List>
                         {sections.map((section, index) => {
                             const isHighlighted = searchResults.includes(section.key);
@@ -1816,7 +1809,6 @@ const Tutorial = () => {
                                         if (scrollTarget) {
                                             scrollTarget.scrollIntoView({ behavior: "smooth", block: "start" });
                                         }
-                                        // 移动端选择后自动关闭菜单
                                         if (isMobile) {
                                             setMobileOpen(false);
                                         }
@@ -1846,7 +1838,7 @@ const Tutorial = () => {
                     </List>
 
 
-                    {/* 无搜索结果提示 */}
+                    {/* No search results message */}
                     {searchTerm && searchResults.length === 0 && (
                         <Box sx={{ px: 1, py: 2 }}>
                             <Typography variant="body2" color="text.secondary">
@@ -1857,36 +1849,35 @@ const Tutorial = () => {
                 </Box>
             </Box>
 
-            {/* 移动端遮罩层 */}
+            {/* Mobile overlay backdrop */}
             {isMobile && mobileOpen && (
                 <Box
                     sx={{
                         position: 'fixed',
-                        top: 64, // 修改：从顶部菜单栏下方开始
+                        top: 64,
                         left: 0,
                         width: '100vw',
-                        height: 'calc(100vh - 64px)', // 修改：减去顶部菜单栏高度
+                        height: 'calc(100vh - 64px)',
                         backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                        zIndex: 899, // 修改：确保在菜单栏下方
+                        zIndex: 899,
                     }}
                     onClick={() => {
                         setMobileOpen(false);
 
-                        // 新增：关闭菜单时自动滚动到当前选中模块
                         const currentRef = sectionRefs.current[selectedSection];
                         currentRef?.scrollIntoView({ behavior: "smooth", block: "start" });
                     }}
                 />
             )}
 
-            {/* 移动端菜单切换按钮 */}
+            {/* Mobile menu toggle button */}
             {isMobile && (
                 <IconButton
                     sx={{
                         position: 'fixed',
-                        top: 72, // 修改：调整到顶部菜单栏下方
+                        top: 72,
                         left: mobileOpen ? `${drawerWidth * 0.8 - 40}px` : '16px',
-                        zIndex: 901, // 修改：确保按钮在菜单栏之上
+                        zIndex: 901,
                         backgroundColor: 'rgba(255, 255, 255, 0.9)',
                         border: '1px solid #ddd',
                         transition: 'left 0.3s ease-in-out',
@@ -1901,14 +1892,15 @@ const Tutorial = () => {
             )}
 
 
-            {/* 右侧内容区域 */}
+            {/* Right Part */}
             <Box
                 component="main"
                 sx={{
                     flexGrow: 1,
                     marginLeft: isMobile ? 0 : `${drawerWidth}px`,
                     //marginLeft: `${drawerWidth}px`,
-                    height: "100vh",
+                    //height: "100vh",
+                    minHeight: 0,
                     padding: isMobile ? 2 : 3,
                     //padding: 3,
                     backgroundColor: "#FFF8E1",
@@ -1916,8 +1908,7 @@ const Tutorial = () => {
                     paddingBottom: '80px'
                 }}
             >
-                {/* 内容区域顶部补空，让内容不被 AppBar 挡住 */}
-                <Box sx={{ paddingTop: isMobile ? '60px' : 0}}>
+                <Box sx={{ paddingTop: isMobile ? "60px" : 0 }}>
                     {renderContent()}
                 </Box>
             </Box>
@@ -1930,7 +1921,7 @@ const styles = {
     tutorialModelBox: {
         paddingTop: "16px",
         minHeight: "100%",
-        paddingBottom: '80px',// 保证内容区域能撑开
+        paddingBottom: '80px',
     },
     title: {
         paddingLeft: "16px",

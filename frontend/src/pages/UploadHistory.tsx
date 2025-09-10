@@ -28,21 +28,12 @@ import {
 } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import { useAuthHook } from "../components/AuthProvider";
-import { useNavigate } from "react-router-dom";
 import { useTranslation } from 'react-i18next';
 import { useTheme, useMediaQuery } from "@mui/material";
 import pageBackgroundStyles from "./pageBackgroundStyles";
 
-const PAGE_SIZE = 10;
-const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
-const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
-    pending: "default", //default color
-    reviewing: "warning", // warning color yellow
-    approved: "success", // success color green
-    rejected: "error", // error color red
-};
 
-
+// Represents a single uploaded photo item with metadata
 interface UploadItem {
     photo_id: string;
     user_id: string;
@@ -56,7 +47,7 @@ interface UploadItem {
     reviewer_id?: string;
     review_time?: string;
 }
-
+// Represents the structure of the API response for paginated photo data
 interface ApiResponse {
     photos: UploadItem[];
     total_count: number;
@@ -76,17 +67,16 @@ const UploadHistory: React.FC = () => {
     const [page, setPage] = useState(1); // current page number (default page 1 of 1)
     const [error, setError] = useState<string | null>(null); // error message
     const [detailOpen, setDetailOpen] = useState(false);
-    const [selectedItem, setSelectedItem] = useState<UploadItem | null>(null);
-    // const navigate = useNavigate();
-    // 新增 搜索结果状态和原始数据缓存
+    const [selectedItem, setSelectedItem] = useState<UploadItem | null>(null);// const navigate = useNavigate();
     const [originalUploads, setOriginalUploads] = useState<UploadItem[]>([]);
     const [searchResults, setSearchResults] = useState<UploadItem[]>([]);
     const [isSearchActive, setIsSearchActive] = useState(false);
     const theme = useTheme();//
     const isMobile = useMediaQuery(theme.breakpoints.down('sm'));//
-
     const PAGE_SIZE = 10;
+    // List of possible status values used for filtering or display
     const statusOptions = ["all", "pending", "reviewing", "approved", "rejected"];
+    // Mapping of status values to corresponding color types for UI components
     const statusColorMap: Record<string, "default" | "success" | "error" | "warning"> = {
         pending: "default", //default color
         reviewing: "warning", // warning color yellow
@@ -99,9 +89,8 @@ const UploadHistory: React.FC = () => {
     useEffect(() => {
         const timer = setTimeout(() => {
             setDebouncedSearchTerm(searchTerm);
-            // 【新增】当搜索词变化时自动执行搜索
+            // Automatically perform searches when search terms change
             if (searchTerm.trim()) {
-                // 直接在这里执行搜索逻辑，而不是调用handleSearch
                 const searchLower = searchTerm.toLowerCase();
                 const results = originalUploads.filter(item => {
                     const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
@@ -110,7 +99,7 @@ const UploadHistory: React.FC = () => {
                 setSearchResults(results);
                 setIsSearchActive(true);
             } else {
-                // 【新增】清空搜索时恢复原始数据
+                // Restore original data when clearing search
                 setIsSearchActive(false);
                 setSearchResults([]);
             }
@@ -122,48 +111,47 @@ const UploadHistory: React.FC = () => {
     // Pull the current user's upload history from the backend /photos/history interface
     // Supports paging, filtering status, and server-side search
     const fetchUploads = async () => {
+        // Exit early if user ID is not available
         if (!user_id) return;
-
+        // Set loading state and clear previous errors
         setLoading(true);
         setError(null);
 
         try {
+            // Construct query parameters for the API request
             const params = new URLSearchParams({
                 user_id,
                 page: page.toString(),
                 limit: PAGE_SIZE.toString(),
             });
 
-            // 【修改】仅在非搜索状态下才添加服务端搜索参数
+            // Add server-side search parameters only when not in search mode.
             if (!isSearchActive && debouncedSearchTerm.trim()) {
                 params.append("search", debouncedSearchTerm.trim());
             }
-
+            // Add status filter if it's not set to "all"
             if (statusFilter !== "all") {
                 params.append("status", statusFilter);
             }
 
             console.log("Fetching with params:", params.toString()); // Debug log
-
+            // Send GET request to the backend API
             const response = await fetch(
                 `http://127.0.0.1:8000/photos/history?${params.toString()}`
             );
-
+            // Throw error if response is not successful
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
-
+            // Parse JSON response into expected structure
             const result: ApiResponse = await response.json();
             console.log("API Response:", result); // Debug log
-
-            // 适配新的API响应格式
+            // If response contains valid photo array, update state
             if (result.photos && Array.isArray(result.photos)) {
                 setUploads(result.photos);
-                // 【新增】缓存原始数据用于客户端搜索
                 setOriginalUploads(result.photos);
                 setTotal(result.total_count|| 0);
             } else {
-                // 兼容旧的API响应格式
                 const uploadsData = Array.isArray(result) ? result : [];
                 setUploads(uploadsData);
                 setOriginalUploads(uploadsData);
@@ -171,14 +159,16 @@ const UploadHistory: React.FC = () => {
             }
 
         } catch (err) {
+            // Handle fetch or parsing errors
             console.error("Failed to fetch upload history:", err);
             setError(t('uploadHistory.failedLoadMessage'));
             setUploads([]);
             setOriginalUploads([]);
             setTotal(0);
         } finally {
+            // Reset loading state
             setLoading(false);
-            // 如果当前处于搜索状态，重新执行搜索
+            // If search is active, re-filter results based on search term
             if (isSearchActive && searchTerm.trim()) {
                 setTimeout(() => {
                     const searchLower = searchTerm.toLowerCase();
@@ -196,7 +186,7 @@ const UploadHistory: React.FC = () => {
         fetchUploads();
     }, [user_id, page, statusFilter]); // Triggers a data reload when the user ID, current page, or status filter changes;
 
-    // 【新增】Website-Suchfunktion
+    // Website-Suchfunktion
     const handleSearch = () => {
         if (!searchTerm.trim()) {
             setSearchResults([]);
@@ -206,16 +196,8 @@ const UploadHistory: React.FC = () => {
 
         const searchLower = searchTerm.toLowerCase();
         const results = originalUploads.filter(item => {
-            // 搜索建筑地址
+            // Searching building address
             const addressMatch = item.building_addr?.toLowerCase().includes(searchLower);
-            // 搜索状态
-            //const statusMatch = item.status.toLowerCase().includes(searchLower);
-            // 搜索photo_id
-            //const photoIdMatch = item.photo_id.toLowerCase().includes(searchLower);
-            // 搜索反馈内容
-            //const feedbackMatch = item.feedback?.toLowerCase().includes(searchLower);
-
-            //return addressMatch || statusMatch || photoIdMatch || feedbackMatch;
             return addressMatch;
         });
 
@@ -225,7 +207,7 @@ const UploadHistory: React.FC = () => {
         console.log(`Search for "${searchTerm}" found ${results.length} results`);
     };
 
-    // 【新增】高亮显示搜索文本
+    // Highlight search text
     const highlightText = (text: string, searchTerm: string) => {
         if (!searchTerm.trim() || !isSearchActive) return text;
 
@@ -267,13 +249,13 @@ const UploadHistory: React.FC = () => {
         setSelectedItem(null);
     };
 
-    //Handling changes to the search input box - 【修改】移除自动重置页面逻辑
+    //Handling changes to the search input box
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
-        // 【修改】移除自动重置页面，改为在搜索时处理
+
     };
 
-    // 【新增】清除搜索功能
+    // Clear search input
     const handleClearSearch = () => {
         setSearchTerm("");
         setSearchResults([]);
@@ -283,8 +265,7 @@ const UploadHistory: React.FC = () => {
     //Handling changes in status filtering
     const handleStatusFilterChange = (e: any) => {
         setStatusFilter(e.target.value);
-        setPage(1); // 重置到第一页
-        // 【新增】状态筛选时，如果有搜索则重新搜索
+        setPage(1);
         if (isSearchActive && searchTerm.trim()) {
             setTimeout(() => handleSearch(), 100);
         }
@@ -311,11 +292,6 @@ const UploadHistory: React.FC = () => {
             return "Invalid date";
         }
 
-        //try {
-          //  return new Date(dateString).toLocaleString();
-        //} catch {
-          //  return "Invalid date";
-        //}
     };
     //Status Display Formatting
     const getStatusDisplayName = (status: string) => {
@@ -323,10 +299,10 @@ const UploadHistory: React.FC = () => {
     };
 
 
-    // 【新增】获取当前显示的数据 - 根据是否在搜索状态决定显示哪些数据
+    // Retrieve the currently displayed data - Determine which data to display based on whether the system is in search mode.
     const getCurrentDisplayData = () => {
         if (isSearchActive) {
-            // 如果在搜索状态，还需要根据状态筛选搜索结果
+            // If in search mode, search results must also be filtered based on status.
             if (statusFilter === "all") {
                 return searchResults;
             } else {
@@ -337,7 +313,7 @@ const UploadHistory: React.FC = () => {
         }
     };
 
-    // 【新增】获取当前显示数据的总数
+    // Get the total count of currently displayed data
     const getCurrentTotal = () => {
         if (isSearchActive) {
             return getCurrentDisplayData().length;
@@ -370,7 +346,7 @@ const UploadHistory: React.FC = () => {
                 </Alert>
             )}
 
-            {/* 【修改】搜索和筛选区域 - 改进搜索框UI和功能 */}
+            {/* Search and Filter Area */}
             <Box display="flex" gap={2} mb={2} sx={{ flexShrink: 0,width:"100%", }}>
                 {!isMobile && (
                     <TextField
@@ -445,7 +421,7 @@ const UploadHistory: React.FC = () => {
                 </FormControl>
             </Box>
 
-            {/* 【新增】搜索结果提示 */}
+            {/* Search Results Tips */}
             {isSearchActive && (
                 <Box sx={{ mb: 2 }}>
                     <Alert severity="info" sx={{ py: 1 }}>
@@ -502,7 +478,7 @@ const UploadHistory: React.FC = () => {
                                             </Box>
                                         )}
 
-                                        {/* 信息区域 */}
+                                        {/* Context */}
                                         <Box mt={2}>
                                             <Typography variant="body2" fontWeight="bold">
                                                 {item.building_addr
@@ -524,7 +500,6 @@ const UploadHistory: React.FC = () => {
                             ))}
                         </Box>
                     ) : (
-                        /* 原始 PC 表格保留 */
                         <TableContainer
                             component={Paper}
                             sx={{
@@ -615,7 +590,7 @@ const UploadHistory: React.FC = () => {
                         </TableContainer>
                     )}
 
-                    {/* 【修改】分页 - 根据搜索状态调整分页逻辑 */}
+                    {/* Pagination - Adjust pagination logic based on search status */}
                     {!isSearchActive && currentTotal > PAGE_SIZE && (
                         <Box mt={2} display="flex" justifyContent="center">
                             <Pagination
@@ -631,7 +606,7 @@ const UploadHistory: React.FC = () => {
                         </Box>
                     )}
 
-                    {/* 【新增】搜索模式下的简单分页提示 */}
+                    {/* Simple pagination prompt in search mode */}
                     {isSearchActive && currentDisplayData.length > 0 && (
                         <Box mt={2} display="flex" justifyContent="center">
                             <Typography variant="body2" color="textSecondary">
@@ -642,7 +617,7 @@ const UploadHistory: React.FC = () => {
                 </>
             )}
 
-            {/* 详情弹窗 - 【修改】增加搜索高亮 */}
+            {/* Details Popup */}
             <Dialog
                 open={detailOpen}
                 onClose={handleDetailClose}
@@ -650,7 +625,7 @@ const UploadHistory: React.FC = () => {
                 fullWidth
                 PaperProps={{
                     sx: {
-                        maxHeight: '90vh', // 限制弹窗最大高度
+                        maxHeight: '90vh',
                         overflow: 'hidden'
                     }
                 }}
