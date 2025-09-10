@@ -29,7 +29,7 @@ const LoadingPage=()=>{
         topContent: {
             paddingTop: { xs: "30vh", sm: "22vh", md: "25vh" },
             zIndex: 2,
-            px: { xs: 2, sm: 3, md: 4 }, // 添加水平内边距
+            px: { xs: 2, sm: 3, md: 4 },
         },
         background: {
             position: "absolute",

@@ -111,7 +111,7 @@ const Sidebar = ({ open, onClose, variant }: SidebarProps) => {
                 <Box>
                     <Divider />
                     <List>
-                        {/* 添加语言选择器 */}
+                        {/*  a language selector */}
                         <ListItem disablePadding>
                             <ListItemButton onClick={toggleLanguage}>
                                 <ListItemIcon><Language /></ListItemIcon>
