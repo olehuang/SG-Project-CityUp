@@ -35,6 +35,33 @@ const Tutorial = () => {
     const [mobileOpen, setMobileOpen] = useState(false); // Control whether mobile drawer is open
     const {t} = useTranslation();    // Translation hook for internationalization
 
+    const containerRef = useRef<HTMLDivElement>(null);
+
+    // This component temporarily disables vertical scrolling on both the document body
+    // and the parent container of a referenced element while it is mounted.
+    // Scrolling behavior is restored automatically when the component unmounts.
+    useEffect(() => {
+        if (containerRef.current) {
+            const parentContainer = containerRef.current.parentElement;
+            if (parentContainer) {
+                const originalOverflow = parentContainer.style.overflowY;
+                parentContainer.style.overflowY = 'hidden';
+
+                return () => {
+                    parentContainer.style.overflowY = originalOverflow;
+                };
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, []);
+
     //  Fetch user roles from Keycloak if token is available
     useEffect(() => {
         const fetchRoles = async () => {
@@ -1697,6 +1724,7 @@ const Tutorial = () => {
     };
     return (
         <Box
+            ref={containerRef}
             sx={{
                 ...pageBackgroundStyles.container,
                 display: "flex",
@@ -1705,6 +1733,12 @@ const Tutorial = () => {
                 alignItems: "stretch",
                 minHeight: "100vh",
                 overflow: "hidden",
+                // 隐藏外部滚动条的样式
+                '&::-webkit-scrollbar': {
+                    display: 'none',
+                },
+                '-ms-overflow-style': 'none',  // IE 和 Edge
+                'scrollbar-width': 'none',     // Firefox
             }}
         >
             {/* Sidebar menu — visible on both desktop and mobile */}
@@ -1717,11 +1751,17 @@ const Tutorial = () => {
                     height: "calc(100vh - 64px)",
                     borderRight: "1px solid #ddd",
                     backgroundColor: "#FFF8E1",
-                    overflowY: "hidden",
+                    overflowY: "auto",
                     zIndex: 900,
                     padding: 0,
                     transform: isMobile && !mobileOpen ? `translateX(-${drawerWidth * 0.8}px)` : 'translateX(0)',
                     transition: 'transform 0.3s ease-in-out',
+                    // 隐藏滚动条但保持滚动
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                    '-ms-overflow-style': 'none',
+                    'scrollbar-width': 'none',
                 }}
             >
                 <Box sx={{ overflow: "hidden", p: 2 }}>
@@ -1898,14 +1938,17 @@ const Tutorial = () => {
                 sx={{
                     flexGrow: 1,
                     marginLeft: isMobile ? 0 : `${drawerWidth}px`,
-                    //marginLeft: `${drawerWidth}px`,
-                    //height: "100vh",
                     minHeight: 0,
                     padding: isMobile ? 2 : 3,
-                    //padding: 3,
                     backgroundColor: "#FFF8E1",
-                    overflowY: "auto",
-                    paddingBottom: '80px'
+                    overflowY: "auto",  // 保持可滚动
+                    paddingBottom: '80px',
+                    // 隐藏滚动条但保持滚动功能
+                    '&::-webkit-scrollbar': {
+                        display: 'none',
+                    },
+                    '-ms-overflow-style': 'none',  // IE 和 Edge
+                    'scrollbar-width': 'none',     // Firefox
                 }}
             >
                 <Box sx={{ paddingTop: isMobile ? "60px" : 0 }}>

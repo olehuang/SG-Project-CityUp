@@ -1,26 +1,25 @@
 
 const pageBackgroundStyles = {
-        // Outer container style for the entire page layout
-        container: {
-            minHeight: "100vh",
-            flexDirection: "column",
-            margin: 0,
-            boxSizing: "border-box",
-            backgroundColor: "#FFF8E1",
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            maxWidth: "100vw",
-            overflow: "hidden",
-        },
-    // Wrapper for inner content, used to constrain width and add padding
-        wrapper: {
-            width: "100%",
-            maxWidth: "1000px",
-            marginTop: "1rem",
-            padding: "0 1rem",
-        },
-    // Title style used for section headers
+    container: {
+        height: "100%",
+        margin: 0,
+        //padding: "1% 1%",
+        boxSizing: "border-box",
+        backgroundColor: "#FFF8E1",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        overflowY: "hidden",
+        flexDirection: "column",
+        maxWidth: "100vw",
+        overflowX: "hidden",
+    },
+    wrapper: {
+        width: "100%",
+        maxWidth: "1000px",
+        marginTop: "1rem",
+        padding: "0 1rem",
+    },
     title: {
         fontWeight: "bold",
         color: "#3E2723",
