@@ -548,7 +548,7 @@ const Upload: React.FC = () => {
                     width: isSmallScreen ? "100%" : "32%",
                     overflowY:isMobile? "visible":"auto",
                     padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `118px 6vw 44px 38px`), // ← 用isMobile微调padding
+                        : (isSmallScreen ? "20px" : `100px 6vw 44px 38px`), // ← 用isMobile微调padding// up before change =118px
                     boxSizing: "border-box",
                     display: "flex",
                     flexDirection: "column",
@@ -566,7 +566,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "10px 12px",
+                            padding: "8px 12px",//up/down before change 10px
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
@@ -595,7 +595,7 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "10px 12px",
+                            padding: "8px 12px",//up/down before change 10px
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
