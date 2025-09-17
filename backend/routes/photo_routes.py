@@ -108,8 +108,8 @@ async def upload_photo(
                 if not blurry_ok:
                     result_auto_check = ReviewStatus.Rejected
             else:
-                """ 
-                For images with EXIF data, verify the URL first, then check image clarity. 
+                """
+                For images with EXIF data, verify the URL first, then check image clarity.
                 Only set the status to pending if all checks pass.
                 """
                 building_gps = (lat, lng)
@@ -579,7 +579,7 @@ async def get_first_upload_time(address: str,request:Request):
         raise HTTPException(status_code=500, detail="Server error while fetching photo list.")
 
 
-# New: Upload History Interface
+# New: Upload history endpoint
 @router.get("/history", response_model=UploadHistoryResponse)
 async def get_upload_history(
         request: Request,
@@ -589,13 +589,13 @@ async def get_upload_history(
         status: Optional[str] = Query(None, description="筛选状态: pending, reviewing, approved, rejected")
 ):
     """
-    Retrieve the user's upload history, supporting pagination and status filtering.
+    Retrieve a user's upload history with optional status filtering and pagination.
     """
     try:
-        # Build query conditions
+        # Build query conditions based on user ID and optional status
         query = {"user_id": user_id}
         if status:
-            # Convert the status string to the corresponding enumeration value
+            # Map status string to internal enum values
             status_mapping = {
                 "pending": ReviewStatus.Pending.value,
                 "reviewing": ReviewStatus.Reviewing.value,
@@ -607,9 +607,10 @@ async def get_upload_history(
             else:
                 raise HTTPException(status_code=400, detail=f"Invalid status: {status}")
 
-        # Calculate the total
+        # Count total matching documents
         total_count = await photo_collection.count_documents(query)
 
+        # Return empty response if no data found
         if total_count == 0:
             return UploadHistoryResponse(
                 photos=[],
@@ -619,20 +620,21 @@ async def get_upload_history(
                 total_pages=0
             )
 
-        # Calculate Paging
+        # Calculate total number of pages
         total_pages = math.ceil(total_count / limit)
 
-        # Calculate the number of skipped documents
+        # Calculate number of documents to skip for pagination
         skip = (page - 1) * limit
         print(f"DEBUG: Total count: {total_count}, Page: {page}, Limit: {limit}")
         print(f"DEBUG: Query conditions: {query}")
 
-        # Query Data
+        # Query photo documents with sorting and pagination
         photos_cursor = photo_collection.find(query).sort("upload_time", -1).skip(skip).limit(limit)
         print("Query for history:", query)
 
         photos = []
         async for photo_doc in photos_cursor:
+            # Convert MongoDB _id to string and assign to photo_id
             photo_doc["photo_id"] = str(photo_doc["_id"])
             photo_id = str(photo_doc["_id"])
             del photo_doc["_id"]
@@ -640,14 +642,12 @@ async def get_upload_history(
             # Compatible with legacy data
             if "building_id" in photo_doc and "building_addr" not in photo_doc:
                 photo_doc["building_addr"] = photo_doc["building_id"]
-
+            # Construct full image URL based on request origin
             photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_id}/data"
-            # Stitching Complete Image URL
-            # filename = photo_doc.get("filename")
-            # if filename:
-            #     photo_doc["image_url"] = str(request.base_url) + f"static/photos/{filename}"
+
             print(f"DEBUG: Successfully processed {len(photos)} photos")
 
+            # If photo was auto-rejected and has no reviewer, assign "admin"
             # For the system to automatically rejected photos show admin as reviewer
             # ======Set the reviewer to admin for photos automatically rejected by the system ======
             if (
@@ -657,7 +657,7 @@ async def get_upload_history(
                 photo_doc["reviewer_id"] = "admin"
             # ====================================================
             photos.append(PhotoResponse(**photo_doc))
-
+        # Return paginated response
         return UploadHistoryResponse(
             photos=photos,
             total_count=total_count,
@@ -667,19 +667,21 @@ async def get_upload_history(
         )
 
     except HTTPException:
+        # Re-raise known HTTP errors
         raise
     except Exception as e:
+        # Log unexpected errors and return server error response
         print(f"get_upload_history error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching upload history.")
 
-# New: Retrieve photo statistics
+# New: Endpoint to retrieve photo statistics for a specific user
 @router.get("/stats/{user_id}")
 async def get_user_photo_stats(user_id: str):
     """
     Retrieve user photo statistics
     """
     try:
-        # Use an aggregation pipeline to count the number of photos in each status.
+        # Use aggregation pipeline to count photos by status
         pipeline = [
             {"$match": {"user_id": user_id}},
             {"$group": {
@@ -692,12 +694,14 @@ async def get_user_photo_stats(user_id: str):
         stats_dict = {}
         total_count = 0
 
+        # Iterate through aggregation results
         async for stat in stats_cursor:
             status = stat["_id"]
             count = stat["count"]
             stats_dict[status] = count
             total_count += count
 
+        # Return structured statistics response
         return {
             "user_id": user_id,
             "total_photos": total_count,
@@ -708,5 +712,6 @@ async def get_user_photo_stats(user_id: str):
         }
 
     except Exception as e:
+        # Log error and return server error response
         print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")

@@ -320,7 +320,7 @@ export const photoReviewStyles = {
         boxShadow: "0 8px 32px rgba(0,0,0,0.3)"
     },
 
-
+    // mobile based
     cardContainer: {
         display: 'flex',
         flexDirection: 'column',
@@ -328,14 +328,14 @@ export const photoReviewStyles = {
         padding: '8px',
     },
 
-
+    // card
     card: {
         position: 'relative',
         borderRadius: 2,
         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
     },
 
-
+    // foto
     cardMedia: {
         cursor: 'pointer',
         height: 180,
@@ -344,7 +344,7 @@ export const photoReviewStyles = {
         borderTopRightRadius: 8,
     },
 
-
+    // context
     cardContent: {
         padding: '12px 16px',
         '& > p': {
@@ -354,14 +354,14 @@ export const photoReviewStyles = {
         },
     },
 
-
+    // button
     cardActions: {
         justifyContent: 'flex-end',
         gap: 8,
         padding: '8px 16px 16px',
     },
 
-
+    // checkbox
     cardCheckbox: {
         position: 'absolute',
         top: 8,

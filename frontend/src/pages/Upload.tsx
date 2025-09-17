@@ -4,6 +4,8 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { useAuthHook } from "../components/AuthProvider";
 import { useTranslation } from 'react-i18next';
+import uploadLayout from "./UploadLayout";
+
 
 //  Default Karolinenplatz.5, Tu Darmstadt S1|01 Audimax Darmstadt
 const DEFAULT_CENTER: [number, number] = [49.874727, 8.656193];
@@ -70,17 +72,7 @@ const Upload: React.FC = () => {
         window.addEventListener('resize', handleResize);
         return () => window.removeEventListener('resize', handleResize);
     }, []);
-    // Determine if it is a small screen
-    const isSmallScreen = windowWidth < 1200;
 
-    // 2. Added isMobile status
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
-    useEffect(() => {
-        const handleResize = () => setIsMobile(window.innerWidth <= 768);
-        handleResize();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, []);
 
     // Map page loads, requests location, automatically locates device
     useEffect(() => {
@@ -336,227 +328,81 @@ const Upload: React.FC = () => {
     }, [latlng]);
 
     return (
-        <div
-            style={{
-                width: "100%",
-                height: isMobile ? "90dvh" : undefined,
-                overflowY: isMobile ? "auto" : "hidden",//Mobile devices scroll to display content; desktop versions remain static.
-                background: "#FFF8E1",
-                display: "flex",
-                flexDirection: isMobile ? "column" : "row",
-                alignItems: "flex-start",
-                justifyContent: "stretch",
-                boxSizing: "border-box",
-                position: "relative",
-                padding: isSmallScreen ? "20px" : "0",
-                paddingBottom: isMobile ? "20px" : "0"
-            }}
-        >
-            {/* Left 2/3: Address input and map */}
-            <div
-                ref={leftSectionRef}
-                style={{
-                    flex: isSmallScreen ? "none" : 2,
-                    width: isSmallScreen ? "100%" : "68%",
-                    padding: isMobile ? "6px" : (isSmallScreen ? "20px" : "10px 38px 44px 6vw"),
-                    boxSizing: "border-box",
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "flex-start",
-                    position: "relative"
-                }}
-            >
-                <h1
-                    style={{
-                        fontSize: isMobile ? "1.3rem" : "2rem",
-                        fontWeight: 700,
-                        margin:"0 0 22px 0",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis"
-                    }}
-                >
-                    {t('UploadPhoto')}
-                </h1>
-                {/* Address entry and search */}
-                <div style={{ marginBottom: 16 }}>
-                    <label htmlFor="address"
-                           style={{
-                               display: "block",
-                               fontWeight: 400,
-                               fontSize: "0.9rem",
-                               marginBottom: 8,
-                           }}>
-                        {t('Uploaddesc')}
-                    </label>
-                    <div style={{ display: "flex", flexDirection: isSmallScreen ? "column" : "row", gap: 8, alignItems: "center", width: "100%" }}>
-                        {/* Door number input box */}
-                        {houseNumberMissing && (
-                            <input
-                                ref={houseNumberRef}
-                                type="text"
-                                value={houseNumber}
-                                onChange={(e) => {
-                                    const value = e.target.value.trim();
-                                    setHouseNumber(value);
-                                    const parts = address.split(", ");
-                                    const streetOnly = parts[0]?.replace(/\s+\d+[a-zA-Z]?$/, "") ?? parts[0];
-                                    // Reassemble “Street + New House Number”
-                                    parts[0] = value ? `${streetOnly} ${value}` : streetOnly;
-                                    setAddress(parts.filter(Boolean).join(", "));
-                                    //setHouseNumber(e.target.value);
-                                    //const parts = address.split(", ");
-                                    //parts[0] = e.target.value || "";
-                                    //setAddress(parts.filter(Boolean).join(", "));
-                                }}
-                                placeholder="Door Nr."
-                                style={{
-                                    width: isSmallScreen ? "100%" : 90,
-                                    fontSize: "0.9rem",
-                                    padding: "10px 12px",
-                                    border: "2px solid #e53935",
-                                    background: "#fff6f5",
-                                    borderRadius: 8,
-                                    boxSizing: "border-box",
-                                    minWidth: 0,
-                                    marginRight: isSmallScreen ? 0 : 8
-                                }}
-                                required
-                            />
-                        )}
-                        {/* Address input box and search button*/}
-                        <div style={{ display: "flex", flex: 1, width: "100%", gap: 8 }}>
-                            <input
-                                id="address"
-                                type="text"
-                                value={address}
-                                onChange={(e) => setAddress(e.target.value)}
-                                placeholder={t('AddAddress')}
-                                style={{
-                                    flex: 1,
-                                    fontSize: "0.9rem",
-                                    padding: "10px 15px",
-                                    border: "1px solid #aaa",
-                                    borderRadius: 8,
-                                    boxSizing: "border-box",
-                                    minWidth: "150px"
-                                }}
-                                onKeyDown={(e) => {
-                                    if (e.key === "Enter") handleAddressSearch();
-                                }}
-                            />
-                            <button
-                                onClick={handleAddressSearch}
-                                style={{
-                                    background: "#60a6fd",
-                                    color: "#fff",
-                                    border: "none",
-                                    borderRadius: 8,
-                                    padding: "10px 20px",
-                                    fontSize: "1rem",
-                                    cursor: "pointer",
-                                    flexShrink: 0,
-                                    whiteSpace: "nowrap"
-                                }}
-                            >
-                                {t('Search')}
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                {/* Missing door number alert*/}
-                {houseNumberMissing && (
-                    <div style={{ color: "#e53935", fontSize: 14, marginTop: isMobile?0:8 }}>
-                        The house number for this building is not available. Please enter it manually.
-                    </div>
-                )}
-                {/* Map */}
-                <div
-                    ref={mapDivRef}
-                    style={{
-                        width: "100%",
-                        height: isMobile ? "30vh" : (isSmallScreen ? "60vh" : "60vh"),
-                        maxHeight: 500,
-                        minHeight: isMobile ? 150 : (isSmallScreen ? 300 : 350),
-                        borderRadius: 16,
-                        overflow: "hidden",
-                        marginBottom: 8,
-                        border: "0.6px solid #eee",
-                        background: "#e0e0e0",
-                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-                    }}
-                >
-                    {latlng ? (
-                        <MapContainer
-                            center={latlng}
-                            zoom={18}
-                            style={{ width: "100%", height: "100%" }}
-                            scrollWheelZoom={true}
-                            maxBounds={MAX_BOUNDS}
-                            maxBoundsViscosity={1}
-                            worldCopyJump={false}
-                        >
-                            {/* To change the source, modify the URL, but this applies only to Leaflet. The property should be changed to the source.
-                            For OSM sources, the URL is “https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png”. */}
-                            <TileLayer
-                                url="/tiles/{z}/{x}/{y}.png"
-                                noWrap
-                                minZoom={17}
-                                maxZoom={21}
-                                attribution="&copy; Implemented by MZP using Unity and QGIS"
-                            />
-                            <Marker
-                                position={latlng}
-                                icon={markerIcon}
-                                draggable={true}
-                                eventHandlers={{
-                                    dragend: handleMarkerDragEnd,
-                                }}
-                            ></Marker>
-                            <SetMapRef />
-                            <LocationPicker />
-                        </MapContainer>
-                    ) : (
-                        <div
+        <div style={uploadLayout.container} className="upload-container">
+            {/* Top row: Left search box + Right button */}
+            <div style={uploadLayout.topRow} className="upload-topRow">
+                {/* Door number input box */}
+                <div style={{ flex: 2, display: "flex", gap: 8, alignItems: "center" }}>
+                    {houseNumberMissing && (
+                        <input
+                            ref={houseNumberRef}
+                            type="text"
+                            value={houseNumber}
+                            onChange={(e) => {
+                                const value = e.target.value.trim();
+                                setHouseNumber(value);
+                                const parts = address.split(", ");
+                                const streetOnly =
+                                    parts[0]?.replace(/\s+\d+[a-zA-Z]?$/, "") ?? parts[0];
+                                parts[0] = value ? `${streetOnly} ${value}` : streetOnly;
+                                setAddress(parts.filter(Boolean).join(", "));
+                            }}
+                            placeholder="Door Nr."
                             style={{
                                 width: "100%",
-                                height: "100%",
-                                display: "flex",
-                                alignItems: "center",
-                                justifyContent: "center",
-                                color: "#888",
-                                fontSize: 20,
+                                fontSize: "0.9rem",
+                                padding: "10px 12px",
+                                border: "2px solid #e53935",
+                                background: "#fff6f5",
+                                borderRadius: 8,
+                                boxSizing: "border-box",
                             }}
-                        >
-                            {locating ? t('uploadMessages.locating') : t('uploadMessages.mapLoadingFailed')}
-                        </div>
+                            required
+                        />
                     )}
+
+                    {/* Address input field */}
+                    <input
+                        id="address"
+                        type="text"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
+                        placeholder={t("AddAddress")}
+                        style={{
+                            flex: 1,
+                            fontSize: "0.9rem",
+                            padding: "10px 15px",
+                            border: "1px solid #aaa",
+                            borderRadius: 8,
+                            boxSizing: "border-box",
+                            minWidth: "150px",
+                        }}
+                        onKeyDown={(e) => {
+                            if (e.key === "Enter") handleAddressSearch();
+                        }}
+                    />
+                    <button
+                        onClick={handleAddressSearch}
+                        style={{
+                            background: "#60a6fd",
+                            color: "#fff",
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "10px 20px",
+                            fontSize: "1rem",
+                            cursor: "pointer",
+                            flexShrink: 0,
+                            whiteSpace: "nowrap",
+                        }}
+                    >
+                        {t("Search")}
+                    </button>
                 </div>
-                {/* Map operation */}
-                <div style={{
-                    textAlign: "center",
-                    marginTop: "10px",
-                    fontSize: isMobile?"0.5rem":"0.9rem",
-                    color: "#666"
-                }}>
-                    {t('mapdesc')}
-                </div>
-            </div>
-            {/* Right Area - Photo Upload*/}
-            <div
-                style={{
-                    flex: isSmallScreen ? "none" : 1,
-                    width: isSmallScreen ? "100%" : "32%",
-                    overflowY:isMobile? "visible":"auto",
-                    padding: isMobile ? "6px"
-                        : (isSmallScreen ? "20px" : `100px 6vw 44px 38px`), // ← 用isMobile微调padding// up before change =118px
-                    boxSizing: "border-box",
-                    display: "flex",
-                    flexDirection: "column",
-                    background: "transparent",
-                }}
-            >
-                {/*Photo/Album button*/}
-                <div style={{ marginBottom: isMobile? "opx" : 16, display: "flex", flexWrap: "wrap", gap: "10px" }}>
+
+                {/* Right button area */}
+                <div
+                    style={{ flex: 1, display: "flex", gap: "1rem", justifyContent: "flex-end" }}
+                >
                     <button
                         onClick={handleTakePhoto}
                         style={{
@@ -566,25 +412,16 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "8px 12px",//up/down before change 10px
+                            padding: "10px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
                             color: "#60a6fd",
                             cursor: "pointer",
                             minWidth: "140px",
-                            transition: "all 0.2s"
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.background = "#60a6fd";
-                            e.currentTarget.style.color = "#fffde7";
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.background = "#fffde7";
-                            e.currentTarget.style.color = "#60a6fd";
                         }}
                     >
-                        <span role="img" aria-label="camera">📷</span> {t('Camera')}
+                        📷 {t("Camera")}
                     </button>
                     <button
                         onClick={handleSelectFromGallery}
@@ -595,25 +432,16 @@ const Upload: React.FC = () => {
                             justifyContent: "center",
                             gap: 8,
                             fontSize: 16,
-                            padding: "8px 12px",//up/down before change 10px
+                            padding: "10px 12px",
                             borderRadius: 8,
                             border: "1px solid #888",
                             background: "#fffde7",
                             color: "#4da151",
                             cursor: "pointer",
                             minWidth: "140px",
-                            transition: "all 0.2s"
-                        }}
-                        onMouseOver={(e) => {
-                            e.currentTarget.style.background = "#4da151";
-                            e.currentTarget.style.color = "#fffde7";
-                        }}
-                        onMouseOut={(e) => {
-                            e.currentTarget.style.background = "#fffde7";
-                            e.currentTarget.style.color = "#4da151";
                         }}
                     >
-                        <span role="img" aria-label="gallery">🖼️</span> {t('Album')}
+                        🖼️ {t("Album")}
                     </button>
                     <input
                         type="file"
@@ -624,157 +452,218 @@ const Upload: React.FC = () => {
                         onChange={handleFileChange}
                     />
                 </div>
-
-                {/* Photo thumbnail area*/}
-                <div style={{
-                    display: "flex",
-                    gap: 10,
-                    flexWrap: "wrap",
-                    minHeight: isMobile? 60 : 90,
-                    //overflow: "auto",
-                    paddingBottom:isMobile ? "5px" : undefined,
-                }}>
-                    {photos.map((photo) => (
-                        <div key={photo.id} style={{ position: "relative" }}>
-                            <img
-                                src={photo.previewUrl}
-                                alt="thumbnail image"
-                                style={{
-                                    width: 78,
-                                    height: 78,
-                                    objectFit: "cover",
-                                    borderRadius: 8,
-                                    border: "1px solid #ddd",
-                                    display: "block",
-                                    boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
-                                }}
-                            />
-                            <button
-                                onClick={() => removePhoto(photo.id)}
-                                style={{
-                                    position: "absolute",
-                                    top: 1,
-                                    right: 1,
-                                    width: 22,
-                                    height: 22,
-                                    borderRadius: "50%",
-                                    border: "none",
-                                    background: "#ee9292",
-                                    color: "#fff",
-                                    fontSize: 14,
-                                    cursor: "pointer",
-                                    lineHeight: "20px",
-                                    zIndex: 2,
-                                }}
-                                title={t('uploadMessages.deletePhoto')}
-                            >
-                                ×
-                            </button>
-                        </div>
-                    ))}
-                </div>
-                {/* Explanation of filming requirements */}
-                <div
-                    style={{
-                        fontSize:  isMobile ? "0.7rem" : "0.98rem",
-                        background: "#fffde7",
-                        borderRadius: 12,
-                        padding: isMobile ? "10px" : "16px",
-                        marginBottom: "16px",
-                        border: "1px solid #f5e79e",
-                        boxSizing: "border-box",
-                        boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
-                        flexGrow: isMobile ? 0 : 1
-                    }}
-                >
-                    <h3 style={{
-                        margin: "0 0 12px 0",
-                        fontSize: isMobile?"0.9rem":"1.1rem",
-                        display: "flex",
-                        alignItems: "center",
-                        gap: isMobile?"3px":"8px",
-                    }}>
-                        <span>📋</span> {t('photoRequirements.title')}
-                    </h3>
-                    <ul style={{paddingLeft: 22, margin: 0, lineHeight: 1.6}}>
-                        <li><strong>{t('photoRequirements.pls')}</strong> {t('photoRequirements.desc')}
-                        </li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noFaces')}</li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noObstructions')}</li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noShadows')}</li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.noDistortion')}</li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.clear')}</li>
-                        <li><strong>{t('photoRequirements.no')}</strong> {t('photoRequirements.wholeBuilding')}</li>
-
-                    </ul>
-                </div>
-                {/* error handle*/}
-                {error && (
-                    <div
-                        style={{
-                            background: error.includes("successful") ? "#e1f7d5" : "#ffd6d6",
-                            color: error.includes("successful") ? "#237a00" : "#b71c1c",
-                            padding: "12px 16px",
-                            marginBottom: 10,
-                            borderRadius: 8,
-                            fontWeight: 500,
-                            border: `1px solid ${error.includes("successful") ? "#a5d6a7" : "#ffcdd2"}`,
-                            display: "flex",
-                            alignItems: "center",
-                            gap: "10px"
-                        }}
-                    >
-                        <span>{error.includes("successful") ? "✅" : "⚠️"}</span>
-                        <div>{error}</div>
-                    </div>
-                )}
-
-                {/* Submit button*/}
-                <button
-                    onClick={handleSubmit}
-                    disabled={isSubmitting}
-                    style={{
-                        width: "100%",
-                        background: isSubmitting ? "#aaa" : "#4da151",
-                        color: "#fff",
-                        fontSize: "1.1rem",
-                        fontWeight: 700,
-                        border: "none",
-                        borderRadius: 8,
-                        padding: "14px 0",
-                        cursor: isSubmitting ? "not-allowed" : "pointer",
-                        boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-                        transition: "background 0.3s",
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        gap: "10px",
-                        marginTop:isMobile?"12px":"16px",
-                    }}
-                >
-                    {isSubmitting ? (
-                        <>
-                            <div style={{
-                                width: 16,
-                                height: 16,
-                                border: "2px solid rgba(255,255,255,0.3)",
-                                borderTop: "2px solid white",
-                                borderRadius: "50%",
-                                animation: "spin 1s linear infinite"
-                            }}></div>
-                            {t('uploadMessages.submitting')}
-                        </>
-                    ) : t('uploadMessages.submit')}
-                </button>
             </div>
 
-            {/* Add animation style */}
+            {/* Prompt when no house number is available */}
+            {houseNumberMissing && (
+                <div style={{ color: "#e53935", fontSize: 14, marginTop: 8 }}>
+                    The house number for this building is not available. Please enter it manually.
+                </div>
+            )}
+
+            {/* Bottom row: Left side map + Four blocks on the right */}
+            <div style={uploadLayout.bottomRow} className="upload-bottomRow">
+                {/* Map on the left */}
+                <div style={uploadLayout.leftColumn} className="upload-leftColumn">
+                    <div
+                        ref={mapDivRef}
+                        style={{
+                            width: "100%",
+                            height: "60vh",
+                            borderRadius: 16,
+                            overflow: "hidden",
+                            background: "#e0e0e0",
+                            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        }}
+                    >
+                        {latlng ? (
+                            <MapContainer
+                                center={latlng}
+                                zoom={18}
+                                style={{ width: "100%", height: "100%" }}
+                                scrollWheelZoom={true}
+                                maxBounds={MAX_BOUNDS}
+                                maxBoundsViscosity={1}
+                                worldCopyJump={false}
+                            >
+                                <TileLayer
+                                    url="/tiles/{z}/{x}/{y}.png"
+                                    noWrap
+                                    minZoom={17}
+                                    maxZoom={21}
+                                    attribution="&copy; Implemented by MZP using Unity and QGIS"
+                                />
+                                <Marker
+                                    position={latlng}
+                                    icon={markerIcon}
+                                    draggable={true}
+                                    eventHandlers={{ dragend: handleMarkerDragEnd }}
+                                />
+                                <SetMapRef />
+                                <LocationPicker />
+                            </MapContainer>
+                        ) : (
+                            <div
+                                style={{
+                                    width: "100%",
+                                    height: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    color: "#888",
+                                    fontSize: 20,
+                                }}
+                            >
+                                {locating
+                                    ? t("uploadMessages.locating")
+                                    : t("uploadMessages.mapLoadingFailed")}
+                            </div>
+                        )}
+                    </div>
+                    <div style={{ textAlign: "center", marginTop: "10px", fontSize: "0.9rem", color: "#666" }}>
+                        {t("mapdesc")}
+                    </div>
+                </div>
+
+                {/* The vertical section on the right */}
+                <div style={uploadLayout.rightColumn} className="upload-rightColumn">
+                    {/* Photo thumbnails */}
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 10, minHeight: 90 }}>
+                        {photos.map((photo) => (
+                            <div key={photo.id} style={{ position: "relative" }}>
+                                <img
+                                    src={photo.previewUrl}
+                                    alt="thumbnail"
+                                    style={{
+                                        width: 78,
+                                        height: 78,
+                                        objectFit: "cover",
+                                        borderRadius: 8,
+                                        border: "1px solid #ddd",
+                                        boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                    }}
+                                />
+                                <button
+                                    onClick={() => removePhoto(photo.id)}
+                                    style={{
+                                        position: "absolute",
+                                        top: 1,
+                                        right: 1,
+                                        width: 22,
+                                        height: 22,
+                                        borderRadius: "50%",
+                                        border: "none",
+                                        background: "#ee9292",
+                                        color: "#fff",
+                                        fontSize: 14,
+                                        cursor: "pointer",
+                                    }}
+                                >
+                                    ×
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Shooting Requirements */}
+                    <div
+                        style={{
+                            fontSize: "0.98rem",
+                            background: "#fffde7",
+                            borderRadius: 12,
+                            padding: "16px",
+                            marginBottom: "16px",
+                            border: "1px solid #f5e79e",
+                            boxShadow: "0 2px 8px rgba(0,0,0,0.05)",
+                        }}
+                    >
+                        <h3 style={{ margin: "0 0 12px 0", fontSize: "1.1rem", display: "flex", alignItems: "center", gap: "8px" }}>
+                            <span>📋</span> {t("photoRequirements.title")}
+                        </h3>
+                        <ul style={{ paddingLeft: 22, margin: 0, lineHeight: 1.6 }}>
+                            <li><strong>{t("photoRequirements.pls")}</strong> {t("photoRequirements.desc")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noFaces")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noObstructions")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noShadows")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noDistortion")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.clear")}</li>
+                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.wholeBuilding")}</li>
+                        </ul>
+                    </div>
+
+                    {/* Error Message */}
+                    {error && (
+                        <div
+                            style={{
+                                background: error.includes("successful") ? "#e1f7d5" : "#ffd6d6",
+                                color: error.includes("successful") ? "#237a00" : "#b71c1c",
+                                padding: "12px 16px",
+                                marginBottom: 10,
+                                borderRadius: 8,
+                                fontWeight: 500,
+                                border: `1px solid ${
+                                    error.includes("successful") ? "#a5d6a7" : "#ffcdd2"
+                                }`,
+                                display: "flex",
+                                alignItems: "center",
+                                gap: "10px",
+                            }}
+                        >
+                            <span>{error.includes("successful") ? "✅" : "⚠️"}</span>
+                            <div>{error}</div>
+                        </div>
+                    )}
+
+                    {/* Submit button */}
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                        style={{
+                            width: "100%",
+                            background: isSubmitting ? "#aaa" : "#4da151",
+                            color: "#fff",
+                            fontSize: "1.1rem",
+                            fontWeight: 700,
+                            border: "none",
+                            borderRadius: 8,
+                            padding: "14px 0",
+                            cursor: isSubmitting ? "not-allowed" : "pointer",
+                            boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            gap: "10px",
+                        }}
+                    >
+                        {isSubmitting ? (
+                            <>
+                                <div
+                                    style={{
+                                        width: 16,
+                                        height: 16,
+                                        border: "2px solid rgba(255,255,255,0.3)",
+                                        borderTop: "2px solid white",
+                                        borderRadius: "50%",
+                                        animation: "spin 1s linear infinite",
+                                    }}
+                                ></div>
+                                {t("uploadMessages.submitting")}
+                            </>
+                        ) : (
+                            t("uploadMessages.submit")
+                        )}
+                    </button>
+                </div>
+            </div>
+
+            {/* loading animation */}
             <style>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
+      @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+      }
+    `}</style>
         </div>
     );
-};export default Upload;
+};
+export default Upload;
