@@ -4,8 +4,9 @@ import pageBackgroundStyles from "./pageBackgroundStyles";
 import React from "react";
 import { useTranslation } from 'react-i18next';
 /**
- * 产品介绍组件（ProductIntroduction）
- * 用于展示CityUp项目简介、用户参与流程及操作入口，适配多端显示。
+ * Product Introduction（ProductIntroduction）
+ * This component displays the CityUp project overview, user engagement process,
+ * and user interface, and is compatible with multiple displays.
  *
  * Component for showing CityUp project introduction, participation steps, and main entry buttons. Responsive layout.
  */
@@ -24,7 +25,7 @@ const ProductIntroduction=()=>{
             }}>
                 <Typography variant="h3" component="h2" sx={{
                     ...pageBackgroundStyles.title,
-                    // 在移动端使用更小的字体，但保持你的响应式设计
+                    // Use smaller fonts on mobile, but keep your design responsive
                     fontSize: {
                         xs: '3rem',  // MODIFIED for mobile
                         sm: '4rem',
@@ -34,7 +35,7 @@ const ProductIntroduction=()=>{
                     textAlign: 'center',
                     lineHeight: 1.1,
                     maxWidth: '100vw',
-                    overflowX: 'hidden',  // 防止横向滚动
+                    overflowX: 'hidden',  // Prevent horizontal scrolling
                     overflow:"hidden",//monitor adapter
                 }}>
                     {t('productIntro.title')}
