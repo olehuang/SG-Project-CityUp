@@ -256,5 +256,26 @@ async def delet_all_photos():
     result =  await photo_collection.delete_many({})
     print(f"Deleted {result.deleted_count} photos")
 
-
+async def delete_photo(id:str,user_id:str):
+    """
+    (Photo Gallery) delete photo by id
+     only photo onwer can delete
+    :param id: which photo will be deleted
+    :param user_id: which user wants to delete photo by id
+    :return:
+    """
+    try:
+        photoId=ObjectId(id)
+        photo = await photo_collection.find_one({"_id":photoId})
+        if not photo:
+            log_error("photo not exist", stack_data=traceback.format_exc())
+            raise HTTPException(status_code=404, detail=f"Photo not found")
+        else:
+            if user_id != photo.get("user_id"):
+                log_error("Only photo onwer can deleted", stack_data=traceback.format_exc())
+                raise HTTPException(status_code=403, detail=f"Only photo onwer can deleted")
+            else:
+                await photo_collection.delete_one({"_id":photoId})
+    except Exception as e:
+        raise HTTPException(status_code=404, detail=f"Photo not found")
 

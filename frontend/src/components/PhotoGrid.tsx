@@ -3,6 +3,7 @@ import {Box, Typography, Dialog, DialogTitle, DialogContent, Button, IconButton}
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Modal from '@mui/material/Modal';
+import DeleteIcon from '@mui/icons-material/Delete';
 import axios from "axios";
 import {useAuthHook} from "./AuthProvider";
 import KeycloakClient from "./keycloak";
@@ -192,6 +193,24 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
         }
     }
 
+    const delete_photo= async (photo:Photo)=>{
+        const baseUrl = "http://localhost:8000/photos/delete_photo";
+        const confirmText = prompt("Please type \"delete\" to confirm deletion of the photo:");
+        if (confirmText !== "delete") {
+            alert("Delete operation canceled。");
+            return;
+        }
+        try{
+            await axios.post(baseUrl,{},{params:{photo_id:photo.id,user_id:user_id}})
+            setOpen(false);
+            setSelectedPhotoIndex(null);
+
+            window.location.reload();
+        }catch (err: any) {
+            console.log(err)
+        }
+    }
+
     return (
         <>
             <Box
@@ -259,6 +278,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         {t("photoGallery.photoDetails.uploadUser")}: {photos[selectedPhotoIndex].uploader}</Typography>
                                     <Typography variant="body1">
                                         {t("photoGallery.photoDetails.favoriteNr")}: {photos[selectedPhotoIndex].likeCount}</Typography>
+
                                 </Box>
                                     <Box sx={{
                                         display: "flex",
@@ -266,12 +286,25 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                         justifyContent: "space-between",
                                         alignItems:"center"
                                     }}>
-                                        <Button startIcon={<FavoriteBorder
-                                            sx={{color: photos[selectedPhotoIndex].is_like ? "red": "gray"}} />}
-                                                onClick={()=>handleLikeToggle(photos[selectedPhotoIndex])}
-                                                 sx={{visibility: photos[selectedPhotoIndex].canLike ?  "visible" : "hidden"}}
+                                        {photos[selectedPhotoIndex].canLike && <Button startIcon={<FavoriteBorder
+                                            sx={{color: photos[selectedPhotoIndex].is_like ? "red" : "gray"}}/>}
+                                                 onClick={() => handleLikeToggle(photos[selectedPhotoIndex])}
+                                                 sx={{visibility: photos[selectedPhotoIndex].canLike ? "visible" : "hidden"}}
                                         > {photos[selectedPhotoIndex].is_like ? t("photoGallery.dislikeButton")
-                                            : t("photoGallery.favoriteButton")}</Button>
+                                            : t("photoGallery.favoriteButton")}</Button>}
+                                        <Button
+                                            variant="outlined"
+                                            color={"error"}
+                                            sx={{
+                                                justifyContent: "end", alignItems: "center",
+                                                visibility: photos[selectedPhotoIndex].uploader_id === user_id ? "visible" : "hidden",
+                                            }}
+                                            onClick={()=> {
+                                                delete_photo(photos[selectedPhotoIndex])
+                                            }}
+                                            startIcon={<DeleteIcon />}>
+                                            Delete
+                                        </Button>
                                         <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
                                            download
                                            style={{textDecoration: "none"}}

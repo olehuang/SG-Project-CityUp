@@ -715,3 +715,19 @@ async def get_user_photo_stats(user_id: str):
         # Log error and return server error response
         print(f"get_user_photo_stats error for user {user_id}:", traceback.format_exc())
         raise HTTPException(status_code=500, detail="Server error while fetching photo statistics.")
+
+
+@router.post("/delete_photo")
+async def delete_photo(photo_id: str, user_id: str):
+    """
+    Delete photo from database
+    :param photo_id:
+    :param user_id:
+    :return:
+    """
+    try:
+        return await db_photoEntities.delete_photo(photo_id,user_id)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Server error while deleting photo.")
+
+
