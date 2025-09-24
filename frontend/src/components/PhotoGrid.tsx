@@ -195,11 +195,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
 
     const delete_photo= async (photo:Photo)=>{
         const baseUrl = "http://localhost:8000/photos/delete_photo";
-        const confirmText = prompt("Please type \"delete\" to confirm deletion of the photo:");
-        if (confirmText !== "delete") {
-            alert("Delete operation canceled。");
-            return;
-        }
+
         try{
             await axios.post(baseUrl,{},{params:{photo_id:photo.id,user_id:user_id}})
             setOpen(false);
@@ -210,6 +206,8 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
             console.log(err)
         }
     }
+
+
 
     return (
         <>
@@ -298,6 +296,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                             sx={{
                                                 justifyContent: "end", alignItems: "center",
                                                 visibility: photos[selectedPhotoIndex].uploader_id === user_id ? "visible" : "hidden",
+                                                marginRight:"2%",
                                             }}
                                             onClick={()=> {
                                                 delete_photo(photos[selectedPhotoIndex])
@@ -305,6 +304,7 @@ const PhotoGrid:React.FC<PhotoGridProps> = ({address}) => {
                                             startIcon={<DeleteIcon />}>
                                             Delete
                                         </Button>
+
                                         <a href={downloadURL+`${photos[selectedPhotoIndex].id}`}
                                            download
                                            style={{textDecoration: "none"}}

@@ -23,6 +23,8 @@ import { useMediaQuery, useTheme } from "@mui/material";
 
 import styles from "./PhotoViewDialogStyles";
 import {useTranslation} from "react-i18next";
+import {map} from "leaflet";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface Props {
     viewAddress: string|null;
@@ -64,6 +66,9 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
     //Mobil-End
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down('md')); // md:  <900px
+
+    const [deletePhotoIds,setDeletePhotoIds] = useState<Set<Photo>>(new Set());
+
     const { t } = useTranslation();//double language
     // Take user from KeycloakClient and if token exist take into roles
     useEffect(() => {
@@ -298,6 +303,37 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
         }
     }
 
+
+    const delete_photo= async (photo:Photo)=>{
+        const baseUrl = "http://localhost:8000/photos/delete_photo";
+        // const confirmText = prompt("Please type \"delete\" to confirm deletion of the photo:");
+        // if (confirmText !== "delete") {
+        //     alert("Delete operation canceled。");
+        //     return;
+        // }
+        try{
+            await axios.post(baseUrl,{},{params:{photo_id:photo.id,user_id:user_id}})
+        }catch (err: any) {
+            console.log(err)
+        }
+    }
+
+    //user can only selves Photos delete
+    const delete_all_photo=async ()=>{
+        const confirmText = prompt("Please type \"delete\" to confirm deletion all the photo of yours:");
+        if (confirmText !== "delete") {
+            alert("Delete operation canceled。");
+            return;
+        }
+        const allPhotos= new Set(sortedPhotos.filter((p:Photo)=>p.uploader_id===user_id));
+        try{
+            await Promise.all(Array.from(allPhotos).map((p: Photo) => delete_photo(p)));
+            window.location.reload();
+            alert("Your Uploaded Photos already deleted successfully.");
+        }catch (e) {
+            console.log(e)
+        }
+    }
     return(
         <>
             <Dialog open={open}
@@ -331,6 +367,18 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                             {t("photoGallery.downloadButton")} ({selectedPhotoIds.size})
                                         </Button>
                                     )}
+                                    <Button
+                                        variant="outlined"
+                                        color={"error"}
+                                        sx={{
+                                            justifyContent: "end",
+                                        }}
+                                        onClick={()=> {
+                                            delete_all_photo()
+                                        }}
+                                        startIcon={<DeleteIcon />}>
+                                        Delete all
+                                    </Button>
                                     {/*Select Button*/}
                                     {isSelecting && <Button
                                         variant="contained"
@@ -341,7 +389,6 @@ const PhotoViewDialog:React.FC<Props>=({viewAddress,open,handleDialogClose})=>{
                                         onClick={() => {
                                             setIsSelecting(!isSelecting);
                                             setSelectedPhotoIds(new Set());
-
                                         }}
                                         color={isSelecting ? "error" : "primary"}
                                         sx={{visibility: roles.includes("admin") ? "visible" : "hidden",}}
