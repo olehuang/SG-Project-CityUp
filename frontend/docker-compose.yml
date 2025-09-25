@@ -1,4 +1,47 @@
 services:
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    networks:
+       - cityUp-network
+    depends_on:
+       backend:
+         - condition: service_started
+
+  backend:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     container_name: backend
+     env_file:
+       - ./backend/.env
+     ports:
+       - "8000:8000"
+     networks:
+       - cityUp-network
+     depends_on:
+           keyclaok:
+            - condition: service_started
+           mongodb:
+            - condition: service_healthy
+
+  mongodb:
+     image: mongo:latest
+     restart: always
+     container_name: mongodb
+     environment:
+       - MONGO_DB_URL=${MONGO_DB_URL}
+     volumes:
+       - mongo_data:/data/db
+     ports:
+       - "27017:27017"
+     networks:
+       - cityUp-network
+     command: mongod --bind_ip_all  --tlsMode=disabled
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -18,10 +61,13 @@ services:
       - ./import/:/opt/keycloak/data/import
 
     networks:
-      - keycloak-network
+      - cityUp-network
     restart: unless-stopped
 
+volumes:
+  mongo_data:
+    driver: local
 
 networks:
-  keycloak-network:
-    driver: bridge
+  cityUp-network:
+      driver: bridge
