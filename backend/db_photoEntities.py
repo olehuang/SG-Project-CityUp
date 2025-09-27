@@ -97,7 +97,7 @@ async def get_photo_list(address:str,request:Request,user_id:str=None):
               photo_doc["likeCount"] =len(photo_doc["like"])
 
             photo_doc["upload_time"] = str(photo_doc["upload_time"])
-            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_doc['photo_id']}/data"
             #del photo_doc["_id"]
             result_photo_list.append(PhotoResponse(**photo_doc))
         return result_photo_list

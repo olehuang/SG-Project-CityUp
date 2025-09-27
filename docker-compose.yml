@@ -10,6 +10,7 @@ services:
     networks:
        - cityUp-network
     volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
       - ./frontend/public/assets:/usr/share/nginx/html/assets:ro
       - ./frontend/public/tiles:/usr/share/nginx/html/tiles:ro
     depends_on:
