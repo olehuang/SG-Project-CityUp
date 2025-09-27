@@ -8,9 +8,11 @@ services:
       - "3000:80"
     networks:
        - cityUp-network
+    volumes:
+      - ./frontend/public:/usr/share/nginx/html/public:ro
     depends_on:
        backend:
-         - condition: service_started
+          condition: service_started
 
   backend:
      build:
@@ -24,17 +26,19 @@ services:
      networks:
        - cityUp-network
      depends_on:
-           keyclaok:
-            - condition: service_started
+           keycloak:
+             condition: service_started
            mongodb:
-            - condition: service_healthy
+             condition: service_healthy
 
   mongodb:
      image: mongo:latest
      restart: always
      container_name: mongodb
      environment:
-       - MONGO_DB_URL=${MONGO_DB_URL}
+       - MONGO_INITDB_DATABASE=city_up
+       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
      volumes:
        - mongo_data:/data/db
      ports:
@@ -42,6 +46,11 @@ services:
      networks:
        - cityUp-network
      command: mongod --bind_ip_all  --tlsMode=disabled
+     healthcheck:
+       test: [ CMD-SHELL, echo 'db.runCommand("ping").ok' ]
+       interval: 5s
+       timeout: 30s
+       retries: 5
 
   keycloak:
     image: quay.io/keycloak/keycloak:latest
@@ -59,7 +68,6 @@ services:
       # Order Path: z.B: /host_mnt/d/../import/
       # or under same Order: ./import
       - ./import/:/opt/keycloak/data/import
-
     networks:
       - cityUp-network
     restart: unless-stopped
