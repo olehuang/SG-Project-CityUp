@@ -1,8 +1,8 @@
 FROM node:18 AS build
 WORKDIR /app
 COPY package*.json ./
-RUN npm install
-COPY src .
+RUN npm install  --legacy-peer-deps
+COPY  . .
 RUN npm run build
 
 

@@ -312,7 +312,7 @@ async def fetch_photos_for_review(reviewer_id:str, request: Request):
         async for photo_doc in locked_photos_cursor:
             photo_doc["photo_id"] = str(photo_doc["_id"])
             # Generate image URL for frontend to fetch photo data
-            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{str(photo_doc["_id"])}/data"
+            photo_doc["image_url"] = f"{request.url.scheme}://{request.url.netloc}/photos/{photo_doc['photo_id']}/data"
             del photo_doc["_id"]
 
             try:

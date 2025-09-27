@@ -581,13 +581,15 @@ const Upload: React.FC = () => {
                             <span>📋</span> {t("photoRequirements.title")}
                         </h3>
                         <ul style={{ paddingLeft: 22, margin: 0, lineHeight: 1.6 }}>
-                            <li><strong>{t("photoRequirements.pls")}</strong> {t("photoRequirements.desc")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noFaces")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noObstructions")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noShadows")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.noDistortion")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.clear")}</li>
-                            <li><strong>{t("photoRequirements.no")}</strong> {t("photoRequirements.wholeBuilding")}</li>
+                            <li>
+                                <><strong>{t("photoRequirements.pls"as any)}</strong> {t("photoRequirements.desc"as any)}</>
+                            </li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.noFaces")}</></li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.noObstructions")}</></li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.noShadows")}</></li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.noDistortion")}</></li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.clear")}</></li>
+                            <li><><strong>{t("photoRequirements.no"as any)}</strong> {t("photoRequirements.wholeBuilding")}</></li>
                         </ul>
                     </div>
 

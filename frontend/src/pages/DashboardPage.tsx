@@ -66,7 +66,7 @@ const DashboardPage: React.FC = () => {
             case "Upload History": return "uploadHistory";
             case "Photo Review": return "photoReview";
             case "Ranking": return "ranking";
-            default: return "";
+            default: return "default";
         }
     };
 
@@ -93,7 +93,7 @@ const DashboardPage: React.FC = () => {
                                 }}
                             >
                                 {iconMap[label]}
-                                <Typography sx={styles.buttonTitle}>{t(`dashboard.${labelMap(label)}Title`)}</Typography>
+                                <Typography sx={styles.buttonTitle}>{String(t(`dashboard.${labelMap(label)}Title`as any))}</Typography>
                                 <Typography sx={styles.buttonDesc}>{desc}</Typography>
                             </Button>
                         </Box>

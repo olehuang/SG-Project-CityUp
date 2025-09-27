@@ -295,7 +295,7 @@ const UploadHistory: React.FC = () => {
     };
     //Status Display Formatting
     const getStatusDisplayName = (status: string) => {
-        return t(`uploadHistory.statusOptions.${status}`);
+        return t(`uploadHistory.statusOptions.${status}`as any);
     };
 
 

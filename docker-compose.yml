@@ -1,15 +1,17 @@
 services:
+
   frontend:
     build:
       context: ./frontend
-      dockerfile: frontend/Dockerfile
+      dockerfile: Dockerfile
     container_name: frontend
     ports:
       - "3000:80"
     networks:
        - cityUp-network
     volumes:
-      - ./frontend/public:/usr/share/nginx/html/public:ro
+      - ./frontend/public/assets:/usr/share/nginx/html/assets:ro
+      - ./frontend/public/tiles:/usr/share/nginx/html/tiles:ro
     depends_on:
        backend:
           condition: service_started
@@ -17,7 +19,7 @@ services:
   backend:
      build:
        context: ./backend
-       dockerfile: frontend/Dockerfile
+       dockerfile: Dockerfile
      container_name: backend
      env_file:
        - ./backend/.env
