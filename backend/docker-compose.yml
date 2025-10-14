@@ -1,0 +1,15 @@
+
+
+services:
+  backend:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      - MONGO_DB_URL=${MONGO_DB_URL}   # 从 ..env 读取 Atlas 连接串
+    networks:
+      - backend-network
+
+networks:
+  backend-network:
+    driver: bridge

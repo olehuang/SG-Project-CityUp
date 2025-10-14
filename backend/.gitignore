@@ -1,0 +1,10 @@
+./.idea
+requirements.txt
+.env
+
+/.idea/
+/__pycache__/
+/test.py
+app.log
+.venv
+uploads/

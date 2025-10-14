@@ -1,0 +1,258 @@
+from datetime import datetime
+import dotenv
+from db_entities import MongoDB, User
+from error_logging import log_error
+import traceback
+BASE_URL = "http://localhost:8000"
+
+
+
+async def save_user_or_create(user: User):
+    """
+    @:param user Props want to storag im DB include user_id, username and email
+    brief: save user information in DB
+    """
+    query={'user_id': user.user_id}
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        result = await users.find_one(query)
+        if result is None:
+            new_user = User(user.user_id, user.username, user.email,user.role)
+            new_user_dict = new_user.__dict__
+            await users.insert_one(new_user_dict)
+            print("save seccessful")
+            return new_user_dict
+        else:
+            return result
+    except Exception as e:
+        log_error("Error from save_user : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now())
+        raise
+
+# async def save_user(user: User):
+#     users = MongoDB.get_instance().get_collection('users')
+#     # TODO: Error Handling
+#     try:
+#         await users.insert_one(user)
+#     except Exception as e:
+#         log_error("Error from save_user with: {}".format(user),e)
+#         raise
+
+async def delete_user(user_id: str):
+    """
+    @user_id: string
+    brief: import user_id can delete user from DB
+    !!! all user information in DB will be deleted !!!
+    do not easy use it. can maker Error
+    """
+    try:
+        query = {"user_id":user_id}
+        users = MongoDB.get_instance().get_collection('users')
+        result= await users.delete_one(query)
+        return {"delete: deleted successfully": result.deleted_count}
+    except Exception as e:
+        log_error("Error from delete_user : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+async def get_user(user_id:str):
+    """
+    @:user_id: userid
+    brief: input user_id give back user information
+    @:return user in DB storaged information
+    """
+    query = {"user_id": user_id}
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        user= await users.find_one(query)
+        return user
+    except Exception as e:
+        log_error("Error from get_user : {}".format(e)
+                  ,stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+async def get_user_role_in_DB(user_id:str):
+    """
+    Determine user roles
+    :param user_id:which user will be take
+    :return:
+    """
+    query = {"user_id":user_id}
+    try:
+        user=await get_user(user_id)
+        return user['role']
+    except Exception as e:
+        log_error("Error from get_user : {}".format(e)
+                  ,stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+
+async def get_all_users():
+    """
+    brief: give back all user information from DB
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        return await users.find().to_list()
+    except Exception as e:
+        log_error("Error from get_all_users : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+async def update_user_role(user_id:str, role="user"):
+
+    """
+    @:user_id: userid,which user role will be update
+    @:role: role= "user"(default)/ "admin"
+    brief: user role can change from user to admin or reverse
+    for example:
+    if a user wants change to  admin, role = "admin"
+    if a admin wants change to user, noly need inport user_id
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id": user_id}
+        neu_valiue={"$set": {"role": role}}
+        result = await users.update_one(query, neu_valiue)
+        return {
+            "message": "User role updated successfully",
+            "matched_count": result.matched_count,
+            "modified_count": result.modified_count
+        }
+    except Exception as e:
+        log_error("Error from update_user_role : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+async def initial_user_point():
+    """
+    Initialize all users' points
+    :return:
+    """
+    try:
+        users=MongoDB.get_instance().get_collection("users")
+        result = await users.update_many({},{"$set":{"point": 0}})
+        return {"message": "User point updated successfully"}
+    except Exception as e:
+        log_error("Error from initial_user_point : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+async def update_user_point(user_id:str,point:int):
+    """
+    :Motivation: need a function to update user point
+    :param user_id: which user need to update
+    :param point: how many points to update
+    :return:
+    """
+    #make sure point not negative number
+    if (point<-1):log_error("Point can't be less than 0",
+                           stack_data=traceback.format_exc(),
+                           time_stamp=datetime.now().isoformat())
+    #make sure point muss be int type
+    if not isinstance(point,int):log_error("Point can't be int type",
+                                           stack_data=traceback.format_exc(),
+                                           time_stamp=datetime.now().isoformat())
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id":user_id}
+        #get user info
+        user=await users.find_one(query)
+        if user is None:
+            return {"message": "User does not exist"}
+        # update user point
+        user_point=user.get('point')+point
+        neu_valiue={"$set": {"point": user_point}}
+        await users.update_one(query, neu_valiue)
+        return {"message": "User point updated successfully"}
+    except Exception as e:
+        log_error("Error from update_user_point : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+async def get_users_in_Order():
+    """
+    :Motivation: need a function to get all users in order follow point just first 100
+    :return: list of all users in order
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        result = await users.find().sort("point", 1).limit(100)
+        return result
+    except Exception as e:
+        log_error("Error from get_users_in_Order : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+
+
+async def get_userRanking(user_id:str):
+    """
+    :motivation: need a function to get user ranking
+    :param user_id: which user want to get ranking
+    :return: position
+    """
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id":user_id}
+        user = await users.find_one(query)
+        better_rank_count = await users.count_documents({"point": {"$gt": user.get('point')}})
+        rank =better_rank_count + 1
+        if rank >=1:return {"rank": rank}
+        else: return {"rank": -1}
+    except Exception as e:
+        log_error("Error from get_userRanking : {}".format(e),
+                  stack_data=traceback.format_exc(),
+                  time_stamp=datetime.now().isoformat())
+        raise
+
+async def update_user_language(user_id: str, language: str):
+    try:
+        users = MongoDB.get_instance().get_collection('users')
+        query = {"user_id": user_id}
+        new_value = {"$set": {"language": language}}
+
+        result = await users.update_one(query, new_value)
+        return {"details": "Language successfully set"}
+    except Exception as e:
+        log_error("Error from update_user_language with: {}".format(user_id),e)
+        raise
+
+async def get_or_create_user(user_id: str):
+    try:
+        query = {"user_id": user_id}
+        users = MongoDB.get_instance().get_collection('users')
+        result = await users.find_one(query)
+        if result is None:
+            new_user_dict = {
+                "user_id": user_id,
+                "username": "default_username",
+                "email": "default@email.com",
+                "role": "user",
+                "language": "en",
+                "point": 0
+            }
+            await users.insert_one(new_user_dict)
+            return new_user_dict
+        else:
+            return result
+
+    except Exception as e:
+        log_error("Error from get_or_create_user with: {}".format(user_id),e)
+        raise
+
+if __name__ == '__main__':
+    dotenv.load_dotenv()

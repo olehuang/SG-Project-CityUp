@@ -1,0 +1,84 @@
+services:
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: frontend
+    ports:
+      - "3000:80"
+    networks:
+       - cityUp-network
+    volumes:
+      - ./frontend/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./frontend/public/assets:/usr/share/nginx/html/assets:ro
+      - ./frontend/public/tiles:/usr/share/nginx/html/tiles:ro
+    depends_on:
+       backend:
+          condition: service_started
+
+  backend:
+     build:
+       context: ./backend
+       dockerfile: Dockerfile
+     container_name: backend
+     env_file:
+       - ./backend/.env
+     ports:
+       - "8000:8000"
+     networks:
+       - cityUp-network
+     depends_on:
+           keycloak:
+             condition: service_started
+           mongodb:
+             condition: service_healthy
+
+  mongodb:
+     image: mongo:latest
+     restart: always
+     container_name: mongodb
+     environment:
+       - MONGO_INITDB_DATABASE=city_up
+       - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+       - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+     volumes:
+       - mongo_data:/data/db
+     ports:
+       - "27017:27017"
+     networks:
+       - cityUp-network
+     command: mongod --bind_ip_all  --tlsMode=disabled
+     healthcheck:
+       test: [ CMD-SHELL, echo 'db.runCommand("ping").ok' ]
+       interval: 5s
+       timeout: 30s
+       retries: 5
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      # path where import Order
+      # absolut Order path like:
+      # or under same order :./import
+      - KEYCLOAK_IMPORT=./import
+    ports:
+      - "8080:8080"
+    command: -v start-dev --import-realm
+    volumes:
+      # local path hangt in container
+      # Order Path: z.B: /host_mnt/d/../import/
+      # or under same Order: ./import
+      - ./import/:/opt/keycloak/data/import
+    networks:
+      - cityUp-network
+    restart: unless-stopped
+
+volumes:
+  mongo_data:
+    driver: local
+
+networks:
+  cityUp-network:
+      driver: bridge
